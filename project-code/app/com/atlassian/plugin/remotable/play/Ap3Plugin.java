@@ -52,9 +52,14 @@ public final class Ap3Plugin extends Plugin
         final String userName = "admin";
         final String password = "admin";
 
-        WS.url(appUri.toString() + "/rest/remoteapps/latest/installer")
+        final String postUrl = appUri.toString() + "/rest/remotable-plugins/latest/installer";
+        final String parameters = "url=" + playAppBaseUrl;
+
+        Logger.of("ap3").debug(format("Posting to URL '%s', with parameters '%s'", postUrl, parameters));
+
+        WS.url(postUrl)
                 .setAuth(userName, password, Realm.AuthScheme.BASIC)
-                .post("url=" + playAppBaseUrl)
+                .post(parameters)
                 .map(new F.Function<WS.Response, Result>()
                 {
                     public Result apply(WS.Response response) throws Throwable
