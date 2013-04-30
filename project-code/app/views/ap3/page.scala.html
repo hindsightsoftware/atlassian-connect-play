@@ -1,0 +1,25 @@
+@(title: String)(head: Html)(content: Html)
+
+@import play.mvc.Http.Context.Implicit.ctx
+@import models.Ap3Application
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width">
+
+        @defining(ctx.args("p3_host").asInstanceOf[Ap3Application].baseUrl) { baseUrl =>
+        <link rel="stylesheet" href="@baseUrl/remotable-plugins/all.css">
+        <script type="text/javascript" src="@baseUrl/remotable-plugins/all.js"></script>
+        }
+
+        @head
+
+        <title>@title</title>
+    </head>
+    <body>
+        @content
+    </body>
+</html>
