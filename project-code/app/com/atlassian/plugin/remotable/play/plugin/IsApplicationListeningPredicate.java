@@ -1,4 +1,4 @@
-package com.atlassian.plugin.remotable.play;
+package com.atlassian.plugin.remotable.play.plugin;
 
 import com.google.common.base.Predicate;
 import com.google.common.io.Closeables;

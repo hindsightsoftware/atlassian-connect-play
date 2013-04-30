@@ -1,0 +1,2 @@
+# Registration
+POST             /remote_plugin_enabled                     com.atlassian.plugin.remotable.play.controllers.RegistrationController.registration()

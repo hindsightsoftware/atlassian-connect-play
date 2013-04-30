@@ -1,5 +1,6 @@
-package com.atlassian.plugin.remotable.play;
+package com.atlassian.plugin.remotable.play.plugin;
 
+import com.atlassian.plugin.remotable.play.Ap3;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.ning.http.client.Realm;
@@ -14,9 +15,10 @@ import play.mvc.Results;
 import java.net.URI;
 import java.util.Set;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
 
-public final class Ap3Plugin extends Plugin
+public final class Ap3AutoInstallPlugin extends Plugin
 {
     private static final Set<URI> AUTOREGISTER_HOSTS = ImmutableSet.of(
             URI.create("http://localhost:1990/confluence"),
@@ -25,9 +27,9 @@ public final class Ap3Plugin extends Plugin
 
     private final Application application;
 
-    public Ap3Plugin(Application application)
+    public Ap3AutoInstallPlugin(Application application)
     {
-        this.application = application;
+        this.application = checkNotNull(application);
     }
 
     @Override
@@ -40,7 +42,7 @@ public final class Ap3Plugin extends Plugin
     public void onStart()
     {
         final Iterable<URI> listeningApplications = Iterables.filter(AUTOREGISTER_HOSTS, new IsApplicationListeningPredicate());
-        final String playAppBaseUrl = getBaseUrl();
+        final String playAppBaseUrl = Ap3.baseUrl.get();
         for (URI appUri : listeningApplications)
         {
             install(appUri, playAppBaseUrl);
@@ -79,15 +81,5 @@ public final class Ap3Plugin extends Plugin
                         return Results.internalServerError(msg);
                     }
                 });
-    }
-
-    private String getBaseUrl()
-    {
-        return application.configuration().getString("application.baseUrl", "http://localhost:9000");
-    }
-
-    @Override
-    public void onStop()
-    {
     }
 }
