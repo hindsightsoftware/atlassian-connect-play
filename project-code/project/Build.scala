@@ -5,7 +5,7 @@ import play.Project._
 object ApplicationBuild extends Build {
 
   val appName         = "ap3-java"
-  val appVersion      = "1.0-SNAPSHOT"
+  val appVersion      = "0.1"
 
   val appDependencies = Seq(
     "com.atlassian.fugue" % "fugue" % "1.1",
@@ -16,7 +16,14 @@ object ApplicationBuild extends Build {
   )
 
   val main = play.Project(appName, appVersion, appDependencies).settings(
-    // Add your own project settings here      
+    organization := "com.atlassian.plugins",
+    publishTo <<= version { (v: String) =>
+      val repo = "https://maven.atlassian.com/"
+      if (v.trim.endsWith("SNAPSHOT"))
+        Some("Atlassian Repositories" at repo + "private-snapshot")
+      else
+        Some("Atlassian"  at repo + "public")
+    },
+    publishMavenStyle := true
   )
-
 }
