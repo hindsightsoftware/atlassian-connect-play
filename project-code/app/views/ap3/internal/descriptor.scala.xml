@@ -1,0 +1,20 @@
+@(baseUrl: String, publicKey: String)
+
+<atlassian-plugin key="_plugin" name="No Op Play Plugin" plugins-version="2">
+    <plugin-info>
+        <description>This is a no-op descriptor, as a placeholder for plugin developers</description>
+        <version>1.0-SNAPSHOT</version>
+        <permissions>
+            <permission>create_oauth_link</permission>
+        </permissions>
+        <param name="documentation.url">@baseUrl</param>
+    </plugin-info>
+
+    <remote-plugin-container key="_container" display-url="@baseUrl">
+        <oauth>
+            <public-key>@publicKey</public-key>
+        </oauth>
+    </remote-plugin-container>
+
+    <webhook key="_registration" event="remote_plugin_enabled" url="/remote_plugin_enabled"/>
+</atlassian-plugin>
