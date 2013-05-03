@@ -27,7 +27,7 @@ echo 'Using POM file at '$POM
 
 JAR=$REPO/$GROUP_ID/$ARTIFACT_ID/$VERSION/jars/$ARTIFACT_ID.jar 
 echo 'Deploying Jar at '$JAR
-deploy $POM $JAR ''k
+deploy $POM $JAR ''
 
 SRC=$REPO/$GROUP_ID/$ARTIFACT_ID/$VERSION/srcs/$ARTIFACT_ID-sources.jar
 echo 'Deploying Sources at '$SRC
