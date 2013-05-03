@@ -5,10 +5,10 @@ import com.atlassian.plugin.remotable.play.Ap3;
 import com.atlassian.plugin.remotable.play.BaseUrl;
 import com.atlassian.plugin.remotable.play.util.Environment;
 import play.Application;
-import play.Logger;
 import play.Plugin;
 
 import static com.atlassian.fugue.Option.option;
+import static com.atlassian.plugin.remotable.play.util.Utils.LOGGER;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
 
@@ -19,7 +19,7 @@ public final class Ap3BaseUrlPlugin extends Plugin
     public Ap3BaseUrlPlugin(Application application)
     {
         Ap3.baseUrl = new ApplicationBaseUrl(checkNotNull(application));
-        Logger.of("ap3").info(format("Resolved base URL of application as '%s'", Ap3.baseUrl.get()));
+        LOGGER.info(format("Resolved base URL of application as '%s'", Ap3.baseUrl.get()));
     }
 
     private static final class ApplicationBaseUrl implements BaseUrl

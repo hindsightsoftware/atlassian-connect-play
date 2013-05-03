@@ -1,2 +1,3 @@
 10000:com.atlassian.plugin.remotable.play.plugin.Ap3BaseUrlPlugin
-20000:com.atlassian.plugin.remotable.play.plugin.Ap3AutoInstallPlugin
+20000:com.atlassian.plugin.remotable.play.plugin.KeyPairPlugin
+30000:com.atlassian.plugin.remotable.play.plugin.Ap3AutoInstallPlugin

@@ -5,13 +5,12 @@ import com.atlassian.plugin.remotable.play.Ap3;
 import com.google.common.base.Supplier;
 import models.Ap3Application;
 import org.codehaus.jackson.JsonNode;
-import play.Logger;
 import play.mvc.BodyParser;
 import play.mvc.Result;
-
 import views.html.ap3.internal.home;
 import views.xml.ap3.internal.descriptor;
 
+import static com.atlassian.plugin.remotable.play.util.Utils.LOGGER;
 import static play.mvc.Controller.request;
 import static play.mvc.Results.ok;
 
@@ -75,7 +74,7 @@ public class Ap3Controller
     @BodyParser.Of(BodyParser.Json.class)
     public static Result registration()
     {
-        Logger.of("ap3").info("Registering host application!");
+        LOGGER.info("Registering host application!");
 
         final JsonNode remoteApp = request().body().asJson();
 

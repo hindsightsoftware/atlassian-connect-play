@@ -10,6 +10,7 @@ object ApplicationBuild extends Build {
   val appDependencies = Seq(
     "com.atlassian.fugue" % "fugue" % "1.1",
     "net.oauth.core" % "oauth" % "20090617",
+    "com.google.guava" % "guava" % "14.0.1",
     javaCore,
     javaJdbc,
     javaEbean

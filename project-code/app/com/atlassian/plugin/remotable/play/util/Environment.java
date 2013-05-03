@@ -9,6 +9,9 @@ import static com.google.common.collect.Maps.newHashMap;
 
 public final class Environment
 {
+    public static final String OAUTH_LOCAL_PUBLIC_KEY = "OAUTH_LOCAL_PUBLIC_KEY";
+    public static final String OAUTH_LOCAL_PRIVATE_KEY = "OAUTH_LOCAL_PRIVATE_KEY";
+
     private static final Map<String, String> env = loadEnv(ImmutableList.of(new ResourcePropertiesLoader("/env.properties", new ClassResourceLoader(Environment.class)), new EnvironmentPropertiesLoader()));
 
     public static String getEnv(String name)

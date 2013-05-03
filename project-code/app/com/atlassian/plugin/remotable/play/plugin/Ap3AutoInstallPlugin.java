@@ -15,6 +15,7 @@ import play.mvc.Results;
 import java.net.URI;
 import java.util.Set;
 
+import static com.atlassian.plugin.remotable.play.util.Utils.LOGGER;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
 
@@ -57,7 +58,7 @@ public final class Ap3AutoInstallPlugin extends Plugin
         final String postUrl = appUri.toString() + "/rest/remotable-plugins/latest/installer";
         final String parameters = "url=" + playAppBaseUrl;
 
-        Logger.of("ap3").debug(format("Posting to URL '%s', with parameters '%s'", postUrl, parameters));
+        LOGGER.debug(format("Posting to URL '%s', with parameters '%s'", postUrl, parameters));
 
         WS.url(postUrl)
                 .setAuth(userName, password, Realm.AuthScheme.BASIC)
@@ -67,7 +68,7 @@ public final class Ap3AutoInstallPlugin extends Plugin
                     public Result apply(WS.Response response) throws Throwable
                     {
                         final String msg = format("Plugin successfully installed into '%s'", appUri);
-                        Logger.of("ap3").info(msg);
+                        LOGGER.info(msg);
                         return Results.ok(msg);
                     }
                 })
@@ -77,7 +78,7 @@ public final class Ap3AutoInstallPlugin extends Plugin
                     public Result apply(Throwable throwable) throws Throwable
                     {
                         final String msg = format("Unable to install plugin into '%s'", appUri);
-                        Logger.of("ap3").error(msg, throwable);
+                        LOGGER.error(msg, throwable);
                         return Results.internalServerError(msg);
                     }
                 });
