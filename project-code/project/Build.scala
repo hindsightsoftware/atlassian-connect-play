@@ -5,7 +5,7 @@ import play.Project._
 object ApplicationBuild extends Build {
 
   val appName         = "play-java-ap3"
-  val appVersion      = "0.2"
+  val appVersion      = "0.3-SNAPSHOT"
 
   val appDependencies = Seq(
     "com.atlassian.fugue" % "fugue" % "1.1",
