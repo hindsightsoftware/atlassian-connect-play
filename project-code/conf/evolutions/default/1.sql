@@ -18,4 +18,4 @@ create sequence ap3_application_seq;
 
 drop table if exists ap3_application cascade;
 
-drop sequence if exists host_application_seq;
+drop sequence if exists ap3_application_seq;

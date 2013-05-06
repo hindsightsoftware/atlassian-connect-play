@@ -1,14 +1,13 @@
 package com.atlassian.plugin.remotable.play.controllers;
 
 import com.atlassian.fugue.Option;
-import com.atlassian.plugin.remotable.play.Ap3;
 import com.google.common.base.Supplier;
 import models.Ap3Application;
 import org.codehaus.jackson.JsonNode;
 import play.mvc.BodyParser;
 import play.mvc.Result;
 import views.html.ap3.internal.home;
-import views.xml.ap3.internal.descriptor;
+import views.xml.ap3.internal.internal_descriptor;
 
 import static com.atlassian.plugin.remotable.play.util.Utils.LOGGER;
 import static play.mvc.Controller.request;
@@ -66,7 +65,7 @@ public class Ap3Controller
             @Override
             public Result get()
             {
-                return ok(descriptor.render(Ap3.baseUrl.get(), Ap3.publicKey.get()));
+                return ok(internal_descriptor.render());
             }
         };
     }

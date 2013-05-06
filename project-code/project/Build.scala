@@ -8,6 +8,7 @@ object ApplicationBuild extends Build {
   val appVersion      = "0.3-SNAPSHOT"
 
   val appDependencies = Seq(
+    "postgresql" % "postgresql" % "8.4-701.jdbc3",
     "com.atlassian.fugue" % "fugue" % "1.1",
     "net.oauth.core" % "oauth" % "20090617",
     "com.google.guava" % "guava" % "14.0.1",

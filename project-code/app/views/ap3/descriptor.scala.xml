@@ -1,0 +1,17 @@
+@(pluginKey: String, pluginName: String)(pluginInfo: Xml)(modules: Xml)
+
+import com.atlassian.plugin.remotable.play.Ap3._
+
+<atlassian-plugin key="@pluginKey" name="@pluginName" plugins-version="2">
+    @pluginInfo
+
+    <remote-plugin-container key="_container" display-url="@com.atlassian.plugin.remotable.play.Ap3.baseUrl.get()">
+        <oauth>
+            <public-key>@com.atlassian.plugin.remotable.play.Ap3.publicKey.get()</public-key>
+        </oauth>
+    </remote-plugin-container>
+
+    <webhook key="_registration" event="remote_plugin_enabled" url="/remote_plugin_enabled"/>
+
+    @modules
+</atlassian-plugin>
