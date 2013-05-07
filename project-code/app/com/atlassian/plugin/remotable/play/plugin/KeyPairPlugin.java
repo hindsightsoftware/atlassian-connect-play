@@ -137,7 +137,7 @@ public class KeyPairPlugin extends AbstractPlugin
 
         if (!privateKeyFile.exists() && !publicKeyFile.exists())
         {
-            final Ap3KeyPair<CharSequence> pair = new WithDelimitorsKeyPair(new Base64KeyPair(new ByteArrayKeyPair(new KeyAp3KeyPair(getRsaKeyPair()))));
+            final Ap3KeyPair<CharSequence> pair = new Base64KeyPair(new ByteArrayKeyPair(new KeyAp3KeyPair(getRsaKeyPair())));
             writeKey(pair.getPrivateKey(), privateKeyFile);
             writeKey(pair.getPublicKey(), publicKeyFile);
 
