@@ -53,7 +53,7 @@ public class Ap3Controller
             @Override
             public Result get()
             {
-                return ok(home.render());
+                return ok(home.render("Welcome to the Atlassian Connect Play module!"));
             }
         };
     }

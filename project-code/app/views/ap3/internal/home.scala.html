@@ -1,22 +1,11 @@
-<!DOCTYPE html>
+@(title: String)
 
+<!DOCTYPE html>
 <html>
-<head>
-    <title>Documentation</title>
-</head>
-<body>
-<header id="header" role="banner">
-    <nav class="aui-header aui-dropdown2-trigger-group" role="navigation" id="test1" style="margin-bottom:20px">
-        <div class="aui-header-primary">
-            <h1 id="logo"><a href="#">Documentation</a></h1>
-        </div>
-    </nav>
-</header>
-<div class="aui-message shadowed">
-    <p class="title">
-        <span class="aui-icon icon-generic"></span>
-        <strong>Hello there...</strong>
-    </p>
-</div>
-</body>
+    <head>
+        <title>@title</title>
+    </head>
+    <body>
+        @play20.welcome(title, style = "Java")
+    </body>
 </html>
