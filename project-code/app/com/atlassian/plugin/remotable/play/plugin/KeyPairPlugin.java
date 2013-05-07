@@ -8,7 +8,6 @@ import com.google.common.io.Files;
 import com.google.common.io.LineProcessor;
 import play.Application;
 import play.Play;
-import play.Plugin;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +22,7 @@ import java.security.SecureRandom;
 import static com.atlassian.plugin.remotable.play.util.Utils.LOGGER;
 import static java.lang.String.format;
 
-public class KeyPairPlugin extends Plugin
+public class KeyPairPlugin extends AbstractPlugin
 {
     static final String PUBLIC_KEY_PEM = "public-key.pem";
     static final String PRIVATE_KEY_PEM = "private-key.pem";
@@ -31,6 +30,7 @@ public class KeyPairPlugin extends Plugin
 
     public KeyPairPlugin(Application application)
     {
+        super(application);
     }
 
     @Override

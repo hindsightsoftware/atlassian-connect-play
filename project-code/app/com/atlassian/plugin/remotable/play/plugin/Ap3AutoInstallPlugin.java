@@ -5,8 +5,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.ning.http.client.Realm;
 import play.Application;
-import play.Logger;
-import play.Plugin;
 import play.libs.F;
 import play.libs.WS;
 import play.mvc.Result;
@@ -16,27 +14,18 @@ import java.net.URI;
 import java.util.Set;
 
 import static com.atlassian.plugin.remotable.play.util.Utils.LOGGER;
-import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
 
-public final class Ap3AutoInstallPlugin extends Plugin
+public final class Ap3AutoInstallPlugin extends AbstractDevPlugin
 {
     private static final Set<URI> AUTOREGISTER_HOSTS = ImmutableSet.of(
             URI.create("http://localhost:1990/confluence"),
             URI.create("http://localhost:2990/jira"),
             URI.create("http://localhost:5990/refapp"));
 
-    private final Application application;
-
     public Ap3AutoInstallPlugin(Application application)
     {
-        this.application = checkNotNull(application);
-    }
-
-    @Override
-    public boolean enabled()
-    {
-        return application.isDev();
+        super(application);
     }
 
     @Override

@@ -5,19 +5,19 @@ import com.atlassian.plugin.remotable.play.Ap3;
 import com.atlassian.plugin.remotable.play.BaseUrl;
 import com.atlassian.plugin.remotable.play.util.Environment;
 import play.Application;
-import play.Plugin;
 
 import static com.atlassian.fugue.Option.option;
 import static com.atlassian.plugin.remotable.play.util.Utils.LOGGER;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
 
-public final class Ap3BaseUrlPlugin extends Plugin
+public final class Ap3BaseUrlPlugin extends AbstractPlugin
 {
     private static final String DEFAULT_BASE_URL = "http://localhost:9000";
 
     public Ap3BaseUrlPlugin(Application application)
     {
+        super(application);
         Ap3.baseUrl = new ApplicationBaseUrl(checkNotNull(application));
         LOGGER.info(format("Resolved base URL of application as '%s'", Ap3.baseUrl.get()));
     }
