@@ -1,16 +1,16 @@
 package com.atlassian.plugin.remotable.play.plugin;
 
 import com.atlassian.plugin.remotable.play.util.Environment;
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
-import com.google.common.io.BaseEncoding;
 import com.google.common.io.Files;
 import com.google.common.io.LineProcessor;
+import org.bouncycastle.openssl.PEMWriter;
 import play.Application;
 import play.Play;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.nio.charset.Charset;
 import java.security.Key;
 import java.security.KeyPair;
@@ -20,6 +20,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
 import static com.atlassian.plugin.remotable.play.util.Utils.LOGGER;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
 
 public class KeyPairPlugin extends AbstractPlugin
@@ -137,7 +138,7 @@ public class KeyPairPlugin extends AbstractPlugin
 
         if (!privateKeyFile.exists() && !publicKeyFile.exists())
         {
-            final Ap3KeyPair<CharSequence> pair = new Base64KeyPair(new ByteArrayKeyPair(new KeyAp3KeyPair(getRsaKeyPair())));
+            final Ap3KeyPair<CharSequence> pair = newKeyPair();
             writeKey(pair.getPrivateKey(), privateKeyFile);
             writeKey(pair.getPublicKey(), publicKeyFile);
 
@@ -165,6 +166,11 @@ public class KeyPairPlugin extends AbstractPlugin
         }
     }
 
+    private static Ap3KeyPair<CharSequence> newKeyPair()
+    {
+        return new PemKeyPair(new KeyAp3KeyPair(getRsaKeyPair()));
+    }
+
     private void writeKey(CharSequence key, File file)
     {
         LOGGER.debug(format("Writing key:\n%s\n", key));
@@ -178,13 +184,12 @@ public class KeyPairPlugin extends AbstractPlugin
         }
     }
 
-    private KeyPair getRsaKeyPair()
+    private static KeyPair getRsaKeyPair()
     {
         final KeyPairGenerator generator;
         try
         {
             generator = KeyPairGenerator.getInstance("RSA");
-            generator.initialize(1024, createFixedRandom());
         }
         catch (NoSuchAlgorithmException e)
         {
@@ -262,86 +267,46 @@ public class KeyPairPlugin extends AbstractPlugin
         }
     }
 
-    private static final class ByteArrayKeyPair implements Ap3KeyPair<byte[]>
+    private static final class PemKeyPair implements Ap3KeyPair<CharSequence>
     {
         private final Ap3KeyPair<Key> kp;
 
-        private ByteArrayKeyPair(Ap3KeyPair<Key> kp)
+        private PemKeyPair(Ap3KeyPair<Key> kp)
         {
-            this.kp = kp;
-        }
-
-        @Override
-        public byte[] getPublicKey()
-        {
-            return getEncoded(kp.getPublicKey());
-        }
-
-        @Override
-        public byte[] getPrivateKey()
-        {
-            final Key privateKey = kp.getPrivateKey();
-            return getEncoded(privateKey);
-        }
-
-        private byte[] getEncoded(Key key)
-        {
-            return key.getEncoded();
-        }
-    }
-
-    private static final class Base64KeyPair implements Ap3KeyPair<CharSequence>
-    {
-        private final Ap3KeyPair<byte[]> kp;
-
-        private Base64KeyPair(Ap3KeyPair<byte[]> kp)
-        {
-            this.kp = kp;
+            this.kp = checkNotNull(kp);
         }
 
         @Override
         public CharSequence getPublicKey()
         {
-            return encode(kp.getPublicKey());
+            return getKeyAsPem(kp.getPublicKey());
         }
 
         @Override
         public CharSequence getPrivateKey()
         {
-            return encode(kp.getPrivateKey());
+            return getKeyAsPem(kp.getPrivateKey());
         }
 
-        private String encode(byte[] key)
+        private String getKeyAsPem(Key key)
         {
-            return BaseEncoding.base64().encode(key);
-        }
-    }
+            try (Writer sw = new StringWriter())
+            {
+                try (PEMWriter pemWriter = new PEMWriter(sw))
+                {
+                    pemWriter.writeObject(key);
+                }
+                catch (IOException e)
+                {
+                    throw new RuntimeException(e);
+                }
 
-    private static final class WithDelimitorsKeyPair implements Ap3KeyPair<CharSequence>
-    {
-        private final Ap3KeyPair<CharSequence> kp;
-
-        private WithDelimitorsKeyPair(Ap3KeyPair<CharSequence> kp)
-        {
-            this.kp = kp;
-        }
-
-        @Override
-        public CharSequence getPublicKey()
-        {
-            return "-----BEGIN PUBLIC KEY-----\n" + format(kp.getPublicKey()) + "\n-----END PUBLIC KEY-----";
-        }
-
-        @Override
-        public CharSequence getPrivateKey()
-        {
-            final CharSequence privateKey = kp.getPrivateKey();
-            return "-----BEGIN RSA PRIVATE KEY-----\n" + format(privateKey) + "\n-----END RSA PRIVATE KEY-----";
-        }
-
-        private String format(CharSequence key)
-        {
-            return Joiner.on('\n').join(Splitter.fixedLength(65).split(key));
+                return sw.toString();
+            }
+            catch (IOException e)
+            {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -368,5 +333,13 @@ public class KeyPairPlugin extends AbstractPlugin
         {
             return hasLine;
         }
+    }
+
+    // a main to generate keys manually
+    public static void main(String[] args)
+    {
+        final Ap3KeyPair<CharSequence> keyPair = newKeyPair();
+        System.out.println(keyPair.getPublicKey());
+        System.out.println(keyPair.getPrivateKey());
     }
 }

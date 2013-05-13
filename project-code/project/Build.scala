@@ -12,6 +12,7 @@ object ApplicationBuild extends Build {
     "com.atlassian.fugue" % "fugue" % "1.1",
     "net.oauth.core" % "oauth" % "20090617",
     "com.google.guava" % "guava" % "14.0.1",
+    "org.bouncycastle" % "bcprov-jdk16" % "1.46",
     javaCore,
     javaJdbc,
     javaEbean
