@@ -31,17 +31,57 @@ Note that I actually also add my local maven repository for good measure and eas
     val appDependencies = Seq(
       javaCore,
       javaEbean,
-      "com.atlassian.plugins" % "ap3-java_2.10" % "0.1",
+      "com.atlassian.plugins" % "ap3-java_2.10" % "<version>",
       // your other dependencies go there
     )
+
+Where _<version>_ is the current version of this module.
 
 #### Add the module's routes to your `routes` configuration
 
     ->      /                                   ap3.Routes
 
-Now you're ready to reload your application. If you're running the Play console (which I highly recommand) you will need
+#### Configure the database
+
+If you don't have already configure a database. In your `application.conf` setup the default database. Here is an example
+using a local postgres installation:
+
+    db.default.driver=org.postgresql.Driver
+    db.default.url="jdbc:postgresql:my-database"
+    db.default.user=my-user
+    db.default.password=my-password
+    db.default.partitionCount=1
+    db.default.maxConnectionsPerPartition=5
+    db.default.minConnectionsPerPartition=1
+    db.default.acquireIncrement=1
+    db.default.acquireRetryAttempts=1
+    db.default.acquireRetryDelay=5 seconds
+
+Note that the postgres driver is already a dependency of the module, so you don't need to add a dependency for it.
+In that same `application.conf` you will need to uncomment the ebean configuration line:
+
+    ebean.default="models.*"
+
+And the last thing is to add the evolutions scripts to your project. In the `conf/evolutions/default` copy the evolution
+scripts you will find in the source code of this module. Note that those scripts are written for Postgres and if you plan
+to use another database you might need to tweak them.
+
+You can read more about some of those topics on the Play website:
+
+* [Configuring the JDBC connection][jdbc]
+* [Using the Ebean ORM]
+* [Managing database evolutions][evolutions]
+
+You're done with the database configuration.
+
+#### Reload
+
+Now you're ready to reload your application. If you're running the Play console you will need
 to run `reload` for the new dependencies, resolvers, etc. to take effect.
-Then you can refresh the home page of your application.
+Then you can refresh the home page of your application. You might need to `apply` the database evolutions, before being
+able to access the actual application.
 
 [play-doc]: http://www.playframework.com/documentation/2.1.1/Home "Play Documentation"
 [sbt]: http://www.scala-sbt.org/ "Simple Build Tool"
+[jdbc]: http://www.playframework.com/documentation/2.1.1/SettingsJDBC
+[evolutions]: http://www.playframework.com/documentation/2.1.1/Evolutions
