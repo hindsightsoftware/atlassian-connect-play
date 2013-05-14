@@ -1,0 +1,10 @@
+@(title: String = "", cssClass: String = "")(content: Html)
+<div class="aui-message @cssClass">
+    @if(title) {
+    <p class="title">
+        <span class="aui-icon icon-@{if(cssClass) cssClass else "generic" }"></span>
+        <strong>@title</strong>
+    </p>
+    }
+    @content
+</div>

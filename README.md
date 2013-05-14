@@ -75,6 +75,12 @@ You can read more about some of those topics on the Play website:
 
 You're done with the database configuration.
 
+#### Define your plugin key (and name)
+
+In `conf/application.conf` define both:
+* `ap3.key` with your plugin key
+* `ap3.name` with your plugin name, this one is optional and will default to your plugin key.
+
 ### Reload
 
 Now you're ready to reload your application. If you're running the Play console you will need

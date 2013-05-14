@@ -1,11 +1,65 @@
 @(title: String)
 
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>@title</title>
-    </head>
-    <body>
-        @play20.welcome(title, style = "Java")
-    </body>
-</html>
+@ap3.internal.main(title){
+    @ap3.internal.header()
+    @ap3.internal.page(title, "Now let's make your plugin do something useful.") {
+
+        <h2>Define your own descriptor.</h2>
+
+        <h3>Override the root URL</h3>
+        <p>In your <code>routes</code> file:</p>
+        @ap3.aui.message() {
+            <code>GET       /                           controllers.Application.index()</code>
+        }
+        <p>Make sure this comes <em>before</em> the included routes from this module, represented by:</p>
+        @ap3.aui.message() {
+            <code>->        /                           ap3.Routes</code>
+        }
+
+        <h3>Define your descriptor template</h3>
+        <p>Create a <code>app/views/descriptor.scala.xml</code> template file, with the following content:</p>
+
+        @ap3.aui.message() {
+            <code><pre>
+@@ap3.descriptor() { @@* using the base descriptor template. *@@
+    &lt;plugin-info>
+        &lt;description>This is my awesome plugin built using Play!&lt;/description>
+        &lt;version>1.0-SNAPSHOT&lt;/version>
+        &lt;permissions>
+            &lt;permission>create_oauth_link&lt;/permission> @@* this permission is needed to create the OAuth link between the plugin and the host application. *@@
+        &lt;/permissions>
+    &lt;/plugin-info>
+} {
+    @@* your modules will go there *@@
+}
+            </pre></code>
+        }
+
+        <h3>Define your <code>Application.index</code> controller method</h3>
+        @ap3.aui.message() {
+            <code><pre>
+public class Application extends Controller {
+
+    public static Result index() {
+        return Ap3Controller.index(
+                Ap3Controller.homeSupplier(), // we keep the HTML home page from the module, as this is our documentation for now
+                descriptor());                // serve the descriptor when accept header is 'application/xml', try 'curl -H "Accept: application/xml" http://localhost:9000'
+    }
+
+    private static Supplier<Result> descriptor() {
+        return new Supplier<Result>() {
+            @@Override
+            public Result get() {
+                return ok(descriptor.render());
+            }
+        };
+    }
+}
+            </pre></code>
+        }
+
+        @ap3.aui.success("That's it!") {
+            <p>You're ready to add your own modules to your plugin.</p>
+        }
+    }
+}
