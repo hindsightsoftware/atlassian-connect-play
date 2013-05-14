@@ -69,7 +69,7 @@ to use another database you might need to tweak them.
 You can read more about some of those topics on the Play website:
 
 * [Configuring the JDBC connection][jdbc]
-* [Using the Ebean ORM]
+* [Using the Ebean ORM][ebean]
 * [Managing database evolutions][evolutions]
 
 You're done with the database configuration.
@@ -84,4 +84,5 @@ able to access the actual application.
 [play-doc]: http://www.playframework.com/documentation/2.1.1/Home "Play Documentation"
 [sbt]: http://www.scala-sbt.org/ "Simple Build Tool"
 [jdbc]: http://www.playframework.com/documentation/2.1.1/SettingsJDBC
+[ebean]: http://www.playframework.com/documentation/2.1.1/JavaEbean
 [evolutions]: http://www.playframework.com/documentation/2.1.1/Evolutions
