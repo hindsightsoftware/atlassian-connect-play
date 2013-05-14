@@ -13,7 +13,7 @@ the next step:
 
 ### Add this module to your Play application.
 
-Your going to need to do three things for that:
+Your going to need to do a few things for that:
 
 #### Add Atlassian's public maven repository
 
@@ -37,13 +37,13 @@ Note that I actually also add my local maven repository for good measure and eas
 
 Where _<version>_ is the current version of this module.
 
-#### Add the module's routes to your `routes` configuration
+#### Add the module's routes to your `conf/routes` configuration
 
     ->      /                                   ap3.Routes
 
 #### Configure the database
 
-If you don't have already configure a database. In your `application.conf` setup the default database. Here is an example
+If you don't already have configured a database, in your `conf/application.conf` setup the default database. Here is an example
 using a local postgres installation:
 
     db.default.driver=org.postgresql.Driver
@@ -58,13 +58,14 @@ using a local postgres installation:
     db.default.acquireRetryDelay=5 seconds
 
 Note that the postgres driver is already a dependency of the module, so you don't need to add a dependency for it.
-In that same `application.conf` you will need to uncomment the ebean configuration line:
+In that same `application.conf` you will need to uncomment the `ebean` configuration line:
 
     ebean.default="models.*"
 
 And the last thing is to add the evolutions scripts to your project. In the `conf/evolutions/default` copy the evolution
-scripts you will find in the source code of this module. Note that those scripts are written for Postgres and if you plan
-to use another database you might need to tweak them.
+scripts you will find in the source code of this module (named `1.sql`, `2.sql`, etc.), re-order them if necessary to work
+with your own evolutions scripts. Note that those scripts are written for Postgres and if you plan to use another
+database you might need to tweak them.
 
 You can read more about some of those topics on the Play website:
 
