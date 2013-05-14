@@ -75,7 +75,7 @@ You can read more about some of those topics on the Play website:
 
 You're done with the database configuration.
 
-#### Reload
+### Reload
 
 Now you're ready to reload your application. If you're running the Play console you will need
 to run `reload` for the new dependencies, resolvers, etc. to take effect.
