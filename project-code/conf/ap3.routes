@@ -2,6 +2,3 @@
 
 GET      /                                  com.atlassian.plugin.remotable.play.controllers.Ap3Controller.index()
 POST     /remote_plugin_enabled             com.atlassian.plugin.remotable.play.controllers.Ap3Controller.registration()
-
-GET      /@home                             com.atlassian.plugin.remotable.play.controllers.Ap3Controller.home()
-GET      /@descriptor                       com.atlassian.plugin.remotable.play.controllers.Ap3Controller.descriptor()
