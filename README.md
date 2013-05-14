@@ -78,6 +78,7 @@ You're done with the database configuration.
 #### Define your plugin key (and name)
 
 In `conf/application.conf` define both:
+
 * `ap3.key` with your plugin key
 * `ap3.name` with your plugin name, this one is optional and will default to your plugin key.
 
