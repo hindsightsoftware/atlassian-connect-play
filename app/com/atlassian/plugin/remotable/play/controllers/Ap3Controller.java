@@ -2,8 +2,11 @@ package com.atlassian.plugin.remotable.play.controllers;
 
 import com.atlassian.fugue.Option;
 import com.google.common.base.Supplier;
+import controllers.AssetsBuilder;
 import models.Ap3Application;
 import org.codehaus.jackson.JsonNode;
+import play.api.mvc.Action;
+import play.api.mvc.AnyContent;
 import play.mvc.BodyParser;
 import play.mvc.Result;
 import views.html.ap3.internal.home;
@@ -102,6 +105,12 @@ public class Ap3Controller
 
         Ap3Application.create(ap3Application);
         return ok();
+    }
+
+    private static AssetsBuilder delegate = new AssetsBuilder();
+
+    public static Action<AnyContent> asset(String path, String file) {
+        return delegate.at(path, file);
     }
 
     private static String getAttributeAsText(JsonNode json, String name)

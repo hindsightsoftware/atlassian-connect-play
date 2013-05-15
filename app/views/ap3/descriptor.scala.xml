@@ -9,7 +9,7 @@
         </oauth>
     </remote-plugin-container>
 
-    <webhook key="_registration" event="remote_plugin_enabled" url="/remote_plugin_enabled"/>
+    <webhook key="_registration" event="remote_plugin_enabled" url="@com.atlassian.plugin.remotable.play.controllers.routes.Ap3Controller.registration()"/>
 
     @modules
 </atlassian-plugin>

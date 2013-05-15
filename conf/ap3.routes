@@ -3,4 +3,4 @@
 GET      /                                  com.atlassian.plugin.remotable.play.controllers.Ap3Controller.index()
 POST     /remote_plugin_enabled             com.atlassian.plugin.remotable.play.controllers.Ap3Controller.registration()
 
-GET      /assets/*file                      controllers.Assets.at(path="/public", file)
+GET      /assets/*file                      com.atlassian.plugin.remotable.play.controllers.Ap3Controller.asset(path="/public", file)
