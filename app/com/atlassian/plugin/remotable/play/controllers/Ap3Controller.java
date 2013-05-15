@@ -9,7 +9,6 @@ import play.api.mvc.Action;
 import play.api.mvc.AnyContent;
 import play.mvc.BodyParser;
 import play.mvc.Result;
-import views.html.ap3.internal.home;
 import views.xml.ap3.internal.internal_descriptor;
 
 import static com.atlassian.plugin.remotable.play.util.Utils.LOGGER;
@@ -20,7 +19,7 @@ public class Ap3Controller
 {
     public static Result index()
     {
-        return index(homeSupplier(), descriptorSupplier());
+        return index(home(), descriptorSupplier());
     }
 
     public static Result index(Supplier<Result> home, Supplier<Result> descriptor)
@@ -39,24 +38,19 @@ public class Ap3Controller
         }
     }
 
-    public static Result home()
-    {
-        return homeSupplier().get();
-    }
-
     public static Result descriptor()
     {
         return descriptorSupplier().get();
     }
 
-    public static Supplier<Result> homeSupplier()
+    public static Supplier<Result> home()
     {
         return new Supplier<Result>()
         {
             @Override
             public Result get()
             {
-                return ok(home.render("Welcome to the Atlassian Connect Play module!"));
+                return Ap3Documentation.descriptor();
             }
         };
     }
