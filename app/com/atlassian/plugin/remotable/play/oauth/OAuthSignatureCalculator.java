@@ -19,7 +19,9 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.atlassian.plugin.remotable.play.util.Utils.LOGGER;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.lang.String.format;
 
 public final class OAuthSignatureCalculator implements WS.SignatureCalculator
 {
@@ -44,8 +46,9 @@ public final class OAuthSignatureCalculator implements WS.SignatureCalculator
     @Override
     public void sign(WS.WSRequest request)
     {
-
-        request.setHeader("Authorization", getAuthorizationHeaderValue(request));
+        final String authorizationHeaderValue = getAuthorizationHeaderValue(request);
+        LOGGER.debug(format("Generated OAuth authorisation header: '%s'", authorizationHeaderValue));
+        request.setHeader("Authorization", authorizationHeaderValue);
     }
 
     public String getAuthorizationHeaderValue(WS.WSRequest request) throws IllegalArgumentException
@@ -53,13 +56,21 @@ public final class OAuthSignatureCalculator implements WS.SignatureCalculator
         try
         {
             final OAuthConsumer localConsumer = LOCAL_CONSUMER.get();
-            final Map<String, String> params = addOAuthParameters(request, localConsumer);
+            final Map<String, String> params = addOAuthParameters(localConsumer);
             if (user.isDefined())
             {
                 params.put(USER_ID_QUERY_PARAMETER, user.get());
             }
 
-            final OAuthMessage oauthMessage = new OAuthMessage(request.getMethod(), request.getUrl(), params.entrySet());
+            final String method = request.getMethod();
+            final String url = request.getUrl();
+
+            LOGGER.debug("Creating OAuth signature for:");
+            LOGGER.debug(format("Method: '%s'", method));
+            LOGGER.debug(format("URL: '%s'", url));
+            LOGGER.debug(format("Parameters: %s", params));
+
+            final OAuthMessage oauthMessage = new OAuthMessage(method, url, params.entrySet());
             oauthMessage.sign(new OAuthAccessor(localConsumer));
             return oauthMessage.getAuthorizationHeader(null);
         }
@@ -76,22 +87,16 @@ public final class OAuthSignatureCalculator implements WS.SignatureCalculator
         }
     }
 
-    private Map<String, String> addOAuthParameters(WS.WSRequest request, final OAuthConsumer local)
+    private Map<String, String> addOAuthParameters(final OAuthConsumer local)
     {
         final HashMap<String, String> params = Maps.newHashMap();
-        addOAuthParameter(request, params, OAuth.OAUTH_SIGNATURE_METHOD, OAuth.RSA_SHA1);
-        addOAuthParameter(request, params, OAuth.OAUTH_VERSION, "1.0");
-        addOAuthParameter(request, params, OAuth.OAUTH_CONSUMER_KEY, local.consumerKey);
-        addOAuthParameter(request, params, OAuth.OAUTH_NONCE, getNonce());
-        addOAuthParameter(request, params, OAuth.OAUTH_TIMESTAMP, getTimestamp());
+        params.put(OAuth.OAUTH_SIGNATURE_METHOD, OAuth.RSA_SHA1);
+        params.put(OAuth.OAUTH_VERSION, "1.0");
+        params.put(OAuth.OAUTH_CONSUMER_KEY, local.consumerKey);
+        params.put(OAuth.OAUTH_NONCE, getNonce());
+        params.put(OAuth.OAUTH_TIMESTAMP, getTimestamp());
 
         return params;
-    }
-
-    private void addOAuthParameter(WS.WSRequest request, Map<String, String> params, String key, String value)
-    {
-        request.addParameter(key, value);
-        params.put(key, value);
     }
 
     private String getNonce()

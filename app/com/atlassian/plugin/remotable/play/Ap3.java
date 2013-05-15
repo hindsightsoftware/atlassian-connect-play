@@ -99,7 +99,11 @@ public final class Ap3
         final Ap3Application hostApplication = getAp3Application();
         final Option<String> user = getUser();
 
-        final WS.WSRequestHolder request = WS.url(hostApplication.baseUrl + url)
+        final String absoluteUrl = hostApplication.baseUrl + url;
+
+        LOGGER.debug(format("Creating request to '%s'", absoluteUrl));
+
+        final WS.WSRequestHolder request = WS.url(absoluteUrl)
                 .setTimeout(DEFAULT_TIMEOUT.intValue())
                 .setFollowRedirects(false) // because we need to sign again in those cases.
                 .sign(new OAuthSignatureCalculator(user));
