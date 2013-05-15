@@ -1,8 +1,79 @@
-# Atlassian Play Java Module for Remote Plugins
+# Play Java Module for Atlassian Connect
 
 ## Description
 
-This is a Play module to help develop Remote Plugins for Atlassian Products.
+This is a Play module to help develop Atlassian Connect add-ons. Here are a few of the useful features it brings to
+add-on developers.
+
+### Creation of RSA key pair
+
+This module will, in [dev mode][dev], generate an RSA key pair, as pem files to be used by your add-on for OAuth signing
+and validation.
+
+Note that the module will automatically add those generated files to `.gitignore` so that you don't accidentally commit
+them to your git repository.
+
+### Auto-install
+
+The module will, in dev mode, scan for local instance of Atlassian products and auto-install the add-on you're working on on every
+change, thus shortening the dev loop. Consider running your Play app with `~ run` to make it even shorter.
+
+Here is the list of applications the module will scan for:
+
+* http://localhost:1990/confluence
+* http://localhost:2990/jira
+* http://localhost:5990/refapp
+
+### Add-on descriptor template
+
+This module provides an add-on descriptor template `ap3.descriptor` so that you don't need to worry about the default
+descriptor configuration:
+
+* defining the `remote-plugin-container` with the correct base URL and public RSA key. Note that the base URL is computed
+by the app and can be further defined using the `BASE_URL` environment variable.
+* defining the registration `webhook` so that installation events of the add-on in host application are automatically
+handled.
+
+Note that by default the module will serve the _empty_ descriptor template when installed, which gives you the minimum
+working add-on.
+
+### Validates incoming OAuth request
+
+Thanks to the `@CheckValidOAuthRequest` annotation, you can ensure incoming requests are valid and coming from a known
+trusted host application. This also...
+
+### Enables multi-tenancy
+
+You can in the context of an OAuth request identify the host application the request is coming from `Ap3#getAp3Application()`
+and also the user on whose behalf the request is made `Ap3#getUser()`.
+
+For multi-tenancy, the important thing is to identify the `key` of the host application available from the `Ap3Application`
+and of course keep track of the current user.
+
+### Make calls back to the host application
+
+Play comes with a [nice library to make HTTP requests][ws] to any host or URL. This module provides a shortcut to make HTTP
+requests back to the host application, using that same API. Simply start your calls with `Ap3#url` instead of `WS.url`. This
+gives you:
+
+* relative URL handling. Don't put absolute URLs, the helper knows about the current host application you're working with
+in the context of the current request.
+* default timeout. You never know what might be going on the network, never make an HTTP request without a timeout.
+* user identification. The request is going to be made as the current user in the HTTP request context.
+* OAuth signing. You're request will be automatically signed, given the key pair you have defined (or we have defined for you
+in dev mode).
+
+### Easy integration of AUI
+
+Include AUI easily in your HTML pages using the template provided by the module `ap3.aui.all()`. You can even ask for
+the version number you'd like.
+
+Current supported versions are:
+
+* 5.0
+* 5.0.1
+* 5.1 (default)
+* 5.2-m1
 
 ## Getting started
 
@@ -75,12 +146,12 @@ You can read more about some of those topics on the Play website:
 
 You're done with the database configuration.
 
-#### Define your plugin key (and name)
+#### Define your add-on key (and name)
 
 In `conf/application.conf` define both:
 
-* `ap3.key` with your plugin key
-* `ap3.name` with your plugin name, this one is optional and will default to your plugin key.
+* `ap3.key` with your add-on key
+* `ap3.name` with your add-on name, this one is optional and will default to your add-on key.
 
 ### Reload
 
@@ -94,3 +165,5 @@ able to access the actual application.
 [jdbc]: http://www.playframework.com/documentation/2.1.1/SettingsJDBC
 [ebean]: http://www.playframework.com/documentation/2.1.1/JavaEbean
 [evolutions]: http://www.playframework.com/documentation/2.1.1/Evolutions
+[dev]: http://www.playframework.com/documentation/api/2.1.1/java/play/Play.html#isDev()
+[ws]: http://www.playframework.com/documentation/2.1.1/JavaWS
