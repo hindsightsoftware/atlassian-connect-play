@@ -3,7 +3,7 @@
 ## Description
 
 This is a Play module to help develop Atlassian Connect add-ons. Here are a few of the useful features it brings to
-add-on developers.
+add-on developers:
 
 ### Creation of RSA key pair
 
@@ -26,7 +26,7 @@ Here is the list of applications the module will scan for:
 
 ### Add-on descriptor template
 
-This module provides an add-on descriptor template `ap3.descriptor` so that you don't need to worry about the default
+This module provides an add-on descriptor template `@ap3.descriptor(){}{}` so that you don't need to worry about the default
 descriptor configuration:
 
 * defining the `remote-plugin-container` with the correct base URL and public RSA key. Note that the base URL is computed
@@ -34,8 +34,8 @@ by the app and can be further defined using the `BASE_URL` environment variable.
 * defining the registration `webhook` so that installation events of the add-on in host application are automatically
 handled.
 
-Note that by default the module will serve the _empty_ descriptor template when installed, which gives you the minimum
-working add-on.
+Note that by default the module will serve the _simplest_ descriptor based on this template when installed, which gives
+you the minimum working Atlassian Connect add-on.
 
 ### Validates incoming OAuth request
 
@@ -53,7 +53,7 @@ and of course keep track of the current user.
 ### Make calls back to the host application
 
 Play comes with a [nice library to make HTTP requests][ws] to any host or URL. This module provides a shortcut to make HTTP
-requests back to the host application, using that same API. Simply start your calls with `Ap3#url` instead of `WS.url`. This
+requests back to the host application, using that same API. Simply start your calls with `Ap3#url` instead of `WS#url`. This
 gives you:
 
 * relative URL handling. Don't put absolute URLs, the helper knows about the current host application you're working with
@@ -63,10 +63,10 @@ in the context of the current request.
 * OAuth signing. You're request will be automatically signed, given the key pair you have defined (or we have defined for you
 in dev mode).
 
-### Easy integration of AUI
+### Easy integration of [AUI][aui]
 
-Include AUI easily in your HTML pages using the template provided by the module `ap3.aui.all()`. You can even ask for
-the version number you'd like.
+Include AUI easily in your HTML pages using the template provided by the module `@ap3.aui.all()`. You can even choose the
+version you'd like to use `@ap3.aui.all("5.2-m1")`:
 
 Current supported versions are:
 
@@ -167,3 +167,4 @@ able to access the actual application.
 [evolutions]: http://www.playframework.com/documentation/2.1.1/Evolutions
 [dev]: http://www.playframework.com/documentation/api/2.1.1/java/play/Play.html#isDev()
 [ws]: http://www.playframework.com/documentation/2.1.1/JavaWS
+[aui]: https://docs.atlassian.com/aui/latest/
