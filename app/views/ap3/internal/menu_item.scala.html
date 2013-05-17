@@ -1,0 +1,5 @@
+@(m : String, id: String)(content: Html)
+
+@if(id == m) { <li class="aui-nav-selected"> } else { <li> }
+    @content
+</li>

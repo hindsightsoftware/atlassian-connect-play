@@ -3,11 +3,16 @@ package com.atlassian.plugin.remotable.play.controllers;
 import play.Play;
 import play.mvc.*;
 
-import views.html.ap3.internal.descriptor_doc;
+import views.html.ap3.internal.*;
 
 @With(Ap3Documentation.IsDevAction.class)
 public class Ap3Documentation
 {
+    public static Result index()
+    {
+        return Results.ok(index_doc.render());
+    }
+
     public static Result descriptor()
     {
         return Results.ok(descriptor_doc.render());

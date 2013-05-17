@@ -1,7 +1,9 @@
-<ul class="aui-nav">
-    <li class="aui-nav-selected"><a href="@com.atlassian.plugin.remotable.play.controllers.routes.Ap3Documentation.descriptor()">Defining your own descriptor</a></li>
-</ul>
+@(menu: String)
 
+<ul class="aui-nav">
+    @ap3.internal.menu_item(menu, "home") { <a href="@com.atlassian.plugin.remotable.play.controllers.routes.Ap3Documentation.index()">Home</a> }
+    @ap3.internal.connect_menu(menu)
+</ul>
 
 <div class="aui-nav-heading"><strong>Atlassian Connect</strong></div>
 <ul class="aui-nav">

@@ -1,4 +1,4 @@
-@(content: Html)
+@(menu: String = "")(content: Html)
 
 @title = @{ "Welcome to the Atlassian Connect Play module!" }
 @subtitle = @{ "Now let's make your plugin do something useful." }
@@ -29,7 +29,7 @@
                 <div class="aui-page-panel-nav">
                     <nav class="aui-navgroup aui-navgroup-vertical">
                         <div class="aui-navgroup-inner">
-                            @ap3.internal.menu()
+                            @ap3.internal.menu(menu)
                         </div>
                     </nav>
                 </div>

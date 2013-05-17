@@ -50,7 +50,7 @@ public class Ap3Controller
             @Override
             public Result get()
             {
-                return Ap3Documentation.descriptor();
+                return Ap3Documentation.index();
             }
         };
     }
