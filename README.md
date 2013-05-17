@@ -26,7 +26,7 @@ Here is the list of applications the module will scan for:
 
 ### Add-on descriptor template
 
-This module provides an add-on descriptor template `@ap3.descriptor(){}{}` so that you don't need to worry about the default
+This module provides an add-on descriptor template `@ac.descriptor(){}{}` so that you don't need to worry about the default
 descriptor configuration:
 
 * defining the `remote-plugin-container` with the correct base URL and public RSA key. Note that the base URL is computed
@@ -44,16 +44,16 @@ trusted host application. This also...
 
 ### Enables multi-tenancy
 
-You can in the context of an OAuth request identify the host application the request is coming from `Ap3#getAp3Application()`
-and also the user on whose behalf the request is made `Ap3#getUser()`.
+You can in the context of an OAuth request identify the host application the request is coming from `AC#getAcHost()`
+and also the user on whose behalf the request is made `AC#getUser()`.
 
-For multi-tenancy, the important thing is to identify the `key` of the host application available from the `Ap3Application`
+For multi-tenancy, the important thing is to identify the `key` of the host application available from the `AcHost`
 and of course keep track of the current user.
 
 ### Make calls back to the host application
 
 Play comes with a [nice library to make HTTP requests][ws] to any host or URL. This module provides a shortcut to make HTTP
-requests back to the host application, using that same API. Simply start your calls with `Ap3#url` instead of `WS#url`. This
+requests back to the host application, using that same API. Simply start your calls with `AC#url` instead of `WS#url`. This
 gives you:
 
 * relative URL handling. Don't put absolute URLs, the helper knows about the current host application you're working with
@@ -65,8 +65,8 @@ in dev mode).
 
 ### Easy integration of [AUI][aui]
 
-Include AUI easily in your HTML pages using the template provided by the module `@ap3.aui.all()`. You can even choose the
-version you'd like to use `@ap3.aui.all("5.2-m1")`:
+Include AUI easily in your HTML pages using the template provided by the module `@ac.aui.all()`. You can even choose the
+version you'd like to use `@ac.aui.all("5.2-m1")`:
 
 Current supported versions are:
 
@@ -102,7 +102,7 @@ Note that I actually also add my local maven repository for good measure and eas
     val appDependencies = Seq(
       javaCore,
       javaEbean,
-      "com.atlassian.plugins" % "ap3-java_2.10" % "<version>",
+      "com.atlassian.connect" % "ac-play-java_2.10" % "<version>",
       // your other dependencies go there
     )
 
@@ -110,7 +110,7 @@ Where _<version>_ is the current version of this module.
 
 #### Add the module's routes to your `conf/routes` configuration
 
-    ->      /                                   ap3.Routes
+    ->      /                                   ac.Routes
 
 #### Configure the database
 

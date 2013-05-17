@@ -1,0 +1,30 @@
+@(menu: String)
+
+<ul class="aui-nav">
+    @ac.internal.menu_item(menu, "home") { <a href="@com.atlassian.connect.play.java.controllers.routes.AcDocumentation.index()">Home</a> }
+    @ac.internal.connect_menu(menu)
+</ul>
+
+<div class="aui-nav-heading"><strong>Atlassian Connect</strong></div>
+<ul class="aui-nav">
+    <li><a href="https://developer.atlassian.com/display/AC/Atlassian+Connect">Home</a></li>
+    <li><a href="https://developer.atlassian.com/display/AC/Getting+Started">Getting Started</a></li>
+    <li><a href="https://developer.atlassian.com/display/AC/Interactive+Descriptor+Guide">Interactive Descriptor Guide</a></li>
+    <li><a href="https://developer.atlassian.com/display/AC/Sample+add-ons">Sample add-ons</a></li>
+</ul>
+
+<div class="aui-nav-heading"><strong>ADG</strong></div>
+<ul class="aui-nav">
+    <li><a href="https://developer.atlassian.com/design/">Home</a></li>
+    <li><a href="http://docs.atlassian.com/aui/latest/">AUI</a></li>
+    <li><a href="http://docs.atlassian.com/aui/latest/sandbox/">AUI Sandbox</a></li>
+</ul>
+
+<div class="aui-nav-heading"><strong>Play!</strong></div>
+<ul class="aui-nav">
+    <li><a href="/@@documentation">Documentation</a></li>
+    <li><a href="/@@documentation/JavaHome">for Java Developers</a></li>
+    <li><a href="/@@documentation/api/java/index.html">Java API</a></li>
+    <li><a href="/@@documentation/ScalaHome">for Scala Developers</a></li>
+    <li><a href="/@@documentation/api/scala/index.html">Scala API</a></li>
+</ul>

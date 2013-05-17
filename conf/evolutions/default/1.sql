@@ -1,6 +1,6 @@
 # --- !Ups
 
-create table ap3_application (
+create table ac_host (
   id                        bigint not null,
   key                       varchar(255) not null,
   public_key                varchar(512) not null,
@@ -12,10 +12,10 @@ create table ap3_application (
   constraint pk_host_application primary key (id))
 ;
 
-create sequence ap3_application_seq;
+create sequence ac_host_seq;
 
 # --- !Downs
 
-drop table if exists ap3_application cascade;
+drop table if exists ac_host cascade;
 
-drop sequence if exists ap3_application_seq;
+drop sequence if exists ac_host_seq;

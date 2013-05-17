@@ -4,7 +4,7 @@ import play.Project._
 
 object ApplicationBuild extends Build {
 
-  val appName         = "play-java-ap3"
+  val appName         = "ac-play-java"
   val appVersion      = "0.5-SNAPSHOT"
 
   val appDependencies = Seq(
@@ -19,7 +19,7 @@ object ApplicationBuild extends Build {
   )
 
   val main = play.Project(appName, appVersion, appDependencies).settings(
-    organization := "com.atlassian.plugins",
+    organization := "com.atlassian.connect",
     publishTo <<= version { (v: String) =>
       val repo = "https://maven.atlassian.com/"
       if (v.trim.endsWith("SNAPSHOT"))

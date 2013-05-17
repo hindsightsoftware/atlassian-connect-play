@@ -1,0 +1,8 @@
+@(version: String = "5.1")
+
+<!-- including AUI version @version -->
+<link rel="stylesheet" href="@com.atlassian.connect.play.java.controllers.routes.AcController.asset("aui/" + version + "/css/aui-all.css")" media="all">
+<!--[if lt IE 9]><link rel="stylesheet" href="@com.atlassian.connect.play.java.controllers.routes.AcController.asset("aui/" + version + "/css/aui-ie.css")" media="all"><![endif]-->
+<!--[if IE 9]><link rel="stylesheet" href="@com.atlassian.connect.play.java.controllers.routes.AcController.asset("aui/" + version + "/css/aui-ie9.css")" media="all"><![endif]-->
+<script src="@com.atlassian.connect.play.java.controllers.routes.AcController.asset("aui/" + version + "/js/aui-all.js")"></script>
+<!--[if lt IE 9]><script src="@com.atlassian.connect.play.java.controllers.routes.AcController.asset("aui/" + version + "/js/aui-ie.js")"></script><![endif]-->
