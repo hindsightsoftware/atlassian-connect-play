@@ -1,33 +1,60 @@
 package com.atlassian.plugin.remotable.play.plugin;
 
+import com.atlassian.plugin.remotable.play.Ap3;
+import com.atlassian.plugin.remotable.play.ConfigurationException;
 import com.atlassian.plugin.remotable.play.util.Environment;
 import com.google.common.io.Files;
 import com.google.common.io.LineProcessor;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openssl.PEMReader;
 import org.bouncycastle.openssl.PEMWriter;
 import play.Application;
 import play.Play;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.SecureRandom;
+import java.security.Security;
+import java.security.Signature;
+import java.security.SignatureException;
 
 import static com.atlassian.plugin.remotable.play.util.Utils.LOGGER;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 import static java.lang.String.format;
 
 public class KeyPairPlugin extends AbstractPlugin
 {
+    private static final String BOUNCY_CASTLE_PROVIDER = "BC";
+    private static final String RSA = "RSA";
+    private static final String SHA_1_PRNG = "SHA1PRNG";
+    private static final String SHA_1_WITH_RSA = "SHA1withRSA";
+
     static final String PUBLIC_KEY_PEM = "public-key.pem";
     static final String PRIVATE_KEY_PEM = "private-key.pem";
     static final Charset UTF_8 = Charset.forName("UTF-8");
+
+    static
+    {
+        if (Security.getProvider(BOUNCY_CASTLE_PROVIDER) == null)
+        {
+            Security.addProvider(new BouncyCastleProvider());
+        }
+    }
 
     public KeyPairPlugin(Application application)
     {
@@ -38,6 +65,7 @@ public class KeyPairPlugin extends AbstractPlugin
     public void onStart()
     {
         handleKeyPair();
+        checkKeyPair();
         updateGitIgnore();
     }
 
@@ -166,6 +194,93 @@ public class KeyPairPlugin extends AbstractPlugin
         }
     }
 
+    private void checkKeyPair()
+    {
+        try
+        {
+            final PrivateKey privateKey = getPrivateKey();
+            final PublicKey publicKey = getPublicKey();
+
+            final Signature signature = getSignature();
+
+            final byte[] message = RandomStringUtils.random(10).getBytes();
+            final byte[] sigBytes = sign(signature, privateKey, message);
+            final boolean verify = verify(signature, publicKey, message, sigBytes);
+
+            if (!verify)
+            {
+                throw new ConfigurationException("Checking key pair failed. It seems the public and private key don't" +
+                        " belong to the same key pair. Please check your configuration. We're using the following keys," +
+                        " is that what you expected?\n" +
+                        Ap3.publicKey.get() + "\n" +
+                        Ap3.privateKey.get());
+            }
+        }
+        catch (InvalidKeyException | SignatureException e)
+        {
+            throw new ConfigurationException("Couldn't check key pair because of the following exception.", e);
+        }
+    }
+
+    private boolean verify(Signature signature, PublicKey publicKey, byte[] message, byte[] signatureBytes) throws InvalidKeyException, SignatureException
+    {
+        signature.initVerify(publicKey);
+        signature.update(message);
+        return signature.verify(signatureBytes);
+    }
+
+    private byte[] sign(Signature signature, PrivateKey key, byte[] message) throws InvalidKeyException, SignatureException
+    {
+        signature.initSign(key, getSecureRandom());
+        signature.update(message);
+
+        return signature.sign();
+    }
+
+    private Signature getSignature() throws InvalidKeyException
+    {
+        final Signature signature;
+        try
+        {
+            signature = Signature.getInstance(SHA_1_WITH_RSA, BOUNCY_CASTLE_PROVIDER);
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+            throw new IllegalStateException("Can't find algorithm: " + SHA_1_WITH_RSA, e);
+        }
+        catch (NoSuchProviderException e)
+        {
+            throw new IllegalStateException("Can't find provider: " + BOUNCY_CASTLE_PROVIDER, e);
+        }
+        return signature;
+    }
+
+    private PublicKey getPublicKey()
+    {
+        final PEMReader publicPemReader = new PEMReader(new StringReader(Ap3.publicKey.get()));
+        try
+        {
+            return ((PublicKey) publicPemReader.readObject());
+        }
+        catch (IOException e)
+        {
+            throw new IllegalStateException("Can't happen, we use a StringReader. Or have I missed something?", e);
+        }
+    }
+
+    private PrivateKey getPrivateKey()
+    {
+        final PEMReader privatePemReader = new PEMReader(new StringReader(Ap3.privateKey.get()));
+        try
+        {
+            return ((KeyPair) privatePemReader.readObject()).getPrivate();
+        }
+        catch (IOException e)
+        {
+            throw new IllegalStateException("Can't happen, we use a StringReader. Or have I missed something?", e);
+        }
+    }
+
     private static Ap3KeyPair<CharSequence> newKeyPair()
     {
         return new PemKeyPair(new KeyAp3KeyPair(getRsaKeyPair()));
@@ -186,16 +301,37 @@ public class KeyPairPlugin extends AbstractPlugin
 
     private static KeyPair getRsaKeyPair()
     {
-        final KeyPairGenerator generator;
+        final KeyPairGenerator generator = getKeyPairGenerator();
+        generator.initialize(1024, getSecureRandom());
+        return generator.generateKeyPair();
+    }
+
+    private static KeyPairGenerator getKeyPairGenerator()
+    {
         try
         {
-            generator = KeyPairGenerator.getInstance("RSA");
+            return KeyPairGenerator.getInstance(RSA, BOUNCY_CASTLE_PROVIDER);
         }
         catch (NoSuchAlgorithmException e)
         {
-            throw new RuntimeException("Can't find RSA!");
+            throw new IllegalStateException("Can't find algorithm: " + RSA, e);
         }
-        return generator.generateKeyPair();
+        catch (NoSuchProviderException e)
+        {
+            throw new IllegalStateException("Can't find provider: " + BOUNCY_CASTLE_PROVIDER, e);
+        }
+    }
+
+    private static SecureRandom getSecureRandom()
+    {
+        try
+        {
+            return SecureRandom.getInstance(SHA_1_PRNG);
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+            throw new IllegalStateException("Could not find algorithm for secure random: " + SHA_1_PRNG, e);
+        }
     }
 
     private static SecureRandom createFixedRandom()
