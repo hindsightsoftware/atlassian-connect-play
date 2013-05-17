@@ -31,8 +31,8 @@ public final class Ap3
 {
     private static final Long DEFAULT_TIMEOUT = TimeUnit.SECONDS.convert(5, TimeUnit.MILLISECONDS);
 
-    public static String PLUGIN_KEY = Play.application().configuration().getString("ap3.key");
-    public static String PLUGIN_NAME = Option.option(Play.application().configuration().getString("ap3.name")).getOrElse(PLUGIN_KEY);
+    public static String PLUGIN_KEY = Play.application().configuration().getString("ap3.key", Play.isDev() ? "_add-on_key" : null);
+    public static String PLUGIN_NAME = Option.option(Play.application().configuration().getString("ap3.name", Play.isDev() ? "Add-on Name" : null)).getOrElse(PLUGIN_KEY);
 
     // the base URL
     public static BaseUrl baseUrl;

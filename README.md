@@ -146,13 +146,6 @@ You can read more about some of those topics on the Play website:
 
 You're done with the database configuration.
 
-#### Define your add-on key (and name)
-
-In `conf/application.conf` define both:
-
-* `ap3.key` with your add-on key
-* `ap3.name` with your add-on name, this one is optional and will default to your add-on key.
-
 ### Reload
 
 Now you're ready to reload your application. If you're running the Play console you will need

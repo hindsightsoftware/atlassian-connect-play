@@ -1,8 +1,10 @@
 package com.atlassian.plugin.remotable.play.plugin;
 
+import com.atlassian.plugin.remotable.play.Ap3;
 import play.Application;
 
 import static com.atlassian.plugin.remotable.play.util.Utils.LOGGER;
+import static java.lang.String.format;
 
 public final class PluginKeyPlugin extends AbstractPlugin
 {
@@ -14,15 +16,14 @@ public final class PluginKeyPlugin extends AbstractPlugin
     @Override
     public void onStart()
     {
-        final String pluginKey = application.configuration().getString("ap3.key");
-        if (pluginKey == null)
+        if (Ap3.PLUGIN_KEY == null)
         {
-            LOGGER.error("Configuration ap3.key must be configured with your plugin key. Please add this to your conf/application.conf");
-            throw new IllegalStateException("Plugin key must be defined, see error message above for more information");
+            LOGGER.error("Property 'ap3.key' must be configured with your add-on key. Please add this to your 'conf/application.conf'");
+            throw new IllegalStateException("Add-on key must be defined, see error message above for more information");
         }
         else
         {
-            LOGGER.debug("Plugin key is set to " + pluginKey);
+            LOGGER.debug(format("Add-on key is set to '%s'", Ap3.PLUGIN_KEY));
         }
     }
 }

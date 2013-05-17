@@ -1,0 +1,41 @@
+@ap3.internal.page("production") {
+    <h2>Preparing for production</h2>
+
+    <p>
+        Here are a few steps you should go through to configure you add-on and your environment before deploying it in
+        production.
+    </p>
+
+    <h3>Set your add-on key (and name)</h3>
+    <p>
+        By default the module defines an add-on key for you when in development. If you haven't done so, set your add-on
+        key (and name) in the <code>application.conf</code> file:
+        <dl>
+           <dt><code>ap3.key</code></dt>
+           <dd>your add-on key, which is used internally as a key by Atlassian Connect.</dd>
+            <dt><code>ap3.name</code></dt>
+           <dd>your add-on name, which is used to display the name of you add-on to end users.</dd>
+        </dl>
+    </p>
+
+    <h3>Set your base URL</h3>
+    <p>
+        By default the base URL is computed by the framework. When deploying to a production instance you should define
+        the <code>BASE_URL</code> environment variable which will then be used as the base URL for your add-on.
+    </p>
+
+    <h3>Set your RSA keys</h3>
+    <p>
+        By default (in dev) the module generates a key pair to use for signing OAuth request when communicating with the
+        host application. Those key files must NOT be used in production.
+    </p>
+    <p>
+        Instead you should define them as environment variables on your production system:
+       <dl>
+           <dt><code>OAUTH_LOCAL_PUBLIC_KEY</code></dt>
+           <dd>is your public key</dd>
+           <dt><code>OAUTH_LOCAL_PRIVATE_KEY</code></dt>
+           <dd>is your private key</dd>
+       </dl>
+    </p>
+}

@@ -18,6 +18,11 @@ public class Ap3Documentation
         return Results.ok(descriptor_doc.render());
     }
 
+    public static Result production()
+    {
+        return Results.ok(production_doc.render());
+    }
+
     public static final class IsDevAction extends Action.Simple
     {
         @Override
