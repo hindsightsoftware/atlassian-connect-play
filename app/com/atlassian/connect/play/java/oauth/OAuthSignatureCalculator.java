@@ -1,10 +1,10 @@
 package com.atlassian.connect.play.java.oauth;
 
-import com.atlassian.fugue.Option;
 import com.atlassian.connect.play.java.AC;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Maps;
+import com.ning.http.client.FluentStringsMap;
 import net.oauth.OAuth;
 import net.oauth.OAuthAccessor;
 import net.oauth.OAuthConsumer;
@@ -15,18 +15,19 @@ import net.oauth.signature.RSA_SHA1;
 import play.libs.WS;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.atlassian.connect.play.java.util.Utils.LOGGER;
-import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
 
 public final class OAuthSignatureCalculator implements WS.SignatureCalculator
 {
-    public static final String USER_ID_QUERY_PARAMETER = "user_id";
-
     private static final Supplier<OAuthConsumer> LOCAL_CONSUMER = Suppliers.memoize(new Supplier<OAuthConsumer>()
     {
         @Override
@@ -35,13 +36,6 @@ public final class OAuthSignatureCalculator implements WS.SignatureCalculator
             return loadLocalConsumer();
         }
     });
-
-    private final Option<String> user;
-
-    public OAuthSignatureCalculator(Option<String> user)
-    {
-        this.user = checkNotNull(user);
-    }
 
     @Override
     public void sign(WS.WSRequest request)
@@ -57,10 +51,7 @@ public final class OAuthSignatureCalculator implements WS.SignatureCalculator
         {
             final OAuthConsumer localConsumer = LOCAL_CONSUMER.get();
             final Map<String, String> params = addOAuthParameters(localConsumer);
-            if (user.isDefined())
-            {
-                params.put(USER_ID_QUERY_PARAMETER, user.get());
-            }
+            addQueryParams(params, getQueryParams(request));
 
             final String method = request.getMethod();
             final String url = request.getUrl();
@@ -84,6 +75,80 @@ public final class OAuthSignatureCalculator implements WS.SignatureCalculator
             // this shouldn't happen as the message is not being read from any IO streams, but the OAuth library throws
             // these around like they're candy, but far less sweet and tasty.
             throw new RuntimeException(e);
+        }
+    }
+
+    private FluentStringsMap getQueryParams(WS.WSRequest request)
+    {
+        final Object underlyingRequest = getRequestObject(getRequestField(request), request);
+        return getQueryParams(getGetQueryParamsMethod(underlyingRequest), underlyingRequest);
+    }
+
+    private FluentStringsMap getQueryParams(Method m, Object request)
+    {
+        try
+        {
+            return (FluentStringsMap) m.invoke(request);
+        }
+        catch (IllegalAccessException | InvocationTargetException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Method getGetQueryParamsMethod(Object o)
+    {
+        try
+        {
+            final Method m = o.getClass().getMethod("getQueryParams");
+            m.setAccessible(true);
+            return m;
+        }
+        catch (NoSuchMethodException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Field getRequestField(WS.WSRequest request)
+    {
+        try
+        {
+            final Field f = request.getClass().getSuperclass().getDeclaredField("request");
+            f.setAccessible(true);
+            return f;
+        }
+        catch (NoSuchFieldException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Object getRequestObject(Field f, WS.WSRequest request)
+    {
+        try
+        {
+            return f.get(request);
+        }
+        catch (IllegalAccessException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void addQueryParams(Map<String, String> params, FluentStringsMap qp)
+    {
+
+        for (Map.Entry<String, List<String>> qparam : qp)
+        {
+            if (qparam.getValue().size() > 1)
+            {
+                throw new RuntimeException("Our OAuth library doesn't support multiple value query params!");
+            }
+            else if (!qparam.getValue().isEmpty())
+            {
+                params.put(qparam.getKey(), qparam.getValue().get(0));
+            }
         }
     }
 

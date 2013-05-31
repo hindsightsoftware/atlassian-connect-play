@@ -1,5 +1,7 @@
 package com.atlassian.connect.play.java;
 
+import com.atlassian.connect.play.java.oauth.OAuthSignatureCalculator;
+import com.atlassian.connect.play.java.util.Environment;
 import com.atlassian.fugue.Option;
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
@@ -14,22 +16,20 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.concurrent.TimeUnit;
 
+import static com.atlassian.connect.play.java.util.Environment.OAUTH_LOCAL_PRIVATE_KEY;
+import static com.atlassian.connect.play.java.util.Environment.OAUTH_LOCAL_PUBLIC_KEY;
+import static com.atlassian.connect.play.java.util.Utils.LOGGER;
 import static com.atlassian.fugue.Option.option;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Suppliers.memoize;
 import static java.lang.String.format;
 import static play.mvc.Http.Context.Implicit.request;
-import static com.atlassian.connect.play.java.util.Utils.LOGGER;
-import static com.atlassian.connect.play.java.util.Environment.OAUTH_LOCAL_PUBLIC_KEY;
-import static com.atlassian.connect.play.java.util.Environment.OAUTH_LOCAL_PRIVATE_KEY;
-import static com.atlassian.connect.play.java.oauth.OAuthSignatureCalculator.USER_ID_QUERY_PARAMETER;
-
-import com.atlassian.connect.play.java.oauth.OAuthSignatureCalculator;
-import com.atlassian.connect.play.java.util.Environment;
 
 public final class AC
 {
     private static final Long DEFAULT_TIMEOUT = TimeUnit.SECONDS.convert(5, TimeUnit.MILLISECONDS);
+
+    public static final String USER_ID_QUERY_PARAMETER = "user_id";
 
     public static String PLUGIN_KEY = Play.application().configuration().getString("ac.key", Play.isDev() ? "_add-on_key" : null);
     public static String PLUGIN_NAME = Option.option(Play.application().configuration().getString("ac.name", Play.isDev() ? "Atlassian Connect Play Add-on" : null)).getOrElse(PLUGIN_KEY);
@@ -106,7 +106,7 @@ public final class AC
         final WS.WSRequestHolder request = WS.url(absoluteUrl)
                 .setTimeout(DEFAULT_TIMEOUT.intValue())
                 .setFollowRedirects(false) // because we need to sign again in those cases.
-                .sign(new OAuthSignatureCalculator(user));
+                .sign(new OAuthSignatureCalculator());
 
         return user.fold(
                 Suppliers.ofInstance(request),
