@@ -12,7 +12,7 @@
     }
 
     <h3>Define your descriptor template</h3>
-    <p>Create a <code>app/views/descriptor.scala.xml</code> template file, with the following content:</p>
+    <p>Create template <code>app/views/descriptor.scala.xml</code>, with the following content:</p>
 
     @ac.aui.message() {
         <code><pre>
@@ -30,7 +30,9 @@
             </pre></code>
     }
 
-    <h3>Define your <code>Application.index</code> controller method</h3>
+    <h3>Define your <code>Application.index</code> controller</h3>
+    <p>Create controller <code>app/controllers/Application.java</code>, with the following content:</p>
+    
     @ac.aui.message() {
             <code><pre>
 package controllers;
@@ -52,7 +54,7 @@ public class Application extends Controller {
 
     private static Supplier descriptor() {
         return new Supplier() {
-            @Override
+            @@Override
             public Result get() {
                 return ok(views.xml.descriptor.render());
             }
