@@ -86,7 +86,7 @@ the next step:
 
 Your going to need to do a few things for that:
 
-#### Add Atlassian's public maven repository
+#### Add Atlassian's public maven repository in your `project/Build.scala` file
 
 This is called a resolver in [SBT][sbt] world. SBT is the build tool, based on Scala, used by Play.
 
@@ -97,7 +97,7 @@ This is called a resolver in [SBT][sbt] world. SBT is the build tool, based on S
 
 Note that I actually also add my local maven repository for good measure and ease of use.
 
-#### Add the module as a dependency
+#### Add the module as a dependency in your `project/Build.scala` file
 
     val appDependencies = Seq(
       javaCore,
@@ -108,9 +108,11 @@ Note that I actually also add my local maven repository for good measure and eas
 
 Where _<version>_ is the current version of this module.
 
-#### Add the module's routes to your `conf/routes` configuration
+#### Add the module's routes to the bottom of your `conf/routes` configuration
 
     ->      /                                   ac.Routes
+
+This will ensure that any routes that are not handled by your application are delegated to this helper module.
 
 #### Configure the database
 
