@@ -161,7 +161,7 @@ able to access the actual application.
 
 If all went well, you should now see the welcome page of the Atlassian Connect Play Module:
 
-![The Atlassian Connect Play Module home page](public/img/ac-home-page.png "The Atlassian Connect Play Module home page")
+![The Atlassian Connect Play Module home page](raw/master/public/img/ac-home-page.png "The Atlassian Connect Play Module home page")
 
 Follow the instructions on that page on defining your own descriptor.
 
