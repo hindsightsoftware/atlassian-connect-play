@@ -108,7 +108,7 @@ Note that I actually also add my local maven repository for good measure and eas
 
 Where _<version>_ is the current version of this module.
 
-#### Add the module's routes to the bottom of your `conf/routes` configuration
+#### Add the module's routes to the top of your `conf/routes` configuration
 
     ->      /                                   ac.Routes
 
