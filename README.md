@@ -108,8 +108,12 @@ Note that I actually also add my local maven repository for good measure and eas
 
 Where _<version>_ is the current version of this module.
 
-#### Add the module's routes to the top of your `conf/routes` configuration
+#### Add the module's routes to your `conf/routes` configuration
 
+Comment the default application index and add the module's routes:
+
+    # Home page
+    # GET     /                           controllers.Application.index()
     ->      /                                   ac.Routes
 
 This will ensure that any routes that are not handled by your application are delegated to this helper module.
@@ -154,6 +158,12 @@ Now you're ready to reload your application. If you're running the Play console 
 to run `reload` for the new dependencies, resolvers, etc. to take effect.
 Then you can refresh the home page of your application. You might need to `apply` the database evolutions, before being
 able to access the actual application.
+
+If all went well, you should now see the welcome page of the Atlassian Connect Play Module:
+
+![The Atlassian Connect Play Module home page](raw/master/public/img/ac-home-page.png "The Atlassian Connect Play Module home page")
+
+Follow the instructions on that page on defining your own descriptor.
 
 [play-doc]: http://www.playframework.com/documentation/2.1.1/Home "Play Documentation"
 [sbt]: http://www.scala-sbt.org/ "Simple Build Tool"
