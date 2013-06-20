@@ -1,6 +1,7 @@
 package com.atlassian.connect.play.java.controllers;
 
 import com.atlassian.fugue.Option;
+import com.google.common.base.Function;
 import com.google.common.base.Supplier;
 import controllers.AssetsBuilder;
 import models.AcHostModel;
@@ -12,6 +13,10 @@ import play.mvc.Result;
 import views.xml.ac.internal.internal_descriptor;
 
 import static com.atlassian.connect.play.java.util.Utils.LOGGER;
+import static com.atlassian.fugue.Option.option;
+import static com.google.common.base.Suppliers.ofInstance;
+import static java.lang.Boolean.FALSE;
+import static java.lang.String.format;
 import static play.mvc.Controller.request;
 import static play.mvc.Results.ok;
 
@@ -24,11 +29,15 @@ public class AcController
 
     public static Result index(Supplier<Result> home, Supplier<Result> descriptor)
     {
-        if (request().accepts("text/html"))
+        if (isRequestFromUpm())
+        {
+            return descriptor.get();
+        }
+        else if (isAcceptHtml())
         {
             return home.get();
         }
-        else if (request().accepts("application/xml"))
+        else if (isAcceptXml())
         {
             return descriptor.get();
         }
@@ -36,6 +45,40 @@ public class AcController
         {
             throw new IllegalStateException("Why do we end up here!");
         }
+    }
+
+    private static boolean isAcceptXml()
+    {
+        return request().accepts("application/xml");
+    }
+
+    private static boolean isAcceptHtml()
+    {
+        return request().accepts("text/html");
+    }
+
+    private static boolean isRequestFromUpm()
+    {
+        return option(getPacClientInfoHeader()).fold(
+                ofInstance(FALSE),
+                new Function<String, Boolean>()
+                {
+                    @Override
+                    public Boolean apply(String input)
+                    {
+                        final boolean isUpm = input.startsWith("client=upm");
+                        if (isUpm)
+                        {
+                            LOGGER.debug(format("Upm is requesting the plugin descriptor: %s", input));
+                        }
+                        return isUpm;
+                    }
+                });
+    }
+
+    private static String getPacClientInfoHeader()
+    {
+        return request().getHeader("X-Pac-Client-Info");
     }
 
     public static Result descriptor()
@@ -103,7 +146,8 @@ public class AcController
 
     private static AssetsBuilder delegate = new AssetsBuilder();
 
-    public static Action<AnyContent> asset(String path, String file) {
+    public static Action<AnyContent> asset(String path, String file)
+    {
         return delegate.at(path, file);
     }
 

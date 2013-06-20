@@ -1,20 +1,15 @@
 package com.atlassian.connect.play.java.plugin;
 
 import com.atlassian.connect.play.java.AC;
+import com.atlassian.connect.play.java.remoteapps.RemoteAppsClient;
+import com.atlassian.connect.play.java.upm.UpmClient;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.ning.http.client.Realm;
 import play.Application;
 import play.libs.F;
-import play.libs.WS;
-import play.mvc.Result;
-import play.mvc.Results;
 
 import java.net.URI;
 import java.util.Set;
-
-import static com.atlassian.connect.play.java.util.Utils.LOGGER;
-import static java.lang.String.format;
 
 public final class AcAutoInstallPlugin extends AbstractDevPlugin
 {
@@ -31,6 +26,11 @@ public final class AcAutoInstallPlugin extends AbstractDevPlugin
     @Override
     public void onStart()
     {
+        install();
+    }
+
+    public static void install()
+    {
         final Iterable<URI> listeningApplications = Iterables.filter(AUTOREGISTER_HOSTS, new IsApplicationListeningPredicate());
         final String playAppBaseUrl = AC.baseUrl.get();
         for (URI appUri : listeningApplications)
@@ -39,37 +39,19 @@ public final class AcAutoInstallPlugin extends AbstractDevPlugin
         }
     }
 
-    private void install(final URI appUri, String playAppBaseUrl)
+    private static void install(final URI appUri, final String playAppBaseUrl)
     {
-        final String userName = "admin";
-        final String password = "admin";
-
-        final String postUrl = appUri.toString() + "/rest/remotable-plugins/latest/installer";
-        final String parameters = "url=" + playAppBaseUrl;
-
-        LOGGER.debug(format("Posting to URL '%s', with parameters '%s'", postUrl, parameters));
-
-        WS.url(postUrl)
-                .setAuth(userName, password, Realm.AuthScheme.BASIC)
-                .post(parameters)
-                .map(new F.Function<WS.Response, Result>()
+        final String baseUrl = appUri.toString();
+        new UpmClient(baseUrl).install(playAppBaseUrl, new F.Callback<Boolean>()
+        {
+            @Override
+            public void invoke(Boolean installed) throws Throwable
+            {
+                if (!installed)
                 {
-                    public Result apply(WS.Response response) throws Throwable
-                    {
-                        final String msg = format("Plugin successfully installed into '%s'", appUri);
-                        LOGGER.info(msg);
-                        return Results.ok(msg);
-                    }
-                })
-                .recover(new F.Function<Throwable, Result>()
-                {
-                    @Override
-                    public Result apply(Throwable throwable) throws Throwable
-                    {
-                        final String msg = format("Unable to install plugin into '%s'", appUri);
-                        LOGGER.error(msg, throwable);
-                        return Results.internalServerError(msg);
-                    }
-                });
+                    new RemoteAppsClient(baseUrl).install(playAppBaseUrl);
+                }
+            }
+        });
     }
 }
