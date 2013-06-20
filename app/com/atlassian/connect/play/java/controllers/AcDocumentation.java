@@ -2,6 +2,8 @@ package com.atlassian.connect.play.java.controllers;
 
 import play.mvc.*;
 
+import views.html.ac.internal.*;
+
 @With(IsDevAction.class)
 public class AcDocumentation
 {
