@@ -1,9 +1,11 @@
-@(menu: String = "")(content: Html)
+@(menu: String = "")(head: Html)(content: Html)
 
 @title = @{ "Welcome to the Atlassian Connect Play module!" }
 @subtitle = @{ "Now let's make your plugin do something useful." }
 
 @ac.internal.main(title) {
+    @head
+} {
 
     @ac.internal.header()
 
@@ -34,6 +36,7 @@
                     </nav>
                 </div>
                 <section class="aui-page-panel-content">
+                    <div id="aui-message-bar"></div>
                     @content
                 </section>
             </div>

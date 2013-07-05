@@ -7,6 +7,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.common.io.Files;
+import models.AcHostModel;
 import play.Play;
 import play.libs.WS;
 import play.mvc.Http;
@@ -94,9 +95,13 @@ public final class AC
 
     public static WS.WSRequestHolder url(String url)
     {
+        return url(url, getAcHost());
+    }
+
+    public static WS.WSRequestHolder url(String url, AcHost acHost)
+    {
         checkState(!url.matches("^[\\w]+:.*"), "Absolute request URIs are not supported for host requests");
 
-        final AcHost acHost = getAcHost();
         final Option<String> user = getUser();
 
         final String absoluteUrl = acHost.getBaseUrl() + url;
@@ -122,6 +127,27 @@ public final class AC
 
     public static AcHost getAcHost()
     {
-        return (AcHost) Http.Context.current().args.get("ac_host");
+        return (AcHost) getHttpContext().args.get("ac_host");
+    }
+
+    public static AcHost setAcHost(String consumerKey)
+    {
+        return setAcHost(getAcHost(consumerKey).getOrError(Suppliers.ofInstance("An error occured getting the host application")));
+    }
+
+    public static Option<? extends AcHost> getAcHost(String consumerKey)
+    {
+        return AcHostModel.findByKey(consumerKey);
+    }
+
+    static AcHost setAcHost(AcHost host)
+    {
+        getHttpContext().args.put("ac_host", host);
+        return host;
+    }
+
+    private static Http.Context getHttpContext()
+    {
+        return Http.Context.current();
     }
 }

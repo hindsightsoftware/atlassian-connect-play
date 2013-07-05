@@ -3,8 +3,7 @@ package com.atlassian.connect.play.java.oauth;
 import com.atlassian.connect.play.java.AC;
 import com.atlassian.connect.play.java.AcHost;
 import com.atlassian.connect.play.java.PublicKeyStore;
-import com.google.common.base.Suppliers;
-import models.AcHostModel;
+import com.google.common.base.Function;
 import play.mvc.Action;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -18,11 +17,7 @@ public final class OAuthRequestValidatorAction extends Action.Simple
     {
         try
         {
-            final String consumerKey = validator.validate(context.request());
-            final AcHost host = AcHostModel.findByKey(consumerKey).getOrError(Suppliers.ofInstance("An error occured getting the host application"));
-
-            context.args.put("ac_host", host);
-
+            AC.setAcHost(validator.validate(context.request()));
             return delegate.call(context);
         }
         catch (UnknownAcHostException e)
@@ -43,8 +38,14 @@ public final class OAuthRequestValidatorAction extends Action.Simple
     {
         public String getPublicKey(String consumerKey)
         {
-            final AcHostModel host = AcHostModel.findByKey(consumerKey).getOrError(Suppliers.ofInstance("An error occured getting the host application"));
-            return host != null ? host.publicKey : null;
+            return AC.getAcHost(consumerKey).map(new Function<AcHost, String>()
+            {
+                @Override
+                public String apply(AcHost host)
+                {
+                    return host.getPublicKey();
+                }
+            }).getOrNull();
         }
     }
 }

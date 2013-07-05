@@ -8,4 +8,7 @@ HEAD     /@connect                          com.atlassian.connect.play.java.cont
 GET      /@connect/descriptor               com.atlassian.connect.play.java.controllers.AcDocumentation.descriptor()
 GET      /@connect/production               com.atlassian.connect.play.java.controllers.AcDocumentation.production()
 
+GET      /@admin                            com.atlassian.connect.play.java.controllers.AcAdmin.index()
+DELETE   /@admin/:key/cache/macro           com.atlassian.connect.play.java.controllers.AcAdmin.clearMacroCache(key: String)
+
 GET      /assets/*file                      com.atlassian.connect.play.java.controllers.AcController.asset(path="/public", file)

@@ -1,0 +1,33 @@
+@(all: List[AcHostModel])
+
+@ac.internal.page("admin-index") {
+    <script src='@com.atlassian.connect.play.java.controllers.routes.AcController.asset("js/admin.js")'></script>
+} {
+    <h1>Registered Hosts</h1>
+    <table class="aui aui-table-sortable">
+        <thead>
+            <tr>
+                <th>Key</th>
+                <th>Base URL</th>
+                <th>Type</th>
+                <th class="aui-table-column-unsortable">Description</th>
+                <!--<th class="aui-table-column-unsortable">Public Key</th>-->
+                <th class="aui-table-column-unsortable">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for(h <- all) {
+            <tr>
+                <td>@h.key</td>
+                <td>@h.baseUrl</td>
+                <td>@h.name</td>
+                <td>@h.description</td>
+                <!--<td>@h.publicKey</td>-->
+                <td>
+                    <a class="clear-cache" href="@com.atlassian.connect.play.java.controllers.routes.AcAdmin.clearMacroCache(h.key)">Clear Cache</a>
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+}

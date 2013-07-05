@@ -9,6 +9,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import java.util.List;
+
 import static com.atlassian.fugue.Option.option;
 import static play.data.validation.Constraints.MaxLength;
 import static play.data.validation.Constraints.Required;
@@ -46,6 +48,12 @@ public final class AcHostModel extends Model implements AcHost
         return baseUrl;
     }
 
+    @Override
+    public String getPublicKey()
+    {
+        return publicKey;
+    }
+
     public String getConsumerInfoUrl()
     {
         return baseUrl + "/plugins/servlet/oauth/consumer-info";
@@ -54,6 +62,11 @@ public final class AcHostModel extends Model implements AcHost
     public static void create(AcHostModel c)
     {
         c.save();
+    }
+
+    public static List<AcHostModel> all()
+    {
+        return find.all();
     }
 
     public static Option<AcHostModel> findByKey(String key)

@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.lang.String.format;
 
 final class OAuthRequestValidator<R>
 {
@@ -68,8 +69,7 @@ final class OAuthRequestValidator<R>
         catch (OAuthProblemException e)
         {
             Logger.warn("The request is not a valid OAuth request", e);
-//            return consumerKey;
-            throw new UnauthorisedOAuthRequestException(String.format("Validation failed: \nproblem: %s\nparameters: %s\n", e.getProblem(), e.getParameters()), e);
+            throw new UnauthorisedOAuthRequestException(format("Validation failed: \nproblem: %s\nparameters: %s\n", e.getProblem(), e.getParameters()), e);
         }
         catch (OAuthException | IOException | URISyntaxException e)
         {

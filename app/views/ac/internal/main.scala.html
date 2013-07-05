@@ -1,4 +1,4 @@
-@(title: String)(content: Html)
+@(title: String)(head: Html)(content: Html)
 
 <!DOCTYPE html>
 <html>
@@ -6,6 +6,7 @@
         <title>@title</title>
         @ac.aui.all()
         <link rel="stylesheet" href="@com.atlassian.connect.play.java.controllers.routes.AcController.asset("css/ac.css")" media="all">
+        @head
     </head>
     <body>
         @content
