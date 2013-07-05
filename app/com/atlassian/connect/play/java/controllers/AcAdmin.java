@@ -4,7 +4,6 @@ import com.atlassian.connect.play.java.AC;
 import com.atlassian.connect.play.java.AcHost;
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
-import com.google.common.base.Suppliers;
 import models.AcHostModel;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.node.ObjectNode;
@@ -13,7 +12,6 @@ import play.libs.Json;
 import play.libs.WS;
 import play.mvc.Http;
 import play.mvc.Result;
-import play.mvc.Results;
 import play.mvc.With;
 
 import static java.lang.String.format;

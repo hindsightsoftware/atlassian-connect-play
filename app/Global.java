@@ -1,4 +1,4 @@
-import com.atlassian.connect.play.java.global.AcGlobalSettings;
+import com.atlassian.connect.play.java.play.AcGlobalSettings;
 
 public final class Global extends AcGlobalSettings
 {
