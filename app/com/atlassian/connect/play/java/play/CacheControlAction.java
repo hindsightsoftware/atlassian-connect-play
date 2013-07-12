@@ -1,5 +1,6 @@
 package com.atlassian.connect.play.java.play;
 
+import com.atlassian.connect.play.java.AC;
 import com.google.common.base.Function;
 import play.Play;
 import play.mvc.Action;
@@ -13,7 +14,7 @@ import static play.mvc.Http.HeaderNames.CACHE_CONTROL;
 
 public final class CacheControlAction extends Action<WithCacheControl>
 {
-    private static final String DEFAULT_CACHE_CONTROL = Play.application().configuration().getString("ac.cache-control", Play.isDev() ? "no-cache" : null);
+    private static final String DEFAULT_CACHE_CONTROL = Play.application().configuration().getString("ac.cache-control", AC.isDev() ? "no-cache" : null);
 
     public Result call(Http.Context ctx) throws Throwable
     {

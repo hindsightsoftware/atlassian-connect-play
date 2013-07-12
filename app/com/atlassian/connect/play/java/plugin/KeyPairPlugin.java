@@ -139,7 +139,7 @@ public class KeyPairPlugin extends AbstractPlugin
 
         if (publicKey == null || privateKey == null)
         {
-            if (Play.isDev())
+            if (AC.isDev())
             {
                 LOGGER.info(format("Generating key pair for OAuth signing, into %s and %s files.", PRIVATE_KEY_PEM, PUBLIC_KEY_PEM));
                 LOGGER.warn("Do NOT add those files into your VCS.");

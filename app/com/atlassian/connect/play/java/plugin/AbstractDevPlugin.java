@@ -1,7 +1,7 @@
 package com.atlassian.connect.play.java.plugin;
 
+import com.atlassian.connect.play.java.AC;
 import play.Application;
-
 
 abstract class AbstractDevPlugin extends AbstractPlugin
 {
@@ -13,6 +13,6 @@ abstract class AbstractDevPlugin extends AbstractPlugin
     @Override
     public final boolean enabled()
     {
-        return application.isDev();
+        return AC.isDev();
     }
 }

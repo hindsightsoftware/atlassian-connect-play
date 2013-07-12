@@ -32,8 +32,8 @@ public final class AC
 
     public static final String USER_ID_QUERY_PARAMETER = "user_id";
 
-    public static String PLUGIN_KEY = Play.application().configuration().getString("ac.key", Play.isDev() ? "_add-on_key" : null);
-    public static String PLUGIN_NAME = Option.option(Play.application().configuration().getString("ac.name", Play.isDev() ? "Atlassian Connect Play Add-on" : null)).getOrElse(PLUGIN_KEY);
+    public static String PLUGIN_KEY = Play.application().configuration().getString("ac.key", isDev() ? "_add-on_key" : null);
+    public static String PLUGIN_NAME = Option.option(Play.application().configuration().getString("ac.name", isDev() ? "Atlassian Connect Play Add-on" : null)).getOrElse(PLUGIN_KEY);
 
     // the base URL
     public static BaseUrl baseUrl;
@@ -59,7 +59,7 @@ public final class AC
     private static String getKey(String envKey, String fileName)
     {
         String key = Environment.getOptionalEnv(envKey, null);
-        if (key == null && Play.isDev())
+        if (key == null && isDev())
         {
             try
             {
@@ -72,7 +72,7 @@ public final class AC
         }
         if (key != null)
         {
-            if (Play.isDev())
+            if (isDev())
             {
                 LOGGER.debug(format("Loaded key '%s' as:\n%s", envKey, key));
             }
@@ -86,6 +86,14 @@ public final class AC
         final StringBuilder sb = new StringBuilder();
         Files.copy(new File(pathname), Charset.forName("UTF-8"), sb);
         return sb.toString();
+    }
+
+    public static boolean isDev()
+    {
+        return Play.isDev()
+                || Play.isTest()
+                || Boolean.valueOf(Play.application().configuration().getString("ac.dev", "false"))
+                || Boolean.getBoolean("ac.dev");
     }
 
     public static Option<String> getUser()
