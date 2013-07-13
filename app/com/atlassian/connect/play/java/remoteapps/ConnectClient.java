@@ -8,11 +8,11 @@ import static com.atlassian.connect.play.java.util.Utils.LOGGER;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
 
-public final class RemoteAppsClient
+public final class ConnectClient
 {
     private final String baseUrl;
 
-    public RemoteAppsClient(String baseUrl)
+    public ConnectClient(String baseUrl)
     {
         this.baseUrl = checkNotNull(baseUrl);
     }
@@ -34,7 +34,7 @@ public final class RemoteAppsClient
                 {
                     public Boolean apply(WS.Response response) throws Throwable
                     {
-                        LOGGER.info(format("Plugin successfully installed on %s (using the RemoteApps REST end point).", baseUrl));
+                        LOGGER.info(format("Plugin successfully installed on %s (using the Atlassian Connect REST end point).", baseUrl));
                         return true;
                     }
                 })
