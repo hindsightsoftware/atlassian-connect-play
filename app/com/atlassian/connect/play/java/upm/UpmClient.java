@@ -40,7 +40,7 @@ public final class UpmClient
                 });
     }
 
-    public F.Promise<Boolean> install(final String uri, final F.Callback<Boolean> callback)
+    public F.Promise<Boolean> install(final String uri, final F.Function<Boolean, F.Promise<Boolean>> callback)
     {
         return getToken().flatMap(new F.Function<String, F.Promise<Boolean>>()
         {
@@ -51,22 +51,21 @@ public final class UpmClient
                         .setQueryParameter("token", token)
                         .setHeader("Content-Type", "application/vnd.atl.plugins.remote.install+json")
                         .post("{ \"pluginUri\": \"" + uri + "\" }")
-                        .map(new F.Function<WS.Response, Boolean>()
+                        .flatMap(new F.Function<WS.Response, F.Promise<Boolean>>()
                         {
                             @Override
-                            public Boolean apply(WS.Response response) throws Throwable
+                            public F.Promise<Boolean> apply(WS.Response response) throws Throwable
                             {
                                 if (is2xxResponse(response))
                                 {
                                     checkInstallStatus(InstallStatus.fromResponse(response), callback);
-                                    return true;
+                                    return F.Promise.pure(true);
                                 }
                                 else
                                 {
                                     LOGGER.debug(format("Could not install plugin (%s) to '%s' via UPM", uri, baseUrl));
                                     LOGGER.debug(format("UPM responded with status code %s (%s) and the following message:\n%s", response.getStatus(), response.getStatusText(), response.getBody()));
-                                    callback.invoke(false);
-                                    return false;
+                                    return callback.apply(false);
                                 }
                             }
                         })
@@ -76,7 +75,6 @@ public final class UpmClient
                             public Boolean apply(Throwable throwable) throws Throwable
                             {
                                 LOGGER.error(format("An error occurred installing plugin (%s) to '%s' via UPM", uri, baseUrl), throwable);
-                                callback.invoke(false);
                                 return false;
                             }
                         });
@@ -84,7 +82,7 @@ public final class UpmClient
         });
     }
 
-    private F.Promise<InstallStatus> checkInstallStatus(String id, final F.Callback<Boolean> callback)
+    private F.Promise<InstallStatus> checkInstallStatus(String id, final F.Function<Boolean, F.Promise<Boolean>> callback)
     {
         return url(format("/pending/%s", id))
                 .get()
@@ -100,7 +98,7 @@ public final class UpmClient
                         else if (response.getStatus() == 303) // see other
                         {
                             LOGGER.info(format("Plugin successfully installed on %s (using the UPM REST end point).", baseUrl));
-                            callback.invoke(true);
+                            callback.apply(true);
                             return InstallStatus.of(true, false);
                         }
                         else
@@ -108,7 +106,7 @@ public final class UpmClient
                             LOGGER.error(
                                     format("Could not check status of plugin install! UPM responded with %s (%s) and the following message:\n:%s",
                                             response.getStatus(), response.getStatusText(), response.getBody()));
-                            callback.invoke(false);
+                            callback.apply(false);
                             return InstallStatus.of(true, true);
                         }
                     }
@@ -119,13 +117,13 @@ public final class UpmClient
                     public InstallStatus apply(Throwable throwable) throws Throwable
                     {
                         LOGGER.error("An error occurred checking the status of a plugin install", throwable);
-                        callback.invoke(false);
+                        callback.apply(false);
                         return InstallStatus.of(true, true);
                     }
                 });
     }
 
-    private void checkInstallStatus(final InstallStatus status, final F.Callback<Boolean> callback)
+    private void checkInstallStatus(final InstallStatus status, final F.Function<Boolean, F.Promise<Boolean>> callback)
     {
         if (!status.done)
         {

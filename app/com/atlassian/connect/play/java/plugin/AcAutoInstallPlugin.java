@@ -1,15 +1,21 @@
 package com.atlassian.connect.play.java.plugin;
 
 import com.atlassian.connect.play.java.AC;
-import com.atlassian.connect.play.java.remoteapps.RemoteAppsClient;
+import com.atlassian.connect.play.java.remoteapps.ConnectClient;
 import com.atlassian.connect.play.java.upm.UpmClient;
+import com.atlassian.fugue.Pair;
+import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import play.Application;
 import play.libs.F;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Set;
+
+import static com.atlassian.fugue.Pair.pair;
+import static com.google.common.collect.Iterables.transform;
 
 public final class AcAutoInstallPlugin extends AbstractDevPlugin
 {
@@ -29,29 +35,48 @@ public final class AcAutoInstallPlugin extends AbstractDevPlugin
         install();
     }
 
-    public static void install()
+    public static F.Promise<List<Pair<URI, Boolean>>> install()
     {
         final Iterable<URI> listeningApplications = Iterables.filter(AUTOREGISTER_HOSTS, new IsApplicationListeningPredicate());
         final String playAppBaseUrl = AC.baseUrl.get();
-        for (URI appUri : listeningApplications)
-        {
-            install(appUri, playAppBaseUrl);
-        }
+
+        return F.Promise.sequence(transform(listeningApplications,
+                new Function<URI, F.Promise<? extends Pair<URI, Boolean>>>()
+                {
+                    @Override
+                    public F.Promise<Pair<URI, Boolean>> apply(URI appUri)
+                    {
+                        return install(appUri, playAppBaseUrl);
+                    }
+                }));
     }
 
-    private static void install(final URI appUri, final String playAppBaseUrl)
+    private static F.Promise<Pair<URI, Boolean>> install(final URI appUri, final String playAppBaseUrl)
     {
         final String baseUrl = appUri.toString();
-        new UpmClient(baseUrl).install(playAppBaseUrl, new F.Callback<Boolean>()
-        {
-            @Override
-            public void invoke(Boolean installed) throws Throwable
-            {
-                if (!installed)
+        return new UpmClient(baseUrl)
+                .install(playAppBaseUrl, new F.Function<Boolean, F.Promise<Boolean>>()
                 {
-                    new RemoteAppsClient(baseUrl).install(playAppBaseUrl);
-                }
-            }
-        });
+                    @Override
+                    public F.Promise<Boolean> apply(Boolean installed) throws Throwable
+                    {
+                        if (!installed)
+                        {
+                            return new ConnectClient(baseUrl).install(playAppBaseUrl);
+                        }
+                        else
+                        {
+                            return F.Promise.pure(true);
+                        }
+                    }
+                })
+                .map(new F.Function<Boolean, Pair<URI, Boolean>>()
+                {
+                    @Override
+                    public Pair<URI, Boolean> apply(Boolean installed) throws Throwable
+                    {
+                        return pair(appUri, installed);
+                    }
+                });
     }
 }
