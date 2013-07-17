@@ -65,8 +65,9 @@ in dev mode).
 
 ### Easy integration of [AUI][aui]
 
-Include AUI easily in your HTML pages using the template provided by the module `@ac.aui.all()`. You can even choose the
-version you'd like to use `@ac.aui.all("5.2-m1")`:
+Include AUI easily in your HTML pages using the template provided by the modules `@ac.aui.styles()` and `@ac.aui.scripts()`. You can even choose the
+version you'd like to use `@ac.aui.styles("5.2-m1")` and `@ac.aui.scripts("5.2-m1")` (and make sure to use the same version in each).  For the best
+results, put `@ac.aui.styles()` in the head of your HTML and `@ac.aui.scripts()` at the end of the body (but before your own scripts).
 
 Current supported versions are:
 
