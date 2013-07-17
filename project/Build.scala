@@ -13,12 +13,14 @@ object ApplicationBuild extends Build {
     "net.oauth.core" % "oauth" % "20090617",
     "com.google.guava" % "guava" % "14.0.1",
     "org.bouncycastle" % "bcprov-jdk16" % "1.46",
+    "com.typesafe.play.extras" % "iteratees-extras_2.10" % "1.0.1",
     javaCore,
     javaJdbc,
     javaEbean
   )
 
   val main = play.Project(appName, appVersion, appDependencies).settings(
+    resolvers += "Typesafe's Repository" at "http://repo.typesafe.com/typesafe/maven-releases",
     organization := "com.atlassian.connect",
     publishTo <<= version { (v: String) =>
       val repo = "https://maven.atlassian.com/"
