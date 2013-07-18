@@ -60,13 +60,14 @@ gives you:
 in the context of the current request.
 * default timeout. You never know what might be going on the network, never make an HTTP request without a timeout.
 * user identification. The request is going to be made as the current user in the HTTP request context.
-* OAuth signing. You're request will be automatically signed, given the key pair you have defined (or we have defined for you
+* OAuth signing. Your request will be automatically signed, given the key pair you have defined (or we have defined for you
 in dev mode).
 
 ### Easy integration of [AUI][aui]
 
-Include AUI easily in your HTML pages using the template provided by the module `@ac.aui.all()`. You can even choose the
-version you'd like to use `@ac.aui.all("5.2-m1")`:
+Include AUI easily in your HTML pages using the template provided by the modules `@ac.aui.styles()` and `@ac.aui.scripts()`. You can even choose the
+version you'd like to use `@ac.aui.styles("5.2-m1")` and `@ac.aui.scripts("5.2-m1")` (and make sure to use the same version in each).  For the best
+results, put `@ac.aui.styles()` in the head of your HTML and `@ac.aui.scripts()` at the end of the body (but before your own scripts).
 
 Current supported versions are:
 
@@ -88,7 +89,7 @@ Your going to need to do a few things for that:
 
 #### Add Atlassian's public maven repository in your `project/Build.scala` file
 
-This is called a resolver in [SBT][sbt] world. SBT is the build tool, based on Scala, used by Play.
+This is called a resolver in the [SBT][sbt] world. SBT is the build tool, based on Scala, used by Play.
 
     val main = play.Project(appName, appVersion, appDependencies).settings(
             resolvers += "Atlassian's Maven Public Repository" at "https://maven.atlassian.com/content/groups/public",
@@ -120,7 +121,7 @@ This will ensure that any routes that are not handled by your application are de
 
 #### Configure the database
 
-If you don't already have configured a database, in your `conf/application.conf` setup the default database. Here is an example
+If you haven't already configured a database, in your `conf/application.conf` setup the default database. Here is an example
 using a local postgres installation:
 
     db.default.driver=org.postgresql.Driver
