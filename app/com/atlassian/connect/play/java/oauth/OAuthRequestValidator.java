@@ -2,19 +2,22 @@ package com.atlassian.connect.play.java.oauth;
 
 import com.atlassian.connect.play.java.BaseUrl;
 import com.atlassian.connect.play.java.PublicKeyStore;
-import net.oauth.OAuthAccessor;
-import net.oauth.OAuthConsumer;
-import net.oauth.OAuthException;
-import net.oauth.OAuthMessage;
-import net.oauth.OAuthProblemException;
-import net.oauth.SimpleOAuthValidator;
+import com.atlassian.connect.play.java.util.Utils;
+import com.atlassian.fugue.Option;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Multimap;
+import net.oauth.*;
 import net.oauth.signature.RSA_SHA1;
 import play.Logger;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Collection;
 
+import static com.atlassian.connect.play.java.util.Utils.LOGGER;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 import static java.lang.String.format;
 
 final class OAuthRequestValidator<R>
@@ -46,12 +49,14 @@ final class OAuthRequestValidator<R>
      */
     public String validate(R request)
     {
-        final String consumerKey = getConsumerKey(request);
+        final Multimap<String, String> parameters = getParameters(request);
+
+        final String consumerKey = getConsumerKey(parameters);
 
         final OAuthMessage message = new OAuthMessage(
                 requestHelper.getHttpMethod(request),
                 requestHelper.getUrl(request, baseUrl),
-                requestHelper.getParameters(request));
+                parameters.entries());
         try
         {
             final OAuthConsumer host = new OAuthConsumer(null, consumerKey, null, null);
@@ -68,20 +73,38 @@ final class OAuthRequestValidator<R>
         }
         catch (OAuthProblemException e)
         {
-            Logger.warn("The request is not a valid OAuth request", e);
+            LOGGER.warn("The request is not a valid OAuth request", e);
             throw new UnauthorisedOAuthRequestException(format("Validation failed: \nproblem: %s\nparameters: %s\n", e.getProblem(), e.getParameters()), e);
         }
         catch (OAuthException | IOException | URISyntaxException e)
         {
-            Logger.error("An error happened validating the OAuth request.", e);
+            LOGGER.error("An error happened validating the OAuth request.", e);
             throw new RuntimeException(e);
         }
     }
 
-    private String getConsumerKey(R request)
+    private Multimap<String, String> getParameters(R request)
     {
-        final String consumerKey = requestHelper.getParameter(request, "oauth_consumer_key");
-        Logger.debug("Found consumer key '" + consumerKey + "'.");
+        final ImmutableMultimap.Builder<String, String> parameters =
+                ImmutableMultimap.<String, String>builder().putAll(requestHelper.getParameters(request));
+
+        final Option<String> authorization = requestHelper.getHeader(request, "Authorization");
+        if (authorization.isDefined())
+        {
+            for (OAuth.Parameter param : OAuthMessage.decodeAuthorization(authorization.get()))
+            {
+                parameters.put(param.getKey(), param.getValue());
+            }
+        }
+        return parameters.build();
+    }
+
+    private String getConsumerKey(Multimap<String, String> parameters)
+    {
+        final Collection<String> consumerKeys = parameters.get("oauth_consumer_key");
+        checkState(consumerKeys.size() == 1, "There should be only one value for the consumer key");
+        String consumerKey = Iterables.getFirst(consumerKeys, null);
+        LOGGER.debug("Found consumer key '" + consumerKey + "'.");
         return consumerKey;
     }
 }

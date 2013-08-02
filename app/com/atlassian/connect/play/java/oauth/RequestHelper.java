@@ -1,6 +1,9 @@
 package com.atlassian.connect.play.java.oauth;
 
 import com.atlassian.connect.play.java.BaseUrl;
+import com.atlassian.fugue.Option;
+import com.atlassian.fugue.Pair;
+import com.google.common.collect.Multimap;
 
 import java.util.Collection;
 import java.util.Map;
@@ -11,7 +14,7 @@ interface RequestHelper<R>
 
     String getUrl(R request, BaseUrl baseUrl);
 
-    String getParameter(R request, String name);
+    Multimap<String, String> getParameters(R request);
 
-    Collection<? extends Map.Entry> getParameters(R request);
+    Option<String> getHeader(R request, String name);
 }

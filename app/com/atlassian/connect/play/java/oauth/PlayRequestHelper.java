@@ -1,15 +1,14 @@
 package com.atlassian.connect.play.java.oauth;
 
 import com.atlassian.connect.play.java.BaseUrl;
-import com.google.common.collect.ArrayListMultimap;
+import com.atlassian.fugue.Option;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import play.mvc.Http;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Map;
 
-import static java.lang.String.format;
+import static com.atlassian.fugue.Option.option;
 
 public final class PlayRequestHelper implements RequestHelper<Http.Request>
 {
@@ -23,26 +22,9 @@ public final class PlayRequestHelper implements RequestHelper<Http.Request>
         return baseUrl.get() + request.path();
     }
 
-    public String getParameter(Http.Request request, String name)
+    public Multimap<String, String> getParameters(Http.Request request)
     {
-        final String[] values = request.queryString().get(name);
-
-        if (values == null)
-        {
-            throw new InvalidOAuthRequestException(format("Could not find parameter %s for request!", name));
-        }
-
-        if (values.length != 1)
-        {
-            throw new InvalidOAuthRequestException(format("Found unexpected values %s for parameter %s", Arrays.toString(values), name));
-        }
-
-        return values[0];
-    }
-
-    public Collection<? extends Map.Entry> getParameters(Http.Request request)
-    {
-        final Multimap<String, String> map = ArrayListMultimap.create();
+        final ImmutableMultimap.Builder<String, String> map = ImmutableMultimap.builder();
         for (Map.Entry<String, String[]> entry : request.queryString().entrySet())
         {
             for (String v : entry.getValue())
@@ -51,6 +33,12 @@ public final class PlayRequestHelper implements RequestHelper<Http.Request>
                 map.put(k, v);
             }
         }
-        return map.entries();
+        return map.build();
+    }
+
+    @Override
+    public Option<String> getHeader(Http.Request request, String name)
+    {
+        return option(request.getHeader(name));
     }
 }
