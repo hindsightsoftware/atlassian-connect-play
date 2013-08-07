@@ -34,6 +34,8 @@ import static com.atlassian.fugue.Option.none;
 import static com.atlassian.fugue.Option.option;
 import static com.atlassian.fugue.Option.some;
 import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Suppliers.memoize;
 import static java.lang.String.format;
 import static play.mvc.Http.Context.Implicit.request;
@@ -120,7 +122,7 @@ public final class AC
 
     public static WS.WSRequestHolder url(String url)
     {
-        return url(url, getAcHost());
+        return url(url, checkNotNull(getAcHost(), "No AcHost found in HttpContext"));
     }
 
     public static WS.WSRequestHolder url(String url, AcHost acHost)
@@ -130,9 +132,10 @@ public final class AC
 
     public static WS.WSRequestHolder url(String url, AcHost acHost, Option<String> userId)
     {
-        checkState(!url.matches("^[\\w]+:.*"), "Absolute request URIs are not supported for host requests");
+        checkNotNull(url, "Url must be non-null");
+        checkNotNull(acHost, "acHost must be non-null");
 
-        final String absoluteUrl = acHost.getBaseUrl() + url;
+        final String absoluteUrl = getAbsoluteUrl(url, acHost);
 
         LOGGER.debug(format("Creating request to '%s'", absoluteUrl));
 
@@ -146,6 +149,20 @@ public final class AC
             request.setQueryParameter(AC_USER_ID_PARAM, userId.get());
         }
         return request;
+    }
+
+    private static String getAbsoluteUrl(String url, AcHost acHost) {
+        String absoluteUrl;
+        if (url.matches("^[\\w]+:.*"))
+        {
+            checkArgument(url.startsWith(acHost.getBaseUrl()), "Absolute request URL must begin with the host base URL");
+            absoluteUrl = url;
+        }
+        else
+        {
+            absoluteUrl = acHost.getBaseUrl() + url;
+        }
+        return absoluteUrl;
     }
 
     public static AcHost getAcHost()
