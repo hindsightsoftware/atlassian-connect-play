@@ -5,7 +5,7 @@ import play.Project._
 object ApplicationBuild extends Build {
 
   val appName         = "ac-play-java"
-  val appVersion      = "0.6.1-SNAPSHOT"
+  val appVersion      = "0.6.0-beta2"
 
   val appDependencies = Seq(
     "postgresql" % "postgresql" % "8.4-701.jdbc3",
