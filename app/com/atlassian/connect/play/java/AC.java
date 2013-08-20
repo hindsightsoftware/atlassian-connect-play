@@ -1,13 +1,12 @@
 package com.atlassian.connect.play.java;
 
+import com.atlassian.connect.play.java.model.AcHostModel;
 import com.atlassian.connect.play.java.oauth.OAuthSignatureCalculator;
 import com.atlassian.connect.play.java.util.Environment;
 import com.atlassian.fugue.Option;
-import com.google.common.base.Function;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.common.io.Files;
-import com.atlassian.connect.play.java.model.AcHostModel;
 import play.Play;
 import play.db.jpa.JPA;
 import play.libs.F;
@@ -110,9 +109,12 @@ public final class AC
 
     public static WS.WSRequestHolder url(String url, AcHost acHost)
     {
-        checkState(!url.matches("^[\\w]+:.*"), "Absolute request URIs are not supported for host requests");
+        return url(url, acHost, getUser().getOrNull());
+    }
 
-        final Option<String> user = getUser();
+    public static WS.WSRequestHolder url(String url, AcHost acHost, String userId)
+    {
+        checkState(!url.matches("^[\\w]+:.*"), "Absolute request URIs are not supported for host requests");
 
         final String absoluteUrl = acHost.getBaseUrl() + url;
 
@@ -123,16 +125,11 @@ public final class AC
                 .setFollowRedirects(false) // because we need to sign again in those cases.
                 .sign(new OAuthSignatureCalculator());
 
-        return user.fold(
-                Suppliers.ofInstance(request),
-                new Function<String, WS.WSRequestHolder>()
-                {
-                    @Override
-                    public WS.WSRequestHolder apply(String user)
-                    {
-                        return request.setQueryParameter(USER_ID_QUERY_PARAMETER, user);
-                    }
-                });
+        if (userId != null)
+        {
+            request.setQueryParameter(USER_ID_QUERY_PARAMETER, userId);
+        }
+        return request;
     }
 
     public static AcHost getAcHost()
