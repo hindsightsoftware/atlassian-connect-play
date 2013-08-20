@@ -4,10 +4,11 @@ import com.atlassian.fugue.Option;
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
 import controllers.AssetsBuilder;
-import models.AcHostModel;
+import com.atlassian.connect.play.java.model.AcHostModel;
 import org.codehaus.jackson.JsonNode;
 import play.api.mvc.Action;
 import play.api.mvc.AnyContent;
+import play.db.jpa.Transactional;
 import play.mvc.BodyParser;
 import play.mvc.Result;
 import views.xml.ac.internal.internal_descriptor;
@@ -111,6 +112,7 @@ public class AcController
     }
 
     @BodyParser.Of(BodyParser.Json.class)
+    @Transactional
     public static Result registration()
     {
         LOGGER.info("Registering host application!");

@@ -14,13 +14,17 @@ object ApplicationBuild extends Build {
     "com.google.guava" % "guava" % "14.0.1",
     "org.bouncycastle" % "bcprov-jdk16" % "1.46",
     "com.typesafe.play.extras" % "iteratees-extras_2.10" % "1.0.1",
+    "org.hibernate" % "hibernate-entitymanager" % "4.2.1.Final",
     javaCore,
     javaJdbc,
-    javaEbean
+    javaJpa
   )
 
   val main = play.Project(appName, appVersion, appDependencies).settings(
+    //we're using JPA so ebean can safely be disabled
+    ebeanEnabled := false,
     resolvers += "Typesafe's Repository" at "http://repo.typesafe.com/typesafe/maven-releases",
+    resolvers += "Atlassian's Maven Public Repository" at "https://maven.atlassian.com/content/groups/public",
     organization := "com.atlassian.connect",
     publishTo <<= version { (v: String) =>
       val repo = "https://maven.atlassian.com/"
@@ -29,6 +33,9 @@ object ApplicationBuild extends Build {
       else
         Some("Atlassian"  at repo + "public")
     },
+
     publishMavenStyle := true
+    // Comment this in to publish to local .m2 repo with 'sbt publish'
+//    ,publishTo := Some(Resolver.file("file",  new File(Path.userHome.absolutePath+"/.m2/repository")))
   )
 }

@@ -7,8 +7,10 @@ import com.google.common.base.Function;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.common.io.Files;
-import models.AcHostModel;
+import com.atlassian.connect.play.java.model.AcHostModel;
 import play.Play;
+import play.db.jpa.JPA;
+import play.libs.F;
 import play.libs.WS;
 import play.mvc.Http;
 
@@ -143,9 +145,23 @@ public final class AC
         return setAcHost(getAcHost(consumerKey).getOrError(Suppliers.ofInstance("An error occured getting the host application")));
     }
 
-    public static Option<? extends AcHost> getAcHost(String consumerKey)
+    public static Option<? extends AcHost> getAcHost(final String consumerKey)
     {
-        return AcHostModel.findByKey(consumerKey);
+        try
+        {
+            return JPA.withTransaction(new F.Function0<Option<? extends AcHost>>()
+            {
+                @Override
+                public Option<? extends AcHost> apply() throws Throwable
+                {
+                    return AcHostModel.findByKey(consumerKey);
+                }
+            });
+        }
+        catch (Throwable throwable)
+        {
+            throw new RuntimeException(throwable);
+        }
     }
 
     static AcHost setAcHost(AcHost host)
