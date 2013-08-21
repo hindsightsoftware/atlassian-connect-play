@@ -39,7 +39,7 @@ public class AcAdmin
                     @Override
                     public F.Promise<Result> apply(final AcHost host)
                     {
-                        return AC.url("/rest/remotable-plugins/1/macro/app/" + AC.PLUGIN_KEY, host).delete().map(new F.Function<WS.Response, Result>()
+                        return AC.url("/rest/atlassian-connect/1/macro/app/" + AC.PLUGIN_KEY, host).delete().map(new F.Function<WS.Response, Result>()
                         {
                             @Override
                             public Result apply(WS.Response response) throws Throwable
