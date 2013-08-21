@@ -34,7 +34,14 @@ public final class AcBaseUrlPlugin extends AbstractPlugin
         @Override
         public String get()
         {
-            return getBaseUrlFromEnv().getOrElse(getBaseUrlFromConfiguration());
+            final String baseUrl = getBaseUrlFromEnv().getOrElse(getBaseUrlFromConfiguration());
+            // Strip trailing / which might have been configured by a plugin developer.
+            // This can cause issues with double slashes and Oauth request validation.
+            if(baseUrl.endsWith("/"))
+            {
+                return baseUrl.substring(0, baseUrl.length()-1);
+            }
+            return baseUrl;
         }
 
         private Option<String> getBaseUrlFromEnv()

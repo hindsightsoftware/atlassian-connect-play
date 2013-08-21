@@ -53,6 +53,22 @@ public final class AcHostModel implements AcHost
     public String name;
     public String description;
 
+    public Long getId() {
+        return id;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
     @Override
     public String getBaseUrl()
     {
