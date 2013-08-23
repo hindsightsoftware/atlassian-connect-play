@@ -17,7 +17,21 @@ public final class OAuthRequestValidatorAction extends Action.Simple
     {
         try
         {
-            AC.setAcHost(validator.validate(context.request()));
+            final String consumerKey = validator.validate(context.request());
+            AC.setAcHost(consumerKey);
+
+            //establish a session for subsequent requests
+            context.session().put(AC.Session.AC_HOST_KEY, consumerKey);
+            final String user = AC.getUser().getOrNull();
+            if (user != null)
+            {
+                context.session().put(AC.Session.USER_ID, user);
+            }
+            else
+            {
+                context.session().remove(AC.Session.USER_ID);
+            }
+
             return delegate.call(context);
         }
         catch (UnknownAcHostException e)

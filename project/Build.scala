@@ -5,7 +5,7 @@ import play.Project._
 object ApplicationBuild extends Build {
 
   val appName         = "ac-play-java"
-  val appVersion      = "0.6.0-beta3"
+  val appVersion      = "0.6.1-SNAPSHOT"
 
   val appDependencies = Seq(
     "postgresql" % "postgresql" % "8.4-701.jdbc3",
@@ -35,7 +35,5 @@ object ApplicationBuild extends Build {
     },
 
     publishMavenStyle := true
-    // Comment this in to publish to local .m2 repo with 'sbt publish'
-//    ,publishTo := Some(Resolver.file("file",  new File(Path.userHome.absolutePath+"/.m2/repository")))
   )
 }
