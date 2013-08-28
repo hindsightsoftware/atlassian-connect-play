@@ -109,10 +109,10 @@ public final class AC
 
     public static WS.WSRequestHolder url(String url, AcHost acHost)
     {
-        return url(url, acHost, getUser().getOrNull());
+        return url(url, acHost, getUser());
     }
 
-    public static WS.WSRequestHolder url(String url, AcHost acHost, String userId)
+    public static WS.WSRequestHolder url(String url, AcHost acHost, Option<String> userId)
     {
         checkState(!url.matches("^[\\w]+:.*"), "Absolute request URIs are not supported for host requests");
 
@@ -125,9 +125,9 @@ public final class AC
                 .setFollowRedirects(false) // because we need to sign again in those cases.
                 .sign(new OAuthSignatureCalculator());
 
-        if (userId != null)
+        if (userId.isDefined())
         {
-            request.setQueryParameter(USER_ID_QUERY_PARAMETER, userId);
+            request.setQueryParameter(USER_ID_QUERY_PARAMETER, userId.get());
         }
         return request;
     }

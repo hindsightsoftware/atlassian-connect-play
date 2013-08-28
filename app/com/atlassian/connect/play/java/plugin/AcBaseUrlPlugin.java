@@ -1,13 +1,13 @@
 package com.atlassian.connect.play.java.plugin;
 
-import com.atlassian.fugue.Option;
 import com.atlassian.connect.play.java.AC;
 import com.atlassian.connect.play.java.BaseUrl;
 import com.atlassian.connect.play.java.util.Environment;
+import com.atlassian.fugue.Option;
 import play.Application;
 
-import static com.atlassian.fugue.Option.option;
 import static com.atlassian.connect.play.java.util.Utils.LOGGER;
+import static com.atlassian.fugue.Option.option;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
 
@@ -35,11 +35,18 @@ public final class AcBaseUrlPlugin extends AbstractPlugin
         public String get()
         {
             final String baseUrl = getBaseUrlFromEnv().getOrElse(getBaseUrlFromConfiguration());
-            // Strip trailing / which might have been configured by a plugin developer.
-            // This can cause issues with double slashes and Oauth request validation.
-            if(baseUrl.endsWith("/"))
+            return stripTrailingSlash(baseUrl);
+        }
+
+        /**
+         * Strip trailing / which might have been configured by a plugin developer. This can cause issues with double
+         * slashes and Oauth request validation.
+         */
+        private String stripTrailingSlash(final String baseUrl)
+        {
+            if (baseUrl.endsWith("/"))
             {
-                return baseUrl.substring(0, baseUrl.length()-1);
+                return baseUrl.substring(0, baseUrl.length() - 1);
             }
             return baseUrl;
         }
