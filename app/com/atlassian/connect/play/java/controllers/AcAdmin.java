@@ -4,9 +4,10 @@ import com.atlassian.connect.play.java.AC;
 import com.atlassian.connect.play.java.AcHost;
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
-import models.AcHostModel;
+import com.atlassian.connect.play.java.model.AcHostModel;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.node.ObjectNode;
+import play.db.jpa.Transactional;
 import play.libs.F;
 import play.libs.Json;
 import play.libs.WS;
@@ -22,11 +23,13 @@ import static play.mvc.Results.ok;
 @With(IsDevAction.class)
 public class AcAdmin
 {
+    @Transactional(readOnly = true)
     public static Result index()
     {
         return ok(views.html.ac.internal.admin.index.render(AcHostModel.all()));
     }
 
+    @Transactional(readOnly = true)
     public static Result clearMacroCache(final String key)
     {
         return async(AC.getAcHost(key).fold(
@@ -36,7 +39,7 @@ public class AcAdmin
                     @Override
                     public F.Promise<Result> apply(final AcHost host)
                     {
-                        return AC.url("/rest/remotable-plugins/1/macro/app/" + AC.PLUGIN_KEY, host).delete().map(new F.Function<WS.Response, Result>()
+                        return AC.url("/rest/atlassian-connect/1/macro/app/" + AC.PLUGIN_KEY, host).delete().map(new F.Function<WS.Response, Result>()
                         {
                             @Override
                             public Result apply(WS.Response response) throws Throwable

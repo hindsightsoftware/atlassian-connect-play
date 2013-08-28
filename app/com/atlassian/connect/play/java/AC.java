@@ -1,14 +1,15 @@
 package com.atlassian.connect.play.java;
 
+import com.atlassian.connect.play.java.model.AcHostModel;
 import com.atlassian.connect.play.java.oauth.OAuthSignatureCalculator;
 import com.atlassian.connect.play.java.util.Environment;
 import com.atlassian.fugue.Option;
-import com.google.common.base.Function;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.common.io.Files;
-import models.AcHostModel;
 import play.Play;
+import play.db.jpa.JPA;
+import play.libs.F;
 import play.libs.WS;
 import play.mvc.Http;
 
@@ -108,9 +109,12 @@ public final class AC
 
     public static WS.WSRequestHolder url(String url, AcHost acHost)
     {
-        checkState(!url.matches("^[\\w]+:.*"), "Absolute request URIs are not supported for host requests");
+        return url(url, acHost, getUser());
+    }
 
-        final Option<String> user = getUser();
+    public static WS.WSRequestHolder url(String url, AcHost acHost, Option<String> userId)
+    {
+        checkState(!url.matches("^[\\w]+:.*"), "Absolute request URIs are not supported for host requests");
 
         final String absoluteUrl = acHost.getBaseUrl() + url;
 
@@ -121,16 +125,11 @@ public final class AC
                 .setFollowRedirects(false) // because we need to sign again in those cases.
                 .sign(new OAuthSignatureCalculator());
 
-        return user.fold(
-                Suppliers.ofInstance(request),
-                new Function<String, WS.WSRequestHolder>()
-                {
-                    @Override
-                    public WS.WSRequestHolder apply(String user)
-                    {
-                        return request.setQueryParameter(USER_ID_QUERY_PARAMETER, user);
-                    }
-                });
+        if (userId.isDefined())
+        {
+            request.setQueryParameter(USER_ID_QUERY_PARAMETER, userId.get());
+        }
+        return request;
     }
 
     public static AcHost getAcHost()
@@ -143,9 +142,23 @@ public final class AC
         return setAcHost(getAcHost(consumerKey).getOrError(Suppliers.ofInstance("An error occured getting the host application")));
     }
 
-    public static Option<? extends AcHost> getAcHost(String consumerKey)
+    public static Option<? extends AcHost> getAcHost(final String consumerKey)
     {
-        return AcHostModel.findByKey(consumerKey);
+        try
+        {
+            return JPA.withTransaction(new F.Function0<Option<? extends AcHost>>()
+            {
+                @Override
+                public Option<? extends AcHost> apply() throws Throwable
+                {
+                    return AcHostModel.findByKey(consumerKey);
+                }
+            });
+        }
+        catch (Throwable throwable)
+        {
+            throw new RuntimeException(throwable);
+        }
     }
 
     static AcHost setAcHost(AcHost host)

@@ -18,6 +18,7 @@ public final class OAuthRequestValidatorAction extends Action.Simple
         try
         {
             AC.setAcHost(validator.validate(context.request()));
+
             return delegate.call(context);
         }
         catch (UnknownAcHostException e)

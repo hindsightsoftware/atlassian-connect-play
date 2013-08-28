@@ -22,7 +22,7 @@ public final class ConnectClient
         final String userName = "admin";
         final String password = "admin";
 
-        final String postUrl = baseUrl + "/rest/remotable-plugins/latest/installer";
+        final String postUrl = baseUrl + "/rest/atlassian-connect/latest/installer";
         final String parameters = "url=" + uri;
 
         LOGGER.debug(format("Posting to URL '%s', with parameters '%s'", postUrl, parameters));
