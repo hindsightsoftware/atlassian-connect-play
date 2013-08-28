@@ -29,12 +29,6 @@ import static play.mvc.Http.Context.Implicit.request;
 
 public final class AC
 {
-    public static class Session
-    {
-        public static final String USER_ID = "userId";
-        public static final String AC_HOST_KEY = "ac_host";
-    }
-
     private static final Long DEFAULT_TIMEOUT = TimeUnit.SECONDS.convert(5, TimeUnit.MILLISECONDS);
 
     public static final String USER_ID_QUERY_PARAMETER = "user_id";
@@ -140,17 +134,7 @@ public final class AC
 
     public static AcHost getAcHost()
     {
-        final AcHost acHost = (AcHost) getHttpContext().args.get("ac_host");
-        if(acHost == null)
-        {
-            //check if there's one in the session!
-            final String hostKey = getHttpContext().session().get(Session.AC_HOST_KEY);
-            if(hostKey != null)
-            {
-                return getAcHost(hostKey).getOrNull();
-            }
-        }
-        return acHost;
+        return (AcHost) getHttpContext().args.get("ac_host");
     }
 
     public static AcHost setAcHost(String consumerKey)
