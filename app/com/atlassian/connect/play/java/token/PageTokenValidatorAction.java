@@ -22,11 +22,11 @@ public final class PageTokenValidatorAction extends Action.Simple
         final F.Tuple<TokenKey, String> tokenDetails = extractTokenDetails(context.request());
         if (tokenDetails == null)
         {
-            return unauthorized("Unauthorised: no valid page token could be found");
+            return unauthorized("Unauthorised: It appears your session has expired. Please reload the page.");
         }
         else if (!AC.tokenStore.validate(tokenDetails._1, tokenDetails._2, System.currentTimeMillis()))
         {
-            return unauthorized("Unauthorised: no valid page token could be found");
+            return unauthorized("Unauthorised: It appears your session has expired. Please reload the page.");
         }
 
         AC.setAcHost(tokenDetails._1.getConsumerKey());
