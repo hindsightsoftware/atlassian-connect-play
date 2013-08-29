@@ -24,10 +24,10 @@ public class TokenStorePlugin extends AbstractPlugin
     public void onStart()
     {
         final String tokenStoreImplClass = application.configuration().getString("ac.token.store");
-        final String tokenExpiry = application.configuration().getString("ac.token.expiry");
+        final String tokenExpiry = application.configuration().getString("ac.token.expiry.secs");
         if (StringUtils.isNotBlank(tokenExpiry) && StringUtils.isNumeric(tokenExpiry))
         {
-            AC.tokenExpiry = Long.parseLong(tokenExpiry);
+            AC.tokenExpiry = TimeUnit.MILLISECONDS.convert(Long.parseLong(tokenExpiry), TimeUnit.SECONDS);
         }
         else
         {

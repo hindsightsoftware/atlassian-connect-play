@@ -10,11 +10,11 @@ import play.mvc.Result;
 
 public final class PageTokenValidatorAction extends Action.Simple
 {
-    public static final String HEADER_PREFIX = "X-ac-";
+    public static final String HEADER_PREFIX = "X-";
 
-    public static final String TOKEN_KEY = "page-view-token";
-    public static final String CONSUMER_KEY = "consumer_key";
-    public static final String USER_KEY = "user_id";
+    public static final String TOKEN_KEY = "acpt";
+    public static final String CONSUMER_KEY = "acck";
+    public static final String USER_KEY = "acuid";
 
     @Override
     public Result call(Http.Context context) throws Throwable
@@ -24,7 +24,7 @@ public final class PageTokenValidatorAction extends Action.Simple
         {
             return unauthorized("Unauthorised: no valid page token could be found");
         }
-        else if (!AC.tokenStore.isValid(tokenDetails._1, tokenDetails._2, System.currentTimeMillis()))
+        else if (!AC.tokenStore.validate(tokenDetails._1, tokenDetails._2, System.currentTimeMillis()))
         {
             return unauthorized("Unauthorised: no valid page token could be found");
         }

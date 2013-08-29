@@ -7,95 +7,65 @@ import com.atlassian.security.random.DefaultSecureTokenGenerator;
 import com.atlassian.security.random.SecureTokenGenerator;
 import com.google.common.collect.Maps;
 
-import java.util.Map;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.ConcurrentMap;
 
 import static com.atlassian.fugue.Option.none;
 import static com.atlassian.fugue.Option.some;
 
 public class MemoryTokenStore implements TokenStore
 {
-    final Map<TokenKey, Token> tokens = Maps.newHashMap();
-    final ReadWriteLock lock = new ReentrantReadWriteLock();
+    final ConcurrentMap<TokenKey, Token> tokens = Maps.newConcurrentMap();
     final SecureTokenGenerator tokenGenerator = DefaultSecureTokenGenerator.getInstance();
 
     @Override
-    public String createIfExpired(final TokenKey key, long requestTime)
+    public void createIfExpired(final TokenKey key, long requestTime)
     {
-        lock.readLock().lock();
-        try
+        final Token currentToken = tokens.get(key);
+        if (hasExpired(currentToken, requestTime))
         {
-            Token token = tokens.get(key);
-            if (!isValid(token, requestTime))
+            //either replace the current token if it exists, or put a new one in place (only if no other thread beat us to it!)
+            if (currentToken == null)
             {
-                lock.readLock().unlock();
-                lock.writeLock().lock();
-                try
-                {
-                    token = tokens.get(key);
-                    if (!isValid(token, requestTime))
-                    {
-                        token = new Token(tokenGenerator.generateToken(), requestTime);
-                        tokens.put(key, token);
-                    }
-                    lock.readLock().lock();
-                }
-                finally
-                {
-                    lock.writeLock().unlock();
-                }
+                tokens.putIfAbsent(key, new Token(tokenGenerator.generateToken(), requestTime));
             }
-            return token.getToken();
-        }
-        finally
-        {
-            lock.readLock().unlock();
+            else
+            {
+                tokens.replace(key, currentToken, new Token(tokenGenerator.generateToken(), requestTime));
+            }
         }
     }
 
     @Override
-    public Option<String> get(final TokenKey key, long requestTime)
+    public Option<Token> get(final TokenKey key, long requestTime)
     {
-        lock.readLock().lock();
-        try
+        final Token token = tokens.get(key);
+        if (hasExpired(token, requestTime))
         {
-            final Token token = tokens.get(key);
-            if (isValid(token, requestTime))
-            {
-                return some(token.getToken());
-            }
             return none();
         }
-        finally
-        {
-            lock.readLock().unlock();
-        }
+        return some(token);
     }
 
     @Override
-    public boolean isValid(final TokenKey key, final String token, final long requestTime)
+    public boolean validate(final TokenKey key, final String token, long requestTime)
     {
-        final Option<String> storedToken = get(key, requestTime);
-        return storedToken.isDefined() && storedToken.get().equals(token);
+        final Option<Token> storedToken = get(key, requestTime);
+        if(storedToken.isDefined() && storedToken.get().getToken().equals(token))
+        {
+            tokens.replace(key, storedToken.get(), new Token(storedToken.get().getToken(), requestTime));
+            return true;
+        }
+        return false;
     }
 
     @Override
     public void remove(final TokenKey key)
     {
-        lock.writeLock().lock();
-        try
-        {
-            tokens.remove(key);
-        }
-        finally
-        {
-            lock.writeLock().unlock();
-        }
+        tokens.remove(key);
     }
 
-    private boolean isValid(final Token token, long requestTime)
+    private boolean hasExpired(final Token token, long requestTime)
     {
-        return token != null && (requestTime - token.getLastRequestTime()) <= AC.tokenExpiry;
+        return token == null || (requestTime - token.getLastRequestTime()) > AC.tokenExpiry;
     }
 }

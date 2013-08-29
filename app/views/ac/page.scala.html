@@ -9,13 +9,14 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <meta name="viewport" content="width=device-width">
-        @if(PageToken.hasToken && AC.getAcHost != null) {
-            <meta name="page-view-token" content="@PageToken.getToken.get">
-            <meta name="consumer_key" content="@AC.getAcHost.getKey">
-            @if(AC.getUser.isDefined) {
-                <meta name="user_id" content="@AC.getUser.get">
+        @defining(PageToken.getToken) { token =>
+            @if(token.isDefined && AC.getAcHost != null) {
+                <meta name="acpt" content="@token.get">
+                <meta name="acck" content="@AC.getAcHost.getKey">
+                @if(AC.getUser.isDefined) {
+                    <meta name="acuid" content="@AC.getUser.get">
+                }
             }
-            @* TODO: Some JS to update links etc. *@
         }
 
         @defining(BaseUrl.get()) { baseUrl =>
@@ -31,5 +32,7 @@
     </head>
     <body style="background-color: transparent"> @* style is there to work around some AUI glitches *@
         @content
+        <script type="text/javascript" src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+        <script type="text/javascript" src="@com.atlassian.connect.play.java.controllers.routes.AcController.asset("js/pagetoken.js")"></script>
     </body>
 </html>
