@@ -135,9 +135,12 @@ using a local postgres installation:
     db.default.acquireRetryAttempts=1
     db.default.acquireRetryDelay=5 seconds
 
+    db.default.jndiName=DefaultDS
+    jpa.default=defaultPersistenceUnit
+
 Note that the postgres driver is already a dependency of the module, so you don't need to add a dependency for it.
 
-The play library uses JPA for persistance so you'll have to create a persistence.xml file in conf/META-INF:
+The play library uses JPA for persistence so you'll have to create a persistence.xml file in conf/META-INF:
 
     <persistence xmlns="http://java.sun.com/xml/ns/persistence"
                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
