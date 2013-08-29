@@ -187,7 +187,7 @@ more work to authenticate remotely.
 For example a remote admin page may include a horizontal navbar including links to various other remote admin pages. When a user clicks
 on any of these links they will load within the iframe without any additional OAuth headers being sent to the remote server.  To overcome
 this, this module provides a secure token mechanism.  If you use `@ac.page` to decorate your pages all links, forms and ajax requests will
-automatically be decorated with this secure token.  If you `@ac.page` is not used any requests will have to be decorated manually. This can be
+automatically be decorated with this secure token.  If `@ac.page` is not used any requests will have to be decorated manually. This can be
 done by adding the following request parameters:
 
     ?acpt=<SECURE_TOKEN>&acck=<CONSUMER_KEY>&acuid=<USER_ID>
@@ -199,6 +199,9 @@ For ajax requests one can also add the following headers to the request:
     X-acuid:<USER_ID>
 
 The secure token can be obtained via a call to `AC.tokenStore.get(new TokenKey(AC.getAcHost().getKey(), AC.getUser()), System.currentTimeMillis())`.
+
+On the server side to verify that an action in your Play controller is being called with a valid token, you can simply add the `@CheckValidPageToken`
+annotation.
 
 By default this module provides an in memory token store which may not be sufficient for large scale production deployments that may require persistence
 to allow for horizontal scaling as well as restarts.  An in memory store could also increase memory usage significantly on a large scale deployment.
