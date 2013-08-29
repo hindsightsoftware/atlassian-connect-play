@@ -139,17 +139,24 @@ Note that the postgres driver is already a dependency of the module, so you don'
 
 The play library uses JPA for persistance so you'll have to create a persistence.xml file in conf/META-INF:
 
-    <persistence-unit name="defaultPersistenceUnit" transaction-type="RESOURCE_LOCAL">
-        <provider>org.hibernate.ejb.HibernatePersistence</provider>
-        <non-jta-data-source>DefaultDS</non-jta-data-source>
-        <class>com.atlassian.connect.play.java.model.AcHostModel</class>
-        <properties>
-            <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
+    <persistence xmlns="http://java.sun.com/xml/ns/persistence"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+                 version="2.0">
+        <persistence-unit name="defaultPersistenceUnit" transaction-type="RESOURCE_LOCAL">
+            <provider>org.hibernate.ejb.HibernatePersistence</provider>
+            <non-jta-data-source>DefaultDS</non-jta-data-source>
+            <class>com.atlassian.connect.play.java.model.AcHostModel</class>
+            <properties>
+                <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQL82Dialect"/>
 
-            <!-- Not recommended for PRODUCTION! This will re-create all tables on restart. -->
-            <property name="hibernate.hbm2ddl.auto" value="create"/>
-        </properties>
-    </persistence-unit>
+                <!-- Not recommended for PRODUCTION! This will re-create all tables on restart. -->
+                <property name="hibernate.hbm2ddl.auto" value="create"/>
+                <!--<property name="hibernate.show_sql" value="true"/>-->
+                <!--<property name="hibernate.format_sql" value="true"/>-->
+            </properties>
+        </persistence-unit>
+    </persistence>
 
 You can read more about some of those topics on the Play website:
 
