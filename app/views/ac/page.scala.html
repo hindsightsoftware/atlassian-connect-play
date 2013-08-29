@@ -1,5 +1,7 @@
 @(title: String)(head: Html)(content: Html)
 @import views.ac.BaseUrl
+@import views.ac.PageToken
+@import com.atlassian.connect.play.java.AC
 
 <!DOCTYPE html>
 <html>
@@ -7,6 +9,14 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <meta name="viewport" content="width=device-width">
+        @if(PageToken.hasToken && AC.getAcHost != null) {
+            <meta name="page-view-token" content="@PageToken.getToken.get">
+            <meta name="consumer_key" content="@AC.getAcHost.getKey">
+            @if(AC.getUser.isDefined) {
+                <meta name="user_id" content="@AC.getUser.get">
+            }
+            @* TODO: Some JS to update links etc. *@
+        }
 
         @defining(BaseUrl.get()) { baseUrl =>
             @if(baseUrl != null) {

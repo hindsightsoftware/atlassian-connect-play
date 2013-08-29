@@ -2,6 +2,7 @@ package com.atlassian.connect.play.java;
 
 import com.atlassian.connect.play.java.model.AcHostModel;
 import com.atlassian.connect.play.java.oauth.OAuthSignatureCalculator;
+import com.atlassian.connect.play.java.token.TokenStore;
 import com.atlassian.connect.play.java.util.Environment;
 import com.atlassian.fugue.Option;
 import com.google.common.base.Supplier;
@@ -38,6 +39,8 @@ public final class AC
 
     // the base URL
     public static BaseUrl baseUrl;
+    public static TokenStore tokenStore;
+    public static long tokenExpiry;
 
     public static final Supplier<String> publicKey = memoize(new Supplier<String>()
     {
@@ -99,7 +102,13 @@ public final class AC
 
     public static Option<String> getUser()
     {
-        return option(request().getQueryString(USER_ID_QUERY_PARAMETER));
+        final Option<String> user = option(request().getQueryString(USER_ID_QUERY_PARAMETER));
+        //user might have been set via com.atlassian.connect.play.java.token.PageTokenValidatorAction
+        if (user.isEmpty())
+        {
+            return Option.option((String) getHttpContext().args.get("user_id"));
+        }
+        return user;
     }
 
     public static WS.WSRequestHolder url(String url)
