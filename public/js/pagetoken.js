@@ -1,8 +1,4 @@
 (function($) {
-    if(window.AJS !== undefined) {
-        window.$ = AJS.$;
-    }
-
     $(function() {
         var getMeta = function(name) { return $('meta[name='+name+']').attr("content") };
         var isAbsolute = /^https?:\/\//i;
