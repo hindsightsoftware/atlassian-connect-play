@@ -8,6 +8,8 @@ import play.mvc.Action;
 import play.mvc.Http;
 import play.mvc.Result;
 
+import static com.atlassian.connect.play.java.Constants.AC_USER_ID_PARAM;
+
 public final class PageTokenValidatorAction extends Action.Simple
 {
     public static final String HEADER_PREFIX = "X-";
@@ -24,7 +26,7 @@ public final class PageTokenValidatorAction extends Action.Simple
         {
             return unauthorized("Unauthorised: It appears your session has expired. Please reload the page.");
         }
-        else if (!AC.tokenStore.validate(tokenDetails._1, tokenDetails._2, System.currentTimeMillis()))
+        else if (!AC.validateToken(tokenDetails._1, tokenDetails._2))
         {
             return unauthorized("Unauthorised: It appears your session has expired. Please reload the page.");
         }
@@ -33,7 +35,7 @@ public final class PageTokenValidatorAction extends Action.Simple
         final Option<String> user = tokenDetails._1.getUser();
         if(user.isDefined())
         {
-            context.args.put("user_id", user.get());
+            context.args.put(AC_USER_ID_PARAM, user.get());
         }
         return delegate.call(context);
     }

@@ -1,4 +1,4 @@
-(function() {
+(function($) {
     if(window.AJS !== undefined) {
         window.$ = AJS.$;
     }
@@ -11,9 +11,11 @@
         var consumer_key = getMeta("acck");
         var user_id = getMeta("acuid");
 
-        var extraUrlParams = "acpt=" + pageToken + "&acck=" + consumer_key;
-        if(user_id !== undefined) {
-            extraUrlParams += "&acuid=" + user_id;
+        var extraUrlParams =
+                "acpt=" + encodeURIComponent(pageToken) +
+                "&acck=" + encodeURIComponent(consumer_key);
+        if(user_id) {
+            extraUrlParams += "&acuid=" + encodeURIComponent(user_id);
         }
 
         //setup ajax requests
@@ -27,7 +29,7 @@
 
         var decorateUrl = function($elem, attribute) {
             var url = $elem.attr(attribute);
-            if(url !== undefined && !isAbsolute.test(url)) {
+            if(url && !isAbsolute.test(url)) {
                 var separator = url.indexOf("?") !== -1 ? "&" : "?";
                 var newUrl = url + separator + extraUrlParams;
                 $elem.attr(attribute, newUrl);
@@ -42,4 +44,4 @@
             decorateUrl($(form), "action");
         });
     });
-})();
+})((window.AJS && AJS.$) || jQuery);

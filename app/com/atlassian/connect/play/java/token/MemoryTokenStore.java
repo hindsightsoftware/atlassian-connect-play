@@ -5,17 +5,19 @@ import com.atlassian.connect.play.java.AC;
 import com.atlassian.fugue.Option;
 import com.atlassian.security.random.DefaultSecureTokenGenerator;
 import com.atlassian.security.random.SecureTokenGenerator;
+import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 
 import java.util.concurrent.ConcurrentMap;
 
 import static com.atlassian.fugue.Option.none;
 import static com.atlassian.fugue.Option.some;
+import static com.atlassian.fugue.Suppliers.alwaysFalse;
 
 public class MemoryTokenStore implements TokenStore
 {
-    final ConcurrentMap<TokenKey, Token> tokens = Maps.newConcurrentMap();
-    final SecureTokenGenerator tokenGenerator = DefaultSecureTokenGenerator.getInstance();
+    private final ConcurrentMap<TokenKey, Token> tokens = Maps.newConcurrentMap();
+    private final SecureTokenGenerator tokenGenerator = DefaultSecureTokenGenerator.getInstance();
 
     @Override
     public void createIfExpired(final TokenKey key, long requestTime)
@@ -47,15 +49,18 @@ public class MemoryTokenStore implements TokenStore
     }
 
     @Override
-    public boolean validate(final TokenKey key, final String token, long requestTime)
+    public boolean validate(final TokenKey key, final String token, final long requestTime)
     {
         final Option<Token> storedToken = get(key, requestTime);
-        if(storedToken.isDefined() && storedToken.get().getToken().equals(token))
+        return storedToken.fold(alwaysFalse(), new Function<Token, Boolean>()
         {
-            tokens.replace(key, storedToken.get(), new Token(storedToken.get().getToken(), requestTime));
-            return true;
-        }
-        return false;
+            @Override
+            public Boolean apply(final Token storedToken)
+            {
+                tokens.replace(key, storedToken, storedToken.update(requestTime));
+                return storedToken.getToken().equals(token);
+            }
+        });
     }
 
     @Override

@@ -3,7 +3,6 @@ package com.atlassian.connect.play.java.oauth;
 import com.atlassian.connect.play.java.AC;
 import com.atlassian.connect.play.java.AcHost;
 import com.atlassian.connect.play.java.PublicKeyStore;
-import com.atlassian.connect.play.java.token.TokenKey;
 import com.google.common.base.Function;
 import play.mvc.Action;
 import play.mvc.Http;
@@ -19,7 +18,7 @@ public final class OAuthRequestValidatorAction extends Action.Simple
         try
         {
             AC.setAcHost(validator.validate(context.request()));
-            AC.tokenStore.createIfExpired(new TokenKey(AC.getAcHost().getKey(), AC.getUser()), System.currentTimeMillis());
+            AC.createTokenIfExpired();
 
             return delegate.call(context);
         }

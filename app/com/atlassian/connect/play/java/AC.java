@@ -2,6 +2,8 @@ package com.atlassian.connect.play.java;
 
 import com.atlassian.connect.play.java.model.AcHostModel;
 import com.atlassian.connect.play.java.oauth.OAuthSignatureCalculator;
+import com.atlassian.connect.play.java.token.Token;
+import com.atlassian.connect.play.java.token.TokenKey;
 import com.atlassian.connect.play.java.token.TokenStore;
 import com.atlassian.connect.play.java.util.Environment;
 import com.atlassian.fugue.Option;
@@ -19,6 +21,10 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.concurrent.TimeUnit;
 
+import static com.atlassian.connect.play.java.Constants.AC_DEV;
+import static com.atlassian.connect.play.java.Constants.AC_HOST_PARAM;
+import static com.atlassian.connect.play.java.Constants.AC_PLUGIN_KEY;
+import static com.atlassian.connect.play.java.Constants.AC_USER_ID_PARAM;
 import static com.atlassian.connect.play.java.util.Environment.OAUTH_LOCAL_PRIVATE_KEY;
 import static com.atlassian.connect.play.java.util.Environment.OAUTH_LOCAL_PUBLIC_KEY;
 import static com.atlassian.connect.play.java.util.Utils.LOGGER;
@@ -32,10 +38,8 @@ public final class AC
 {
     private static final Long DEFAULT_TIMEOUT = TimeUnit.SECONDS.convert(5, TimeUnit.MILLISECONDS);
 
-    public static final String USER_ID_QUERY_PARAMETER = "user_id";
-
-    public static String PLUGIN_KEY = Play.application().configuration().getString("ac.key", isDev() ? "_add-on_key" : null);
-    public static String PLUGIN_NAME = Option.option(Play.application().configuration().getString("ac.name", isDev() ? "Atlassian Connect Play Add-on" : null)).getOrElse(PLUGIN_KEY);
+    public static String PLUGIN_KEY = Play.application().configuration().getString(AC_PLUGIN_KEY, isDev() ? "_add-on_key" : null);
+    public static String PLUGIN_NAME = Option.option(Play.application().configuration().getString(Constants.AC_PLUGIN_NAME, isDev() ? "Atlassian Connect Play Add-on" : null)).getOrElse(PLUGIN_KEY);
 
     // the base URL
     public static BaseUrl baseUrl;
@@ -96,17 +100,17 @@ public final class AC
     {
         return Play.isDev()
                 || Play.isTest()
-                || Boolean.valueOf(Play.application().configuration().getString("ac.dev", "false"))
-                || Boolean.getBoolean("ac.dev");
+                || Boolean.valueOf(Play.application().configuration().getString(AC_DEV, "false"))
+                || Boolean.getBoolean(AC_DEV);
     }
 
     public static Option<String> getUser()
     {
-        final Option<String> user = option(request().getQueryString(USER_ID_QUERY_PARAMETER));
+        final Option<String> user = option(request().getQueryString(AC_USER_ID_PARAM));
         //user might have been set via com.atlassian.connect.play.java.token.PageTokenValidatorAction
         if (user.isEmpty())
         {
-            return Option.option((String) getHttpContext().args.get("user_id"));
+            return Option.option((String) getHttpContext().args.get(AC_USER_ID_PARAM));
         }
         return user;
     }
@@ -136,14 +140,14 @@ public final class AC
 
         if (userId.isDefined())
         {
-            request.setQueryParameter(USER_ID_QUERY_PARAMETER, userId.get());
+            request.setQueryParameter(AC_USER_ID_PARAM, userId.get());
         }
         return request;
     }
 
     public static AcHost getAcHost()
     {
-        return (AcHost) getHttpContext().args.get("ac_host");
+        return (AcHost) getHttpContext().args.get(AC_HOST_PARAM);
     }
 
     public static AcHost setAcHost(String consumerKey)
@@ -170,9 +174,24 @@ public final class AC
         }
     }
 
+    public static void createTokenIfExpired()
+    {
+        tokenStore.createIfExpired(new TokenKey(AC.getAcHost().getKey(), AC.getUser()), System.currentTimeMillis());
+    }
+
+    public static boolean validateToken(final TokenKey key, final String providedToken)
+    {
+        return tokenStore.validate(key, providedToken, System.currentTimeMillis());
+    }
+
+    public static Option<Token> getToken()
+    {
+        return tokenStore.get(new TokenKey(AC.getAcHost().getKey(), AC.getUser()), System.currentTimeMillis());
+    }
+
     static AcHost setAcHost(AcHost host)
     {
-        getHttpContext().args.put("ac_host", host);
+        getHttpContext().args.put(AC_HOST_PARAM, host);
         return host;
     }
 

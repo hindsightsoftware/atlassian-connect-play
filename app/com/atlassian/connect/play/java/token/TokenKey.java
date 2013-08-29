@@ -32,11 +32,8 @@ public final class TokenKey
         if (o == null || getClass() != o.getClass()) { return false; }
 
         final TokenKey tokenKey = (TokenKey) o;
+        return consumerKey.equals(tokenKey.consumerKey) && user.equals(tokenKey.user);
 
-        if (!consumerKey.equals(tokenKey.consumerKey)) { return false; }
-        if (!user.equals(tokenKey.user)) { return false; }
-
-        return true;
     }
 
     @Override

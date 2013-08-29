@@ -13,9 +13,7 @@
             @if(token.isDefined && AC.getAcHost != null) {
                 <meta name="acpt" content="@token.get">
                 <meta name="acck" content="@AC.getAcHost.getKey">
-                @if(AC.getUser.isDefined) {
-                    <meta name="acuid" content="@AC.getUser.get">
-                }
+                <meta name="acuid" content="@AC.getUser.getOrElse("")">
             }
         }
 
@@ -32,7 +30,7 @@
     </head>
     <body style="background-color: transparent"> @* style is there to work around some AUI glitches *@
         @content
-        <script type="text/javascript" src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+        <script type="text/javascript">(window.AJS && window.AJS.$) || document.write('<script src="//code.jquery.com/jquery-1.10.2.min.js"><\/script>')</script>
         <script type="text/javascript" src="@com.atlassian.connect.play.java.controllers.routes.AcController.asset("js/pagetoken.js")"></script>
     </body>
 </html>

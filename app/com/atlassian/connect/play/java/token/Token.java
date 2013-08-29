@@ -20,4 +20,9 @@ public final class Token
     {
         return lastRequestTime;
     }
+
+    public Token update(long lastRequestTime)
+    {
+        return new Token(this.token, lastRequestTime);
+    }
 }
