@@ -28,20 +28,21 @@
             });
         };
 
-        //setup ajax requests
-        $.ajaxSetup({
-            headers: {
-                "X-acpt" : AC.pageToken
-            },
-            complete: function(resp) {
-                var newToken = resp.getResponseHeader("X-acpt");
+        var updateToken = function() {
+            $.ajaxSetup( { headers: { "X-acpt": AC.pageToken } });
+            refreshUrls();
+        };
+
+        //handle token refresh if allowInsecurePolling was specified.
+        $(document).ajaxComplete(function(e, xhr, opts) {
+            if(xhr) {
+                var newToken = xhr.getResponseHeader("X-acpt");
                 if(newToken) {
                     AC.pageToken = newToken;
-                    refreshUrls();
+                    updateToken();
                 }
             }
         });
-
-        refreshUrls();
+        updateToken();
     });
 })((window.AJS && AJS.$) || jQuery);

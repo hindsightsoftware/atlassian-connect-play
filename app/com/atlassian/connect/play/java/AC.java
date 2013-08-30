@@ -177,9 +177,9 @@ public final class AC
         }
     }
 
-    public static void refreshToken()
+    public static void refreshToken(boolean allowInsecurePolling)
     {
-        final Token token = new Token(AC.getAcHost().getKey(), AC.getUser(), System.currentTimeMillis());
+        final Token token = new Token(AC.getAcHost().getKey(), AC.getUser(), System.currentTimeMillis(), allowInsecurePolling);
 
         final String jsonToken = Base64.encodeBase64String(token.toJson().toString().getBytes());
         final String encryptedToken = Crypto.encryptAES(jsonToken);
@@ -187,12 +187,18 @@ public final class AC
         getHttpContext().args.put(AC_TOKEN, encryptedToken);
     }
 
-    public static Option<Token> validateToken(final String encryptedToken)
+    public static Option<Token> validateToken(final String encryptedToken, final boolean allowInsecurePolling)
     {
         try
         {
             final String decrypted = Crypto.decryptAES(encryptedToken);
             final Token token = Token.fromJson(Json.parse(new String(Base64.decodeBase64(decrypted))));
+            //only accept tokens which allowInsecurePolling from Actions that were annotated with this option set
+            //to true!
+            if(!allowInsecurePolling && token.isAllowInsecurePolling())
+            {
+                return none();
+            }
             if (token != null && (System.currentTimeMillis() - AC.tokenExpiry) <= token.getTimestamp())
             {
                 return some(token);

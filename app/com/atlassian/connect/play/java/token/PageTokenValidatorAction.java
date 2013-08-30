@@ -10,7 +10,7 @@ import play.mvc.Result;
 import static com.atlassian.connect.play.java.Constants.AC_USER_ID_PARAM;
 import static com.atlassian.fugue.Option.option;
 
-public final class PageTokenValidatorAction extends Action.Simple
+public final class PageTokenValidatorAction extends Action<CheckValidToken>
 {
     public static final String HEADER_PREFIX = "X-";
 
@@ -19,12 +19,13 @@ public final class PageTokenValidatorAction extends Action.Simple
     @Override
     public Result call(final Http.Context context) throws Throwable
     {
+        final boolean allowInsecurePolling = this.configuration.allowInsecurePolling();
         final Option<String> token = extractTokenDetails(context.request());
         if (token.isEmpty())
         {
             return unauthorized("Unauthorised: It appears your session has expired. Please reload the page.");
         }
-        final Option<Token> decryptedToken = AC.validateToken(token.get());
+        final Option<Token> decryptedToken = AC.validateToken(token.get(), allowInsecurePolling);
         if (decryptedToken.isEmpty())
         {
             return unauthorized("Unauthorised: It appears your session has expired. Please reload the page.");
@@ -39,8 +40,11 @@ public final class PageTokenValidatorAction extends Action.Simple
 
         //valid request so lets refresh the token with a new timestamp and add it to the response headers
         //so clients can update their tokens on ajax responses!
-        AC.refreshToken();
-        context.response().setHeader(HEADER_PREFIX + TOKEN_KEY, AC.getToken().get());
+        AC.refreshToken(allowInsecurePolling);
+        if (allowInsecurePolling)
+        {
+            context.response().setHeader(HEADER_PREFIX + TOKEN_KEY, AC.getToken().get());
+        }
         return delegate.call(context);
     }
 

@@ -10,7 +10,7 @@ object ApplicationBuild extends Build {
   val appDependencies = Seq(
     "postgresql" % "postgresql" % "8.4-701.jdbc3",
     "com.atlassian.fugue" % "fugue" % "1.1",
-    "com.atlassian.security" % "atlassian-secure-random" % "3.2",
+    "commons-codec" % "commons-codec" % "1.8",
     "net.oauth.core" % "oauth" % "20090617",
     "com.google.guava" % "guava" % "14.0.1",
     "org.bouncycastle" % "bcprov-jdk16" % "1.46",
