@@ -18,7 +18,7 @@ public final class OAuthRequestValidatorAction extends Action.Simple
         try
         {
             AC.setAcHost(validator.validate(context.request()));
-            AC.createTokenIfExpired();
+            AC.refreshToken();
 
             return delegate.call(context);
         }

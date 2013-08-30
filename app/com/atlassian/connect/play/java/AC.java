@@ -3,16 +3,17 @@ package com.atlassian.connect.play.java;
 import com.atlassian.connect.play.java.model.AcHostModel;
 import com.atlassian.connect.play.java.oauth.OAuthSignatureCalculator;
 import com.atlassian.connect.play.java.token.Token;
-import com.atlassian.connect.play.java.token.TokenKey;
-import com.atlassian.connect.play.java.token.TokenStore;
 import com.atlassian.connect.play.java.util.Environment;
 import com.atlassian.fugue.Option;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.common.io.Files;
+import org.apache.commons.codec.binary.Base64;
 import play.Play;
+import play.api.libs.Crypto;
 import play.db.jpa.JPA;
 import play.libs.F;
+import play.libs.Json;
 import play.libs.WS;
 import play.mvc.Http;
 
@@ -24,11 +25,14 @@ import java.util.concurrent.TimeUnit;
 import static com.atlassian.connect.play.java.Constants.AC_DEV;
 import static com.atlassian.connect.play.java.Constants.AC_HOST_PARAM;
 import static com.atlassian.connect.play.java.Constants.AC_PLUGIN_KEY;
+import static com.atlassian.connect.play.java.Constants.AC_TOKEN;
 import static com.atlassian.connect.play.java.Constants.AC_USER_ID_PARAM;
 import static com.atlassian.connect.play.java.util.Environment.OAUTH_LOCAL_PRIVATE_KEY;
 import static com.atlassian.connect.play.java.util.Environment.OAUTH_LOCAL_PUBLIC_KEY;
 import static com.atlassian.connect.play.java.util.Utils.LOGGER;
+import static com.atlassian.fugue.Option.none;
 import static com.atlassian.fugue.Option.option;
+import static com.atlassian.fugue.Option.some;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Suppliers.memoize;
 import static java.lang.String.format;
@@ -43,7 +47,6 @@ public final class AC
 
     // the base URL
     public static BaseUrl baseUrl;
-    public static TokenStore tokenStore;
     public static long tokenExpiry;
 
     public static final Supplier<String> publicKey = memoize(new Supplier<String>()
@@ -174,19 +177,39 @@ public final class AC
         }
     }
 
-    public static void createTokenIfExpired()
+    public static void refreshToken()
     {
-        tokenStore.createIfExpired(new TokenKey(AC.getAcHost().getKey(), AC.getUser()), System.currentTimeMillis());
+        final Token token = new Token(AC.getAcHost().getKey(), AC.getUser(), System.currentTimeMillis());
+
+        final String jsonToken = Base64.encodeBase64String(token.toJson().toString().getBytes());
+        final String encryptedToken = Crypto.encryptAES(jsonToken);
+
+        getHttpContext().args.put(AC_TOKEN, encryptedToken);
     }
 
-    public static boolean validateToken(final TokenKey key, final String providedToken)
+    public static Option<Token> validateToken(final String encryptedToken)
     {
-        return tokenStore.validate(key, providedToken, System.currentTimeMillis());
+        try
+        {
+            final String decrypted = Crypto.decryptAES(encryptedToken);
+            final Token token = Token.fromJson(Json.parse(new String(Base64.decodeBase64(decrypted))));
+            if (token != null && (System.currentTimeMillis() - AC.tokenExpiry) <= token.getTimestamp())
+            {
+                return some(token);
+            }
+        }
+        catch(Throwable t)
+        {
+            //Crypto throws Exceptions when there's issues decrypting.  That's normal usage in
+            //case someone's trying to fake a token, so lets ignore it here.
+        }
+
+        return none();
     }
 
-    public static Option<Token> getToken()
+    public static Option<String> getToken()
     {
-        return tokenStore.get(new TokenKey(AC.getAcHost().getKey(), AC.getUser()), System.currentTimeMillis());
+        return Option.option((String) getHttpContext().args.get(AC_TOKEN));
     }
 
     static AcHost setAcHost(AcHost host)
