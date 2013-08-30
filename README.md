@@ -190,24 +190,18 @@ this, this module provides a secure token mechanism.  If you use `@ac.page` to d
 automatically be decorated with this secure token.  If `@ac.page` is not used any requests will have to be decorated manually. This can be
 done by adding the following request parameters:
 
-    ?acpt=<SECURE_TOKEN>&acck=<CONSUMER_KEY>&acuid=<USER_ID>
+    ?acpt=<SECURE_TOKEN>
 
-For ajax requests one can also add the following headers to the request:
+For ajax requests one can also add the following header to the request:
 
     X-acpt:<SECURE_TOKEN>
-    X-acck:<CONSUMER_KEY>
-    X-acuid:<USER_ID>
 
-The secure token can be obtained via a call to `AC.tokenStore.get(new TokenKey(AC.getAcHost().getKey(), AC.getUser()), System.currentTimeMillis())`.
+The secure token can be obtained via a call to `AC.getToken().getOrNull()`.
 
-On the server side to verify that an action in your Play controller is being called with a valid token, you can simply add the `@CheckValidPageToken`
-annotation.
-
-By default this module provides an in memory token store which may not be sufficient for large scale production deployments that may require persistence
-to allow for horizontal scaling as well as restarts.  An in memory store could also increase memory usage significantly on a large scale deployment.
-
-A custom token store implementation can be configured via the `ac.token.store` configuration property.  This token store has to implement and follow the
-contract defined in the `TokenStore` interface defined in this module.
+On the server side to verify that an action in your Play controller is being called with a valid token, you can simply add the `@CheckValidToken`
+annotation.  Tokens contain a timestamp and will time out once they are older than 15 minutes (configurable via `ac.token.expiry.secs` in application.conf).
+Any response from an action annotated with @CheckValidToken will contain a fresh token in the 'X-acpt' response header.  If `@ac.page` is used, this will
+trigger tokens to be refreshed client-side automatically, however if `@ac.page` is not used this may have to be done manually.
 
 [play-doc]: http://www.playframework.com/documentation/2.1.1/Home "Play Documentation"
 [sbt]: http://www.scala-sbt.org/ "Simple Build Tool"

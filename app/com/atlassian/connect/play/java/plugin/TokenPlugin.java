@@ -14,11 +14,11 @@ import static com.atlassian.fugue.Option.some;
 /**
  * Takes care of initialising the pluggable token store
  */
-public class TokenStorePlugin extends AbstractPlugin
+public class TokenPlugin extends AbstractPlugin
 {
     private static final long DEFAULT_TOKEN_EXPIRY = TimeUnit.MILLISECONDS.convert(15, TimeUnit.MINUTES);
 
-    public TokenStorePlugin(final Application application)
+    public TokenPlugin(final Application application)
     {
         super(application);
     }
