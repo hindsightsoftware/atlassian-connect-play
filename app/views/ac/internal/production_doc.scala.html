@@ -1,3 +1,5 @@
+@import com.atlassian.connect.play.java.Constants
+
 @ac.internal.page("production") {
 } {
     <h2>Preparing for production</h2>
@@ -12,9 +14,9 @@
         By default the module defines an add-on key for you when in development. If you haven't done so, set your add-on
         key (and name) in the <code>application.conf</code> file:
         <dl>
-           <dt><code>ac.key</code></dt>
+           <dt><code>@Constants.AC_PLUGIN_KEY</code></dt>
            <dd>your add-on key, which is used internally as a key by Atlassian Connect.</dd>
-            <dt><code>ac.name</code></dt>
+            <dt><code>@Constants.AC_PLUGIN_NAME</code></dt>
            <dd>your add-on name, which is used to display the name of you add-on to end users.</dd>
         </dl>
     </p>
