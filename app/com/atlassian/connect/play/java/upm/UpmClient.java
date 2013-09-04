@@ -125,7 +125,7 @@ public final class UpmClient
 
     private void checkInstallStatus(final InstallStatus status, final F.Function<Boolean, F.Promise<Boolean>> callback)
     {
-        if (!status.done)
+        if (!status.done && status.ping > 0)
         {
             LOGGER.trace("Checking the status...");
             scheduleOnce(status.ping, new Runnable()
@@ -196,10 +196,14 @@ public final class UpmClient
         static InstallStatus fromResponse(WS.Response response)
         {
             final JsonNode jsonNode = response.asJson();
-            final int ping = jsonNode.get("pingAfter").getIntValue();
+            final int ping = jsonNode.has("pingAfter") ? jsonNode.get("pingAfter").getIntValue() : 0;
             final String self = jsonNode.get("links").get("self").getTextValue();
             final String id = self.substring(self.lastIndexOf('/') + 1, self.length());
             final boolean done = jsonNode.get("status").get("done").getBooleanValue();
+
+            // if the plugin is installed, lets see if there is some information that might be useful
+            if(done && jsonNode.get("status").has("subCode"))
+                LOGGER.error("An error occurred installing this plugin: "+jsonNode.get("status").get("subCode"));
 
             return new InstallStatus(id, done, ping, false);
         }
