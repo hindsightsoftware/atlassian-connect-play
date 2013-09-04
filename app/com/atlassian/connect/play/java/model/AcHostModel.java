@@ -53,19 +53,23 @@ public final class AcHostModel implements AcHost
     public String name;
     public String description;
 
-    public Long getId() {
+    public Long getId()
+    {
         return id;
     }
 
-    public String getKey() {
+    public String getKey()
+    {
         return key;
     }
 
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
-    public String getDescription() {
+    public String getDescription()
+    {
         return description;
     }
 

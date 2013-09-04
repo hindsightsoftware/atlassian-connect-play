@@ -1,6 +1,7 @@
 package com.atlassian.connect.play.java.plugin;
 
 import com.atlassian.connect.play.java.AC;
+import com.atlassian.connect.play.java.Constants;
 import play.Application;
 
 import static com.atlassian.connect.play.java.util.Utils.LOGGER;
@@ -18,7 +19,7 @@ public final class PluginKeyPlugin extends AbstractPlugin
     {
         if (AC.PLUGIN_KEY == null)
         {
-            LOGGER.error("Property 'ac.key' must be configured with your add-on key. Please add this to your 'conf/application.conf'");
+            LOGGER.error("Property '" + Constants.AC_PLUGIN_KEY + "' must be configured with your add-on key. Please add this to your 'conf/application.conf'");
             throw new IllegalStateException("Add-on key must be defined, see error message above for more information");
         }
         else
