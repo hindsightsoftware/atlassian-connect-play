@@ -1,7 +1,6 @@
 package com.atlassian.connect.play.java.plugin;
 
 import com.atlassian.connect.play.java.AC;
-import com.atlassian.connect.play.java.remoteapps.ConnectClient;
 import com.atlassian.connect.play.java.upm.UpmClient;
 import com.atlassian.fugue.Pair;
 import com.google.common.base.Function;
@@ -62,7 +61,14 @@ public final class AcAutoInstallPlugin extends AbstractDevPlugin
                     {
                         if (!installed)
                         {
-                            return new ConnectClient(baseUrl).install(playAppBaseUrl);
+                            return new UpmClient(baseUrl).install(playAppBaseUrl, new F.Function<Boolean, F.Promise<Boolean>>()
+                            {
+                                @Override
+                                public F.Promise<Boolean> apply(final Boolean aBoolean) throws Throwable
+                                {
+                                    return F.Promise.pure(aBoolean);
+                                }
+                            });
                         }
                         else
                         {
