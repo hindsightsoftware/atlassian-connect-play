@@ -53,36 +53,20 @@ public final class AcAutoInstallPlugin extends AbstractDevPlugin
     private static F.Promise<Pair<URI, Boolean>> install(final URI appUri, final String playAppBaseUrl)
     {
         final String baseUrl = appUri.toString();
-        return new UpmClient(baseUrl)
-                .install(playAppBaseUrl, new F.Function<Boolean, F.Promise<Boolean>>()
-                {
-                    @Override
-                    public F.Promise<Boolean> apply(Boolean installed) throws Throwable
-                    {
-                        if (!installed)
-                        {
-                            return new UpmClient(baseUrl).install(playAppBaseUrl, new F.Function<Boolean, F.Promise<Boolean>>()
-                            {
-                                @Override
-                                public F.Promise<Boolean> apply(final Boolean aBoolean) throws Throwable
-                                {
-                                    return F.Promise.pure(aBoolean);
-                                }
-                            });
-                        }
-                        else
-                        {
-                            return F.Promise.pure(true);
-                        }
-                    }
-                })
-                .map(new F.Function<Boolean, Pair<URI, Boolean>>()
-                {
-                    @Override
-                    public Pair<URI, Boolean> apply(Boolean installed) throws Throwable
-                    {
-                        return pair(appUri, installed);
-                    }
-                });
+        return new UpmClient(baseUrl).install(playAppBaseUrl, new F.Function<Boolean, F.Promise<Boolean>>()
+        {
+            @Override
+            public F.Promise<Boolean> apply(Boolean installed) throws Throwable
+            {
+                return F.Promise.pure(installed);
+            }
+        }).map(new F.Function<Boolean, Pair<URI, Boolean>>()
+        {
+            @Override
+            public Pair<URI, Boolean> apply(Boolean installed) throws Throwable
+            {
+                return pair(appUri, installed);
+            }
+        });
     }
 }
