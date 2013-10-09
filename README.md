@@ -13,6 +13,11 @@ and validation.
 Note that the module will automatically add those generated files to `.gitignore` so that you don't accidentally commit
 them to your git repository.
 
+In production the location of the RSA key pair should be specified via environment variables. This can be done in 2 different ways:
+
+* Specify location of pem key files via the `OAUTH_LOCAL_PUBLIC_KEY_FILE` and `OAUTH_LOCAL_PRIVATE_KEY_FILE` environment variables
+* Specify the key contents directly via the `OAUTH_LOCAL_PUBLIC_KEY` and `OAUTH_LOCAL_PRIVATE_KEY` environment variables
+
 ### Auto-install
 
 The module will, in dev mode, scan for local instance of Atlassian products and auto-install the add-on you're working on on every

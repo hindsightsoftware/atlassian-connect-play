@@ -3,11 +3,10 @@ package com.atlassian.connect.play.java;
 import com.atlassian.connect.play.java.model.AcHostModel;
 import com.atlassian.connect.play.java.oauth.OAuthSignatureCalculator;
 import com.atlassian.connect.play.java.token.Token;
-import com.atlassian.connect.play.java.util.Environment;
+import com.atlassian.connect.play.java.util.OAuthKeys;
 import com.atlassian.fugue.Option;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
-import com.google.common.io.Files;
 import org.apache.commons.codec.binary.Base64;
 import play.Play;
 import play.api.libs.Crypto;
@@ -17,9 +16,6 @@ import play.libs.Json;
 import play.libs.WS;
 import play.mvc.Http;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.concurrent.TimeUnit;
 
 import static com.atlassian.connect.play.java.Constants.AC_DEV;
@@ -27,16 +23,12 @@ import static com.atlassian.connect.play.java.Constants.AC_HOST_PARAM;
 import static com.atlassian.connect.play.java.Constants.AC_PLUGIN_KEY;
 import static com.atlassian.connect.play.java.Constants.AC_TOKEN;
 import static com.atlassian.connect.play.java.Constants.AC_USER_ID_PARAM;
-import static com.atlassian.connect.play.java.util.Environment.OAUTH_LOCAL_PRIVATE_KEY;
-import static com.atlassian.connect.play.java.util.Environment.OAUTH_LOCAL_PUBLIC_KEY;
 import static com.atlassian.connect.play.java.util.Utils.LOGGER;
 import static com.atlassian.fugue.Option.none;
 import static com.atlassian.fugue.Option.option;
 import static com.atlassian.fugue.Option.some;
-import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Suppliers.memoize;
 import static java.lang.String.format;
 import static play.mvc.Http.Context.Implicit.request;
 
@@ -51,55 +43,8 @@ public final class AC
     public static BaseUrl baseUrl;
     public static long tokenExpiry;
 
-    public static final Supplier<String> publicKey = memoize(new Supplier<String>()
-    {
-        @Override
-        public String get()
-        {
-            return getKey(OAUTH_LOCAL_PUBLIC_KEY, "public-key.pem");
-        }
-    });
-
-    public static final Supplier<String> privateKey = memoize(new Supplier<String>()
-    {
-        @Override
-        public String get()
-        {
-            return getKey(OAUTH_LOCAL_PRIVATE_KEY, "private-key.pem");
-        }
-    });
-
-    private static String getKey(String envKey, String fileName)
-    {
-        String key = Environment.getOptionalEnv(envKey, null);
-        if (key == null && isDev())
-        {
-            try
-            {
-                key = getFileContent(fileName);
-            }
-            catch (IOException e)
-            {
-                LOGGER.warn(format("Could not read '%s' file.", fileName), e);
-            }
-        }
-        if (key != null)
-        {
-            if (isDev())
-            {
-                LOGGER.debug(format("Loaded key '%s' as:\n%s", envKey, key));
-            }
-            return key;
-        }
-        throw new IllegalStateException(format("Could NOT find %s for OAuth!", envKey));
-    }
-
-    private static String getFileContent(String pathname) throws IOException
-    {
-        final StringBuilder sb = new StringBuilder();
-        Files.copy(new File(pathname), Charset.forName("UTF-8"), sb);
-        return sb.toString();
-    }
+    public static final Supplier<String> publicKey = OAuthKeys.publicKey;
+    public static final Supplier<String> privateKey = OAuthKeys.privateKey;
 
     public static boolean isDev()
     {

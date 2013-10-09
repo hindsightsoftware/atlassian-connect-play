@@ -10,7 +10,6 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMReader;
 import org.bouncycastle.openssl.PEMWriter;
 import play.Application;
-import play.Play;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,6 +31,8 @@ import java.security.Security;
 import java.security.Signature;
 import java.security.SignatureException;
 
+import static com.atlassian.connect.play.java.util.OAuthKeys.PRIVATE_KEY_PEM;
+import static com.atlassian.connect.play.java.util.OAuthKeys.PUBLIC_KEY_PEM;
 import static com.atlassian.connect.play.java.util.Utils.LOGGER;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
@@ -43,8 +44,6 @@ public class KeyPairPlugin extends AbstractPlugin
     private static final String SHA_1_PRNG = "SHA1PRNG";
     private static final String SHA_1_WITH_RSA = "SHA1withRSA";
 
-    static final String PUBLIC_KEY_PEM = "public-key.pem";
-    static final String PRIVATE_KEY_PEM = "private-key.pem";
     static final Charset UTF_8 = Charset.forName("UTF-8");
 
     static
