@@ -16,6 +16,7 @@ object ApplicationBuild extends Build {
     "org.bouncycastle" % "bcprov-jdk16" % "1.46",
     "com.typesafe.play.extras" % "iteratees-extras_2.10" % "1.0.1",
     "org.hibernate" % "hibernate-entitymanager" % "4.2.1.Final",
+    "xml-apis" % "xml-apis" % "1.4.01",
     javaCore,
     javaJdbc,
     javaJpa
