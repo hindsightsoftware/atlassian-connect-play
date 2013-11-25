@@ -70,16 +70,21 @@ in dev mode).
 
 ### Easy integration of [AUI][aui]
 
-Include AUI easily in your HTML pages using the template provided by the modules `@ac.aui.styles()` and `@ac.aui.scripts()`. You can even choose the
-version you'd like to use `@ac.aui.styles("5.2-m1")` and `@ac.aui.scripts("5.2-m1")` (and make sure to use the same version in each).  For the best
-results, put `@ac.aui.styles()` in the head of your HTML and `@ac.aui.scripts()` at the end of the body (but before your own scripts).
+Include AUI easily in your HTML pages using the template provided by the modules `@ac.aui.styles()` and `@ac.aui.scripts()`. Presently [AUI][aui] 5.2 is the 
+only AUI version provided, but future versions can be used when published by including the AUI version and jQuery versions (Scripts only) as parameters 
+`@ac.aui.styles("5.2")` and `@ac.aui.scripts("5.2", "1.8.3")` (and make sure to use the same version in each).  For the best results, put `@ac.aui.styles()` 
+in the head of your HTML and `@ac.aui.scripts()` at the end of the body (but before your own scripts).
 
-Current supported versions are:
+Previous versions of the Play Module supported older AUI versions, these have been removed as AUI Styles and Scripts are now sourced from a CDN for 
+performance reasons.
 
-* 5.0
-* 5.0.1
-* 5.1 (default)
-* 5.2-m1
+#### [Soy][soy] and experimental AUI features
+
+Support for JavaScript [Soy][soy] templates and experimental AUI features can be enabled by passing additional parameters to the `@ac.aui.styles()` and 
+`@ac.aui.scripts()` templates.
+
+* Enable experimental AUI features `@ac.aui.styles("5.2", true)` and `@ac.aui.scripts("5.2", "1.8.3", true)`
+* Enable soy templates support `@ac.aui.scripts("5.2", "1.8.3", false, true)`
 
 ## Getting started
 
@@ -219,3 +224,4 @@ trigger tokens to be refreshed client-side automatically, however if `@ac.page` 
 [dev]: http://www.playframework.com/documentation/api/2.1.1/java/play/Play.html#isDev()
 [ws]: http://www.playframework.com/documentation/2.1.1/JavaWS
 [aui]: https://docs.atlassian.com/aui/latest/
+[soy]: https://docs.atlassian.com/aui/latest/docs/soy.html
