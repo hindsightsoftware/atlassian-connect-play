@@ -117,7 +117,7 @@ Note that I actually also add my local maven repository for good measure and eas
       // your other dependencies go there
     )
 
-Where _<version>_ is the current version of this module.
+Where _<version>_ is the latest version of this module. The latest published version of the Atlassian Connect Play module can be found in the [Atlassian Maven repository](https://maven.atlassian.com/content/groups/public/com/atlassian/connect/ac-play-java_2.10). The current latest version is 0.6.3.
 
 #### Add the module's routes to your `conf/routes` configuration
 
