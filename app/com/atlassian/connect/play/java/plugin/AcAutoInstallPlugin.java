@@ -15,6 +15,7 @@ import java.util.Set;
 
 import static com.atlassian.fugue.Pair.pair;
 import static com.google.common.collect.Iterables.transform;
+import static com.atlassian.connect.play.java.util.Utils.LOGGER;
 
 public final class AcAutoInstallPlugin extends AbstractDevPlugin
 {
@@ -53,11 +54,14 @@ public final class AcAutoInstallPlugin extends AbstractDevPlugin
     private static F.Promise<Pair<URI, Boolean>> install(final URI appUri, final String playAppBaseUrl)
     {
         final String baseUrl = appUri.toString();
+        LOGGER.info("Attempting to install addon with baseURL = " + playAppBaseUrl + " to application at url = " + baseUrl);
         return new UpmClient(baseUrl).install(playAppBaseUrl, new F.Function<Boolean, F.Promise<Boolean>>()
         {
             @Override
             public F.Promise<Boolean> apply(Boolean installed) throws Throwable
             {
+                LOGGER.info((installed ? "Succeeded" : "Failed") + " installing addon with baseURL = " + playAppBaseUrl +
+                        " to application at url = " + baseUrl);
                 return F.Promise.pure(installed);
             }
         }).map(new F.Function<Boolean, Pair<URI, Boolean>>()

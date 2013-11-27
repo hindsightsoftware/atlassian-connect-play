@@ -6,7 +6,8 @@
     <h3>Override the root URL</h3>
     <p>In your <code>routes</code> file:</p>
     @ac.aui.message() {
-        <code>GET       /                           controllers.Application.index()</code>
+        <code><pre>GET       /                           controllers.Application.index()
+GET       /descriptor                 controllers.Application.descriptor()</code></pre>
     }
     <p>Make sure this comes <em>before</em> the included routes from this module, represented by:</p>
     @ac.aui.message() {
@@ -40,25 +41,27 @@
 package controllers;
 
 import com.atlassian.connect.play.java.controllers.AcController;
-
 import com.google.common.base.Supplier;
-
 import play.mvc.Controller;
 import play.mvc.Result;
+
 
 public class Application extends Controller {
 
     public static Result index() {
         return AcController.index(
                 AcController.home(), // we keep the HTML home page from the module, as this is our documentation for now
-                descriptor());       // serve the descriptor when accept header is 'application/xml', try 'curl -H "Accept: application/xml" http://localhost:9000'
+                descriptorSupplier());       // serve the descriptor when accept header is 'application/xml', try 'curl -H "Accept: application/xml" http://localhost:9000'
     }
 
-    private static Supplier descriptor() {
-        return new Supplier() {
-            @@Override
+    public static Result descriptor() {
+        return ok(views.xml.descriptor.render());
+    }
+
+    private static Supplier<Result> descriptorSupplier() {
+        return new Supplier<Result>() {
             public Result get() {
-                return ok(views.xml.descriptor.render());
+                return descriptor();
             }
         };
     }
@@ -67,7 +70,7 @@ public class Application extends Controller {
     }
 
     @ac.aui.message() {
-        <p>You can view your current descriptor <a href="descriptor-xml">here</a></p>
+        <p>You can view your current descriptor <a href="/descriptor">here</a></p>
     }
 
     @ac.aui.success("That's it!") {

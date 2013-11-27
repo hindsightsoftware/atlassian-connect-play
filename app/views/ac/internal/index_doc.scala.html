@@ -1,6 +1,14 @@
 @ac.internal.page("home") {
 } {
-    <p>Now you're ready to start developing your plugin. Here are a few topics you might be interested in:</p>
+    <p>Now you're ready to start developing your plugin. Before you begin we recommend you turn up the logging for AC Play.
+    Add the following to your application.conf file</p>
+
+    @ac.aui.message() {
+        <pre><code># Logger used by AC Play:
+logger.ac=INFO</code></pre>
+    }
+
+    <p>Here are a few topics you might be interested in:</p>
     <p>
         <ul>
             @ac.internal.connect_menu("home")
