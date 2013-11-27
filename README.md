@@ -156,6 +156,8 @@ using a local postgres installation:
 
 Note that the postgres driver is already a dependency of the module, so you don't need to add a dependency for it.
 
+If you don't have postgres installed you can get it [here](http://www.postgresql.org/). Follow the instructions to create and start a new server. You'll need to create a new user and database. Make sure that you marry up the values in `conf/application.conf` with the values you use in postgres.
+
 The play library uses JPA for persistence so you'll have to create a persistence.xml file in conf/META-INF:
 
     <persistence xmlns="http://java.sun.com/xml/ns/persistence"
