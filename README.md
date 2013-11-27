@@ -42,6 +42,12 @@ handled.
 Note that by default the module will serve the _simplest_ descriptor based on this template when installed, which gives
 you the minimum working Atlassian Connect add-on.
 
+As of version 0.6.4 you can view the descriptor xml by navigating to /@connect/descriptor-xml (e.g If running as localhost [http://localhost:9000/@connect/descriptor-xml](http://localhost:9000/@connect/descriptor-xml)). In older versions use
+
+```
+curl -H "Accept: application/xml"  http://localhost:9000/
+```
+
 ### Validates incoming OAuth request
 
 Thanks to the `@CheckValidOAuthRequest` annotation, you can ensure incoming requests are valid and coming from a known
