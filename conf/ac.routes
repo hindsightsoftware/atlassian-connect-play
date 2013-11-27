@@ -6,6 +6,7 @@ POST     /remote_plugin_enabled             com.atlassian.connect.play.java.cont
 GET      /@connect                          com.atlassian.connect.play.java.controllers.AcDocumentation.index()
 PUT      /@connect                          com.atlassian.connect.play.java.controllers.UpmController.install()
 GET      /@connect/descriptor               com.atlassian.connect.play.java.controllers.AcDocumentation.descriptor()
+GET      /@connect/descriptor-xml           com.atlassian.connect.play.java.controllers.AcController.descriptor()
 GET      /@connect/production               com.atlassian.connect.play.java.controllers.AcDocumentation.production()
 
 GET      /@admin                            com.atlassian.connect.play.java.controllers.AcAdmin.index()
