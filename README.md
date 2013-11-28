@@ -98,7 +98,7 @@ Support for JavaScript [Soy][soy] templates and experimental AUI features can be
 
 You should find everything you need on the [Play! website][play-doc]. 
 
-_Note: When you run `play new` make sure you choose the **Create a simple Java application** option when prompted. AC Play Java supports Java only. There is an open source Scala version of AC Play in Atlassian Labs if you prefer, but note that it is not officially supported by Atlassian._ 
+_Note: When you run `play new` make sure you choose the **Create a simple Java application** option when prompted. AC Play Java supports Java only. There is an open source [Scala version of AC Play](https://bitbucket.org/atlassian/atlassian-connect-play-scala) in Atlassian Labs if you prefer, but note that it is not officially supported by Atlassian._ 
 
 Once you have your Play application up and running, go to
 the next step:
