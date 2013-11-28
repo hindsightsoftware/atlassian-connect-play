@@ -229,6 +229,29 @@ in the context of the current request.
 * OAuth signing. Your request will be automatically signed, given the key pair you have defined (or we have defined for you
 in dev mode).
 
+#### Using the product REST API
+
+Certain REST URLs may require additional permissions that should be added to your atlassian-plugin.xml file.
+
+[Jira Permissions](https://developer.atlassian.com/static/connect/index-plugin.html?lic=none&xdm_e=https%3A%2F%2Fdeveloper.atlassian.com&xdm_c=channel-interactive-guide-0&xdm_p=1#jira/permissions)
+
+[Confluence Permissions](https://developer.atlassian.com/static/connect/index-plugin.html?lic=none&xdm_e=https%3A%2F%2Fdeveloper.atlassian.com&xdm_c=channel-interactive-guide-0&xdm_p=1#confluence/permissions)
+
+For example, to view details of a specific jira issue.
+
+    AC.url("/rest/api/2/issue/ISSUE-KEY").get();
+
+You also need to add the permission:
+````
+<!--! This plugin needs several permissions: -->
+<permissions>
+    <!--! * Create a trusted link in JIRA that will allow authenticated REST calls -->
+    <permission>create_oauth_link</permission>
+    <!--! * Query JIRA issues, projects, and issue types -->
+    <permission>browse_projects</permission>
+</permissions>
+````
+
 ### Easy integration of [AUI][aui]
 [auiIntegration]:
 
