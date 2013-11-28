@@ -5,16 +5,16 @@
 This is a Play module to help develop Atlassian Connect add-ons. Here are a few of the useful features it brings to
 add-on developers:
 
-* [Creation of RSA key pair][rsaCreation]
-* [Auto-install of Addon][autoInstall]
-* [Addon descriptor template][descriptorTemplate]
-* [Validates incoming OAuth request][requestValidation]
-* [Enables multi-tenancy][multiTenancy]
-* [Make calls back to the host application][hostRequests]
-* [Easy integration of AUI][auiIntegration]
-* [Soy and experimental AUI features][soyTemplates]
+* [Creation of RSA key pair](#markdown-header-creation-of-rsa-key-pair)
+* [Auto-install of Addon](#markdown-header-auto-install)
+* [Addon descriptor template](#markdown-header-add-on-descriptor-template)
+* [Validates incoming OAuth request](#markdown-header-validates-incoming-oauth-request)
+* [Enables multi-tenancy](#markdown-header-enables-multi-tenancy)
+* [Make calls back to the host application](#markdown-header-make-calls-back-to-the-host-application)
+* [Easy integration of AUI](#markdown-header-easy-integration-of-aui)
+* [Soy and experimental AUI features](#markdown-header-soy-and-experimental-aui-features)
 
-More details can be found in the [AC Play Java Benefits][benefits] section.
+More details can be found in the [AC Play Java Benefits](#markdown-header-ac-play-java-benefits) section.
 
 ## Getting started
 
