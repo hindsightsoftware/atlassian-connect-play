@@ -42,6 +42,12 @@ handled.
 Note that by default the module will serve the _simplest_ descriptor based on this template when installed, which gives
 you the minimum working Atlassian Connect add-on.
 
+As of version 0.6.4 you can view the descriptor xml by navigating to /@connect/descriptor-xml (e.g If running as localhost [http://localhost:9000/@connect/descriptor-xml](http://localhost:9000/@connect/descriptor-xml)). In older versions use
+
+```
+curl -H "Accept: application/xml"  http://localhost:9000/
+```
+
 ### Validates incoming OAuth request
 
 Thanks to the `@CheckValidOAuthRequest` annotation, you can ensure incoming requests are valid and coming from a known
@@ -90,7 +96,11 @@ Support for JavaScript [Soy][soy] templates and experimental AUI features can be
 
 ### Create your Java Play application
 
-You should find everything you need on the [Play! website][play-doc]. Once you have your Play application up and running, go to
+You should find everything you need on the [Play! website][play-doc]. 
+
+_Note: When you run `play new` make sure you choose the **Create a simple Java application** option when prompted. AC Play Java supports Java only. There is an open source [Scala version of AC Play](https://bitbucket.org/atlassian/atlassian-connect-play-scala) in Atlassian Labs if you prefer, but note that it is not officially supported by Atlassian._ 
+
+Once you have your Play application up and running, go to
 the next step:
 
 ### Add this module to your Play application.
@@ -149,6 +159,8 @@ using a local postgres installation:
     jpa.default=defaultPersistenceUnit
 
 Note that the postgres driver is already a dependency of the module, so you don't need to add a dependency for it.
+
+If you don't have postgres installed you can get it [here](http://www.postgresql.org/). Follow the instructions to create and start a new server. You'll need to create a new user and database. Make sure that you marry up the values in `conf/application.conf` with the values you use in postgres.
 
 The play library uses JPA for persistence so you'll have to create a persistence.xml file in conf/META-INF:
 
