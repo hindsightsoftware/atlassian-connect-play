@@ -2,9 +2,10 @@ package com.atlassian.connect.play.java.controllers;
 
 import com.atlassian.connect.play.java.plugin.AcAutoInstallPlugin;
 import com.atlassian.fugue.Pair;
-import org.codehaus.jackson.node.ArrayNode;
-import org.codehaus.jackson.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import play.libs.F;
+import play.libs.F.Promise;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -17,16 +18,16 @@ import java.util.List;
 @With(IsDevAction.class)
 public class UpmController extends Controller
 {
-    public static Result install()
+    public static Promise<Result> install()
     {
-        return async(AcAutoInstallPlugin.install().map(new F.Function<List<Pair<URI, Boolean>>, Result>()
+        return AcAutoInstallPlugin.install().map(new F.Function<List<Pair<URI, Boolean>>, Result>()
         {
             @Override
             public Result apply(List<Pair<URI, Boolean>> pairs) throws Throwable
             {
                 return Results.ok(newJsonHosts(pairs));
             }
-        }));
+        });
     }
 
     private static ObjectNode newJsonHosts(List<Pair<URI, Boolean>> pairs)

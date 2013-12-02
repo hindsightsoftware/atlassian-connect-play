@@ -2,14 +2,12 @@ package com.atlassian.connect.play.java.oauth;
 
 import com.atlassian.connect.play.java.BaseUrl;
 import com.atlassian.connect.play.java.PublicKeyStore;
-import com.atlassian.connect.play.java.util.Utils;
 import com.atlassian.fugue.Option;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import net.oauth.*;
 import net.oauth.signature.RSA_SHA1;
-import play.Logger;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

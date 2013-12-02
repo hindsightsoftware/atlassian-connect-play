@@ -5,7 +5,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Supplier;
 import controllers.AssetsBuilder;
 import com.atlassian.connect.play.java.model.AcHostModel;
-import org.codehaus.jackson.JsonNode;
+import com.fasterxml.jackson.databind.JsonNode;
 import play.api.mvc.Action;
 import play.api.mvc.AnyContent;
 import play.db.jpa.Transactional;
@@ -19,7 +19,7 @@ import static com.google.common.base.Suppliers.ofInstance;
 import static java.lang.Boolean.FALSE;
 import static java.lang.String.format;
 import static play.mvc.Controller.request;
-import static play.mvc.Results.ok;
+import play.mvc.Results;
 
 public class AcController
 {
@@ -106,7 +106,7 @@ public class AcController
             @Override
             public Result get()
             {
-                return ok(internal_descriptor.render());
+                return Results.ok(internal_descriptor.render());
             }
         };
     }
@@ -143,7 +143,7 @@ public class AcController
         acHost.description = getAttributeAsText(remoteApp, "description");
 
         AcHostModel.create(acHost);
-        return ok();
+        return Results.ok();
     }
 
     private static AssetsBuilder delegate = new AssetsBuilder();
@@ -155,6 +155,6 @@ public class AcController
 
     private static String getAttributeAsText(JsonNode json, String name)
     {
-        return json.get(name).getTextValue();
+        return json.get(name).textValue();
     }
 }
