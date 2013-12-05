@@ -16,6 +16,9 @@ add-on developers:
 
 More details can be found in the [AC Play Java Benefits](#markdown-header-ac-play-java-benefits) section.
 
+## Release Notes
+0.6.4 Upgrades to Play 2.2. **Note this is a backwards incompatible change**.
+
 ## Getting started
 
 ### Create your Java Play application
