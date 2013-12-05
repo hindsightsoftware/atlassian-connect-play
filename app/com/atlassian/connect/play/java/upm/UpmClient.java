@@ -2,7 +2,7 @@ package com.atlassian.connect.play.java.upm;
 
 import akka.actor.Cancellable;
 import com.ning.http.client.Realm;
-import org.codehaus.jackson.JsonNode;
+import com.fasterxml.jackson.databind.JsonNode;
 import play.libs.Akka;
 import play.libs.F;
 import play.libs.WS;
@@ -198,10 +198,10 @@ public final class UpmClient
             final JsonNode jsonNode = response.asJson();
             final JsonNode statusNode = jsonNode.get("status");
 
-            final int ping = jsonNode.has("pingAfter") ? jsonNode.get("pingAfter").getIntValue() : 0;
-            final String self = jsonNode.get("links").get("self").getTextValue();
+            final int ping = jsonNode.has("pingAfter") ? jsonNode.get("pingAfter").intValue() : 0;
+            final String self = jsonNode.get("links").get("self").textValue();
             final String id = self.substring(self.lastIndexOf('/') + 1, self.length());
-            final boolean done = statusNode.get("done").getBooleanValue();
+            final boolean done = statusNode.get("done").booleanValue();
 
             // if the plugin is installed, lets see if there is some information that might be useful
             if(done && statusNode.has("subCode"))

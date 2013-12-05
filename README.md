@@ -16,13 +16,16 @@ add-on developers:
 
 More details can be found in the [AC Play Java Benefits](#markdown-header-ac-play-java-benefits) section.
 
+## Release Notes
+0.6.4 Upgrades to Play 2.2. **Note this is a backwards incompatible change**.
+
 ## Getting started
 
 ### Create your Java Play application
 
-You should find everything you need on the [Play! website][play-doc]. 
+You should find everything you need on the [Play! website][play-doc].
 
-_Note: When you run `play new` make sure you choose the **Create a simple Java application** option when prompted. AC Play Java supports Java only. There is an open source [Scala version of AC Play](https://bitbucket.org/atlassianlabs/atlassian-connect-play-scala) in Atlassian Labs if you prefer, but note that it is not officially supported by Atlassian._
+_Note: When you run `play new` make sure you choose the **Create a simple Java application** option when prompted. AC Play Java supports Java only. There is an open source [Scala version of AC Play][ac-play-scala] in Atlassian Labs if you prefer, but note that it is not officially supported by Atlassian._
 
 Once you have your Play application up and running, go to
 the next step:
@@ -51,7 +54,7 @@ Note that I actually also add my local maven repository for good measure and eas
       // your other dependencies go there
     )
 
-Where _<version>_ is the latest version of this module. The latest published version of the Atlassian Connect Play module can be found in the [Atlassian Maven repository](https://maven.atlassian.com/content/groups/public/com/atlassian/connect/ac-play-java_2.10). The current latest version is 0.6.3.
+Where _<version>_ is the latest version of this module. The latest published version of the Atlassian Connect Play module can be found in the [Atlassian Maven repository][atlassian-maven-repo]. The current latest version is 0.6.4.
 
 #### Add the module's routes to your `conf/routes` configuration
 
@@ -59,7 +62,7 @@ Comment the default application index and add the module's routes:
 
     # Home page
     # GET     /                           controllers.Application.index()
-    ->      /                                   ac.Routes
+    ->        /                           ac.Routes
 
 This will ensure that any routes that are not handled by your application are delegated to this helper module.
 
@@ -156,7 +159,7 @@ trigger tokens to be refreshed client-side automatically, however if `@ac.page` 
 [benefits]:
 
 ### Creation of RSA key pair
-[rsaCreation]: 
+[rsaCreation]:
 This module will, in [dev mode][dev], generate an RSA key pair, as pem files to be used by your add-on for OAuth signing
 and validation.
 
@@ -194,7 +197,7 @@ handled.
 Note that by default the module will serve the _simplest_ descriptor based on this template when installed, which gives
 you the minimum working Atlassian Connect add-on.
 
-As of version 0.6.4 you can view the descriptor xml by navigating to /@connect/descriptor-xml (e.g If running as localhost [http://localhost:9000/@connect/descriptor-xml](http://localhost:9000/@connect/descriptor-xml)). In older versions use
+If you follow the instuctions in Getting Started then you can view the descriptor xml by navigating to /descriptor (e.g If running as localhost [http://localhost:9000/descriptor](http://localhost:9000/descriptor)). Or alternatively use
 
 ```
 curl -H "Accept: application/xml"  http://localhost:9000/
@@ -233,9 +236,9 @@ in dev mode).
 
 Certain REST URLs may require additional permissions that should be added to your atlassian-plugin.xml file.
 
-[Jira Permissions](https://developer.atlassian.com/static/connect/index-plugin.html?lic=none&xdm_e=https%3A%2F%2Fdeveloper.atlassian.com&xdm_c=channel-interactive-guide-0&xdm_p=1#jira/permissions)
+[Jira Permissions][jira-permissions]
 
-[Confluence Permissions](https://developer.atlassian.com/static/connect/index-plugin.html?lic=none&xdm_e=https%3A%2F%2Fdeveloper.atlassian.com&xdm_c=channel-interactive-guide-0&xdm_p=1#confluence/permissions)
+[Confluence Permissions][confluence-permissions]
 
 For example, to view details of a specific jira issue.
 
@@ -255,30 +258,34 @@ You also need to add the permission:
 ### Easy integration of [AUI][aui]
 [auiIntegration]:
 
-Include AUI easily in your HTML pages using the template provided by the modules `@ac.aui.styles()` and `@ac.aui.scripts()`. Presently [AUI][aui] 5.2 is the 
-only AUI version provided, but future versions can be used when published by including the AUI version and jQuery versions (Scripts only) as parameters 
-`@ac.aui.styles("5.2")` and `@ac.aui.scripts("5.2", "1.8.3")` (and make sure to use the same version in each).  For the best results, put `@ac.aui.styles()` 
+Include AUI easily in your HTML pages using the template provided by the modules `@ac.aui.styles()` and `@ac.aui.scripts()`. Presently [AUI][aui] 5.2 is the
+only AUI version provided, but future versions can be used when published by including the AUI version and jQuery versions (Scripts only) as parameters
+`@ac.aui.styles("5.2")` and `@ac.aui.scripts("5.2", "1.8.3")` (and make sure to use the same version in each).  For the best results, put `@ac.aui.styles()`
 in the head of your HTML and `@ac.aui.scripts()` at the end of the body (but before your own scripts).
 
-Previous versions of the Play Module supported older AUI versions, these have been removed as AUI Styles and Scripts are now sourced from a CDN for 
+Previous versions of the Play Module supported older AUI versions, these have been removed as AUI Styles and Scripts are now sourced from a CDN for
 performance reasons.
 
 #### [Soy][soy] and experimental AUI features
 [soyTemplates]:
 
-Support for JavaScript [Soy][soy] templates and experimental AUI features can be enabled by passing additional parameters to the `@ac.aui.styles()` and 
+Support for JavaScript [Soy][soy] templates and experimental AUI features can be enabled by passing additional parameters to the `@ac.aui.styles()` and
 `@ac.aui.scripts()` templates.
 
 * Enable experimental AUI features `@ac.aui.styles("5.2", true)` and `@ac.aui.scripts("5.2", "1.8.3", true)`
 * Enable soy templates support `@ac.aui.scripts("5.2", "1.8.3", false, true)`
 
-
-[play-doc]: http://www.playframework.com/documentation/2.1.1/Home "Play Documentation"
+## Links
+[play-doc]: http://www.playframework.com/documentation/2.2.x/Home "Play Documentation"
 [sbt]: http://www.scala-sbt.org/ "Simple Build Tool"
-[jdbc]: http://www.playframework.com/documentation/2.1.1/SettingsJDBC
-[ebean]: http://www.playframework.com/documentation/2.1.1/JavaEbean
-[evolutions]: http://www.playframework.com/documentation/2.1.1/Evolutions
-[dev]: http://www.playframework.com/documentation/api/2.1.1/java/play/Play.html#isDev()
-[ws]: http://www.playframework.com/documentation/2.1.1/JavaWS
+[jdbc]: http://www.playframework.com/documentation/2.2.x/SettingsJDBC
+[ebean]: http://www.playframework.com/documentation/2.2.x/JavaEbean
+[evolutions]: http://www.playframework.com/documentation/2.2.x/Evolutions
+[dev]: http://www.playframework.com/documentation/api/2.2.x/java/play/Play.html#isDev()
+[ws]: http://www.playframework.com/documentation/2.2.x/JavaWS
 [aui]: https://docs.atlassian.com/aui/latest/
 [soy]: https://docs.atlassian.com/aui/latest/docs/soy.html
+[jira-permissions]: https://developer.atlassian.com/static/connect/index-plugin.html?lic=none&xdm_e=https%3A%2F%2Fdeveloper.atlassian.com&xdm_c=channel-interactive-guide-0&xdm_p=1#jira/permissions "Jira Permissions"
+[confluence-permissions]: https://developer.atlassian.com/static/connect/index-plugin.html?lic=none&xdm_e=https%3A%2F%2Fdeveloper.atlassian.com&xdm_c=channel-interactive-guide-0&xdm_p=1#confluence/permissions "Confluence Permissions"
+[ac-play-scala]: https://bitbucket.org/atlassianlabs/atlassian-connect-play-scala "Scala version of AC Play"
+[atlassian-maven-repo]: https://maven.atlassian.com/content/groups/public/com/atlassian/connect/ac-play-java_2.10 "Atlassian Maven repository"

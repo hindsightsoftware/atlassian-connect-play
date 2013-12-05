@@ -3,7 +3,7 @@ package com.atlassian.connect.play.java.play;
 import com.google.common.collect.ObjectArrays;
 import play.GlobalSettings;
 import play.api.mvc.EssentialFilter;
-import play.extras.iteratees.GzipFilter;
+import play.filters.gzip.GzipFilter;
 import play.mvc.Action;
 import play.mvc.Http;
 
@@ -19,7 +19,7 @@ public class AcGlobalSettings extends GlobalSettings
     }
 
     @Override
-    public Action onRequest(final Http.Request request, final Method actionMethod)
+    public Action<WithCacheControl> onRequest(final Http.Request request, final Method actionMethod)
     {
         return new CacheControlAction();
     }

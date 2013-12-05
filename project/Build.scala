@@ -14,12 +14,13 @@ object ApplicationBuild extends Build {
     "net.oauth.core" % "oauth" % "20090617",
     "com.google.guava" % "guava" % "14.0.1",
     "org.bouncycastle" % "bcprov-jdk16" % "1.46",
-    "com.typesafe.play.extras" % "iteratees-extras_2.10" % "1.0.1",
     "org.hibernate" % "hibernate-entitymanager" % "4.2.1.Final",
     "xml-apis" % "xml-apis" % "1.4.01",
     javaCore,
     javaJdbc,
-    javaJpa
+    javaJpa,
+    cache,
+    filters
   )
 
   val main = play.Project(appName, appVersion, appDependencies).settings(

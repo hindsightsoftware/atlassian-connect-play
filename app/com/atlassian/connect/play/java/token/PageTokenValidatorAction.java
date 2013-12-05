@@ -2,11 +2,13 @@ package com.atlassian.connect.play.java.token;
 
 import com.atlassian.connect.play.java.AC;
 import com.atlassian.fugue.Option;
+
 import org.apache.commons.lang3.StringUtils;
+
+import play.libs.F.Promise;
 import play.mvc.Action;
 import play.mvc.Http;
-import play.mvc.Result;
-
+import play.mvc.SimpleResult;
 import static com.atlassian.connect.play.java.Constants.AC_USER_ID_PARAM;
 import static com.atlassian.fugue.Option.option;
 
@@ -17,18 +19,18 @@ public final class PageTokenValidatorAction extends Action<CheckValidToken>
     public static final String TOKEN_KEY = "acpt";
 
     @Override
-    public Result call(final Http.Context context) throws Throwable
+    public Promise<SimpleResult> call(final Http.Context context) throws Throwable
     {
         final boolean allowInsecurePolling = this.configuration.allowInsecurePolling();
         final Option<String> token = extractTokenDetails(context.request());
         if (token.isEmpty())
         {
-            return unauthorized("Unauthorised: It appears your session has expired. Please reload the page.");
+            return Promise.pure((SimpleResult)unauthorized("Unauthorised: It appears your session has expired. Please reload the page."));
         }
         final Option<Token> decryptedToken = AC.validateToken(token.get(), allowInsecurePolling);
         if (decryptedToken.isEmpty())
         {
-            return unauthorized("Unauthorised: It appears your session has expired. Please reload the page.");
+            return Promise.pure((SimpleResult)unauthorized("Unauthorised: It appears your session has expired. Please reload the page."));
         }
 
         AC.setAcHost(decryptedToken.get().getAcHost());

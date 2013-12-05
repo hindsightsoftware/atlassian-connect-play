@@ -2,11 +2,12 @@ package com.atlassian.connect.play.java.play;
 
 import com.atlassian.connect.play.java.AC;
 import com.google.common.base.Function;
+
 import play.Play;
+import play.libs.F.Promise;
 import play.mvc.Action;
 import play.mvc.Http;
-import play.mvc.Result;
-
+import play.mvc.SimpleResult;
 import javax.annotation.Nullable;
 
 import static com.atlassian.fugue.Option.option;
@@ -16,14 +17,14 @@ public final class CacheControlAction extends Action<WithCacheControl>
 {
     private static final String DEFAULT_CACHE_CONTROL = Play.application().configuration().getString("ac.cache-control", AC.isDev() ? "no-cache" : null);
 
-    public Result call(Http.Context ctx) throws Throwable
+    public Promise<SimpleResult> call(Http.Context ctx) throws Throwable
     {
         if (!ctx.args.containsKey(CACHE_CONTROL))
         {
             ctx.args.put(CACHE_CONTROL, getCacheControl());
         }
 
-        final Result result = delegate.call(ctx);
+        final Promise<SimpleResult> result = delegate.call(ctx);
 
         final String cacheControl = (String) ctx.args.get(CACHE_CONTROL);
         final Http.Response response = ctx.response();
