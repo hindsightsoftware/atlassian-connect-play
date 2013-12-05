@@ -5,87 +5,26 @@
 This is a Play module to help develop Atlassian Connect add-ons. Here are a few of the useful features it brings to
 add-on developers:
 
-### Creation of RSA key pair
+* [Creation of RSA key pair](#markdown-header-creation-of-rsa-key-pair)
+* [Auto-install of Addon](#markdown-header-auto-install)
+* [Addon descriptor template](#markdown-header-add-on-descriptor-template)
+* [Validates incoming OAuth request](#markdown-header-validates-incoming-oauth-request)
+* [Enables multi-tenancy](#markdown-header-enables-multi-tenancy)
+* [Make calls back to the host application](#markdown-header-make-calls-back-to-the-host-application)
+* [Easy integration of AUI](#markdown-header-easy-integration-of-aui)
+* [Soy and experimental AUI features](#markdown-header-soy-and-experimental-aui-features)
 
-This module will, in [dev mode][dev], generate an RSA key pair, as pem files to be used by your add-on for OAuth signing
-and validation.
-
-Note that the module will automatically add those generated files to `.gitignore` so that you don't accidentally commit
-them to your git repository.
-
-In production the location of the RSA key pair should be specified via environment variables. This can be done in 2 different ways:
-
-* Specify location of pem key files via the `OAUTH_LOCAL_PUBLIC_KEY_FILE` and `OAUTH_LOCAL_PRIVATE_KEY_FILE` environment variables
-* Specify the key contents directly via the `OAUTH_LOCAL_PUBLIC_KEY` and `OAUTH_LOCAL_PRIVATE_KEY` environment variables
-
-### Auto-install
-
-The module will, in dev mode, scan for local instance of Atlassian products and auto-install the add-on you're working on on every
-change, thus shortening the dev loop. Consider running your Play app with `~ run` to make it even shorter.
-
-Here is the list of applications the module will scan for:
-
-* http://localhost:1990/confluence
-* http://localhost:2990/jira
-* http://localhost:5990/refapp
-
-### Add-on descriptor template
-
-This module provides an add-on descriptor template `@ac.descriptor(){}{}` so that you don't need to worry about the default
-descriptor configuration:
-
-* defining the `remote-plugin-container` with the correct base URL and public RSA key. Note that the base URL is computed
-by the app and can be further defined using the `BASE_URL` environment variable.
-* defining the registration `webhook` so that installation events of the add-on in host application are automatically
-handled.
-
-Note that by default the module will serve the _simplest_ descriptor based on this template when installed, which gives
-you the minimum working Atlassian Connect add-on.
-
-### Validates incoming OAuth request
-
-Thanks to the `@CheckValidOAuthRequest` annotation, you can ensure incoming requests are valid and coming from a known
-trusted host application. This also...
-
-### Enables multi-tenancy
-
-You can in the context of an OAuth request identify the host application the request is coming from `AC#getAcHost()`
-and also the user on whose behalf the request is made `AC#getUser()`.
-
-For multi-tenancy, the important thing is to identify the `key` of the host application available from the `AcHost`
-and of course keep track of the current user.
-
-### Make calls back to the host application
-
-Play comes with a [nice library to make HTTP requests][ws] to any host or URL. This module provides a shortcut to make HTTP
-requests back to the host application, using that same API. Simply start your calls with `AC#url` instead of `WS#url`. This
-gives you:
-
-* relative URL handling. Don't put absolute URLs, the helper knows about the current host application you're working with
-in the context of the current request.
-* default timeout. You never know what might be going on the network, never make an HTTP request without a timeout.
-* user identification. The request is going to be made as the current user in the HTTP request context.
-* OAuth signing. Your request will be automatically signed, given the key pair you have defined (or we have defined for you
-in dev mode).
-
-### Easy integration of [AUI][aui]
-
-Include AUI easily in your HTML pages using the template provided by the modules `@ac.aui.styles()` and `@ac.aui.scripts()`. You can even choose the
-version you'd like to use `@ac.aui.styles("5.2-m1")` and `@ac.aui.scripts("5.2-m1")` (and make sure to use the same version in each).  For the best
-results, put `@ac.aui.styles()` in the head of your HTML and `@ac.aui.scripts()` at the end of the body (but before your own scripts).
-
-Current supported versions are:
-
-* 5.0
-* 5.0.1
-* 5.1 (default)
-* 5.2-m1
+More details can be found in the [AC Play Java Benefits](#markdown-header-ac-play-java-benefits) section.
 
 ## Getting started
 
 ### Create your Java Play application
 
-You should find everything you need on the [Play! website][play-doc]. Once you have your Play application up and running, go to
+You should find everything you need on the [Play! website][play-doc].
+
+_Note: When you run `play new` make sure you choose the **Create a simple Java application** option when prompted. AC Play Java supports Java only. There is an open source [Scala version of AC Play](https://bitbucket.org/atlassianlabs/atlassian-connect-play-scala) in Atlassian Labs if you prefer, but note that it is not officially supported by Atlassian._
+
+Once you have your Play application up and running, go to
 the next step:
 
 ### Add this module to your Play application.
@@ -112,7 +51,7 @@ Note that I actually also add my local maven repository for good measure and eas
       // your other dependencies go there
     )
 
-Where _<version>_ is the current version of this module.
+Where _<version>_ is the latest version of this module. The latest published version of the Atlassian Connect Play module can be found in the [Atlassian Maven repository](https://maven.atlassian.com/content/groups/public/com/atlassian/connect/ac-play-java_2.10). The current latest version is 0.6.3.
 
 #### Add the module's routes to your `conf/routes` configuration
 
@@ -144,6 +83,8 @@ using a local postgres installation:
     jpa.default=defaultPersistenceUnit
 
 Note that the postgres driver is already a dependency of the module, so you don't need to add a dependency for it.
+
+If you don't have postgres installed you can get it [here](http://www.postgresql.org/). Follow the instructions to create and start a new server. You'll need to create a new user and database. Make sure that you marry up the values in `conf/application.conf` with the values you use in postgres.
 
 The play library uses JPA for persistence so you'll have to create a persistence.xml file in conf/META-INF:
 
@@ -182,7 +123,7 @@ able to access the actual application.
 
 If all went well, you should now see the welcome page of the Atlassian Connect Play Module:
 
-![The Atlassian Connect Play Module home page](raw/master/public/img/ac-home-page.png "The Atlassian Connect Play Module home page")
+![The Atlassian Connect Play Module home page](https://bitbucket.org/atlassian/atlassian-connect-play-java/raw/master/public/img/ac-home-page.png "The Atlassian Connect Play Module home page")
 
 Follow the instructions on that page on defining your own descriptor.
 
@@ -211,11 +152,133 @@ annotation.  Tokens contain a timestamp and will time out once they are older th
 Any response from an action annotated with @CheckValidToken will contain a fresh token in the 'X-acpt' response header.  If `@ac.page` is used, this will
 trigger tokens to be refreshed client-side automatically, however if `@ac.page` is not used this may have to be done manually.
 
-[play-doc]: http://www.playframework.com/documentation/2.1.1/Home "Play Documentation"
+## AC Play Java Benefits
+[benefits]:
+
+### Creation of RSA key pair
+[rsaCreation]:
+This module will, in [dev mode][dev], generate an RSA key pair, as pem files to be used by your add-on for OAuth signing
+and validation.
+
+Note that the module will automatically add those generated files to `.gitignore` so that you don't accidentally commit
+them to your git repository.
+
+In production the location of the RSA key pair should be specified via environment variables. This can be done in 2 different ways:
+
+* Specify location of pem key files via the `OAUTH_LOCAL_PUBLIC_KEY_FILE` and `OAUTH_LOCAL_PRIVATE_KEY_FILE` environment variables
+* Specify the key contents directly via the `OAUTH_LOCAL_PUBLIC_KEY` and `OAUTH_LOCAL_PRIVATE_KEY` environment variables
+
+### Auto-install
+[autoInstall]:
+
+The module will, in dev mode, scan for local instance of Atlassian products and auto-install the add-on you're working on on every
+change, thus shortening the dev loop. Consider running your Play app with `~ run` to make it even shorter.
+
+Here is the list of applications the module will scan for:
+
+* http://localhost:1990/confluence
+* http://localhost:2990/jira
+* http://localhost:5990/refapp
+
+### Add-on descriptor template
+[descriptorTemplate]:
+
+This module provides an add-on descriptor template `@ac.descriptor(){}{}` so that you don't need to worry about the default
+descriptor configuration:
+
+* defining the `remote-plugin-container` with the correct base URL and public RSA key. Note that the base URL is computed
+by the app and can be further defined using the `BASE_URL` environment variable.
+* defining the registration `webhook` so that installation events of the add-on in host application are automatically
+handled.
+
+Note that by default the module will serve the _simplest_ descriptor based on this template when installed, which gives
+you the minimum working Atlassian Connect add-on.
+
+As of version 0.6.4 you can view the descriptor xml by navigating to /@connect/descriptor-xml (e.g If running as localhost [http://localhost:9000/@connect/descriptor-xml](http://localhost:9000/@connect/descriptor-xml)). In older versions use
+
+```
+curl -H "Accept: application/xml"  http://localhost:9000/
+```
+
+### Validates incoming OAuth request
+[requestValidation]:
+
+Thanks to the `@CheckValidOAuthRequest` annotation, you can ensure incoming requests are valid and coming from a known
+trusted host application. This also...
+
+### Enables multi-tenancy
+[multiTenancy]:
+
+You can in the context of an OAuth request identify the host application the request is coming from `AC#getAcHost()`
+and also the user on whose behalf the request is made `AC#getUser()`.
+
+For multi-tenancy, the important thing is to identify the `key` of the host application available from the `AcHost`
+and of course keep track of the current user.
+
+### Make calls back to the host application
+[hostRequests]:
+
+Play comes with a [nice library to make HTTP requests][ws] to any host or URL. This module provides a shortcut to make HTTP
+requests back to the host application, using that same API. Simply start your calls with `AC#url` instead of `WS#url`. This
+gives you:
+
+* relative URL handling. Don't put absolute URLs, the helper knows about the current host application you're working with
+in the context of the current request.
+* default timeout. You never know what might be going on the network, never make an HTTP request without a timeout.
+* user identification. The request is going to be made as the current user in the HTTP request context.
+* OAuth signing. Your request will be automatically signed, given the key pair you have defined (or we have defined for you
+in dev mode).
+
+#### Using the product REST API
+
+Certain REST URLs may require additional permissions that should be added to your atlassian-plugin.xml file.
+
+[Jira Permissions](https://developer.atlassian.com/static/connect/index-plugin.html?lic=none&xdm_e=https%3A%2F%2Fdeveloper.atlassian.com&xdm_c=channel-interactive-guide-0&xdm_p=1#jira/permissions)
+
+[Confluence Permissions](https://developer.atlassian.com/static/connect/index-plugin.html?lic=none&xdm_e=https%3A%2F%2Fdeveloper.atlassian.com&xdm_c=channel-interactive-guide-0&xdm_p=1#confluence/permissions)
+
+For example, to view details of a specific jira issue.
+
+    AC.url("/rest/api/2/issue/ISSUE-KEY").get();
+
+You also need to add the permission:
+````
+<!--! This plugin needs several permissions: -->
+<permissions>
+    <!--! * Create a trusted link in JIRA that will allow authenticated REST calls -->
+    <permission>create_oauth_link</permission>
+    <!--! * Query JIRA issues, projects, and issue types -->
+    <permission>browse_projects</permission>
+</permissions>
+````
+
+### Easy integration of [AUI][aui]
+[auiIntegration]:
+
+Include AUI easily in your HTML pages using the template provided by the modules `@ac.aui.styles()` and `@ac.aui.scripts()`. Presently [AUI][aui] 5.2 is the
+only AUI version provided, but future versions can be used when published by including the AUI version and jQuery versions (Scripts only) as parameters
+`@ac.aui.styles("5.2")` and `@ac.aui.scripts("5.2", "1.8.3")` (and make sure to use the same version in each).  For the best results, put `@ac.aui.styles()`
+in the head of your HTML and `@ac.aui.scripts()` at the end of the body (but before your own scripts).
+
+Previous versions of the Play Module supported older AUI versions, these have been removed as AUI Styles and Scripts are now sourced from a CDN for
+performance reasons.
+
+#### [Soy][soy] and experimental AUI features
+[soyTemplates]:
+
+Support for JavaScript [Soy][soy] templates and experimental AUI features can be enabled by passing additional parameters to the `@ac.aui.styles()` and
+`@ac.aui.scripts()` templates.
+
+* Enable experimental AUI features `@ac.aui.styles("5.2", true)` and `@ac.aui.scripts("5.2", "1.8.3", true)`
+* Enable soy templates support `@ac.aui.scripts("5.2", "1.8.3", false, true)`
+
+
+[play-doc]: http://www.playframework.com/documentation/2.2.x/Home "Play Documentation"
 [sbt]: http://www.scala-sbt.org/ "Simple Build Tool"
-[jdbc]: http://www.playframework.com/documentation/2.1.1/SettingsJDBC
-[ebean]: http://www.playframework.com/documentation/2.1.1/JavaEbean
-[evolutions]: http://www.playframework.com/documentation/2.1.1/Evolutions
-[dev]: http://www.playframework.com/documentation/api/2.1.1/java/play/Play.html#isDev()
-[ws]: http://www.playframework.com/documentation/2.1.1/JavaWS
+[jdbc]: http://www.playframework.com/documentation/2.2.x/SettingsJDBC
+[ebean]: http://www.playframework.com/documentation/2.2.x/JavaEbean
+[evolutions]: http://www.playframework.com/documentation/2.2.x/Evolutions
+[dev]: http://www.playframework.com/documentation/api/2.2.x/java/play/Play.html#isDev()
+[ws]: http://www.playframework.com/documentation/2.2.x/JavaWS
 [aui]: https://docs.atlassian.com/aui/latest/
+[soy]: https://docs.atlassian.com/aui/latest/docs/soy.html
