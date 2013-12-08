@@ -34,27 +34,28 @@ the next step:
 
 Your going to need to do a few things for that:
 
-#### Add Atlassian's public maven repository in your `project/Build.scala` file
+#### Add Atlassian's public maven repository in your `build.sbt` file
 
-This is called a resolver in the [SBT][sbt] world. SBT is the build tool, based on Scala, used by Play.
+This is called a resolver in the [SBT][sbt] world. SBT is the build tool, based on Scala, used by Play. *Note the newline is important.*
 
-    val main = play.Project(appName, appVersion, appDependencies).settings(
-            resolvers += "Atlassian's Maven Public Repository" at "https://maven.atlassian.com/content/groups/public",
-            resolvers += "Local Maven Repository" at "file://" + Path.userHome + "/.m2/repository"
-    )
+    resolvers += "Atlassian's Maven Public Repository" at "https://maven.atlassian.com/content/groups/public"
+
+	resolvers += "Local Maven Repository" at "file://" + Path.userHome + "/.m2/repository"
+
 
 Note that I actually also add my local maven repository for good measure and ease of use.
 
-#### Add the module as a dependency in your `project/Build.scala` file
+#### Add the module as a dependency in your `build.sbt` file
 
-    val appDependencies = Seq(
-      javaCore,
-      javaJpa,
-      "com.atlassian.connect" % "ac-play-java_2.10" % "<version>",
-      // your other dependencies go there
-    )
+    libraryDependencies ++= Seq(
+    	javaCore,
+    	javaJpa,
+    	"com.atlassian.connect" % "ac-play-java_2.10" % "<version>" withSources()
+        // your other dependencies go there
+	)
 
 Where _<version>_ is the latest version of this module. The latest published version of the Atlassian Connect Play module can be found in the [Atlassian Maven repository][atlassian-maven-repo]. The current latest version is 0.6.4.
+Note _withSources()_ is optional. It will download the source which can help with debugging.
 
 #### Add the module's routes to your `conf/routes` configuration
 
