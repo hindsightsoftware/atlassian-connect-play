@@ -1,7 +1,7 @@
 package com.atlassian.connect.play.java;
 
 import com.atlassian.connect.play.java.model.AcHostModel;
-import com.atlassian.connect.play.java.oauth.OAuthSignatureCalculator;
+import com.atlassian.connect.play.java.auth.oauth.OAuthSignatureCalculator;
 import com.atlassian.connect.play.java.token.Token;
 import com.atlassian.connect.play.java.util.OAuthKeys;
 import com.atlassian.fugue.Option;

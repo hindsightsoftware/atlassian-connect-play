@@ -1,29 +1,22 @@
-package com.atlassian.connect.play.java.oauth;
+package com.atlassian.connect.play.java.auth.oauth;
 
 import com.atlassian.connect.play.java.BaseUrl;
 import com.atlassian.connect.play.java.PublicKeyStore;
-import com.atlassian.fugue.Option;
-import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.Iterables;
+import com.atlassian.connect.play.java.auth.AbstractRequestValidator;
+import com.atlassian.connect.play.java.auth.RequestHelper;
 import com.google.common.collect.Multimap;
 import net.oauth.*;
 import net.oauth.signature.RSA_SHA1;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Collection;
 
 import static com.atlassian.connect.play.java.util.Utils.LOGGER;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static java.lang.String.format;
 
-final class OAuthRequestValidator<R>
-{
-    private final RequestHelper<R> requestHelper;
-    private final PublicKeyStore publicKeyStore;
-    private final BaseUrl baseUrl;
-
+final class OAuthRequestValidator<R> extends AbstractRequestValidator<R> {
     /**
      * @param requestHelper the helper to extract information from the given type of request.
      * @param publicKeyStore the store to the public key, used to check the OAuth signature.
@@ -32,9 +25,7 @@ final class OAuthRequestValidator<R>
      */
     public OAuthRequestValidator(RequestHelper<R> requestHelper, PublicKeyStore publicKeyStore, BaseUrl baseUrl)
     {
-        this.requestHelper = checkNotNull(requestHelper);
-        this.publicKeyStore = checkNotNull(publicKeyStore);
-        this.baseUrl = checkNotNull(baseUrl);
+        super(requestHelper, publicKeyStore, baseUrl);
     }
 
     /**
@@ -45,6 +36,7 @@ final class OAuthRequestValidator<R>
      * @return the OAuth consumer key set in the request.
      * @throws InvalidOAuthRequestException if the request is invalid.
      */
+    @Override
     public String validate(R request)
     {
         final Multimap<String, String> parameters = getParameters(request);
@@ -58,11 +50,7 @@ final class OAuthRequestValidator<R>
         try
         {
             final OAuthConsumer host = new OAuthConsumer(null, consumerKey, null, null);
-            final String publicKey = publicKeyStore.getPublicKey(consumerKey);
-            if (publicKey == null)
-            {
-                throw new UnknownAcHostException(consumerKey);
-            }
+            final String publicKey = fetchPublicKey(consumerKey);
 
             host.setProperty(RSA_SHA1.PUBLIC_KEY, publicKey);
             message.validateMessage(new OAuthAccessor(host), new SimpleOAuthValidator());
@@ -81,28 +69,4 @@ final class OAuthRequestValidator<R>
         }
     }
 
-    private Multimap<String, String> getParameters(R request)
-    {
-        final ImmutableMultimap.Builder<String, String> parameters =
-                ImmutableMultimap.<String, String>builder().putAll(requestHelper.getParameters(request));
-
-        final Option<String> authorization = requestHelper.getHeader(request, "Authorization");
-        if (authorization.isDefined())
-        {
-            for (OAuth.Parameter param : OAuthMessage.decodeAuthorization(authorization.get()))
-            {
-                parameters.put(param.getKey(), param.getValue());
-            }
-        }
-        return parameters.build();
-    }
-
-    private String getConsumerKey(Multimap<String, String> parameters)
-    {
-        final Collection<String> consumerKeys = parameters.get("oauth_consumer_key");
-        checkState(consumerKeys.size() == 1, "There should be only one value for the consumer key");
-        String consumerKey = Iterables.getFirst(consumerKeys, null);
-        LOGGER.debug("Found consumer key '" + consumerKey + "'.");
-        return consumerKey;
-    }
 }

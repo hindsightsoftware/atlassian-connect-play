@@ -1,8 +1,10 @@
-package com.atlassian.connect.play.java.oauth;
+package com.atlassian.connect.play.java.auth.oauth;
 
 import com.atlassian.connect.play.java.AC;
 import com.atlassian.connect.play.java.AcHost;
 import com.atlassian.connect.play.java.PublicKeyStore;
+import com.atlassian.connect.play.java.auth.PlayRequestHelper;
+import com.atlassian.connect.play.java.auth.UnknownAcHostException;
 import com.google.common.base.Function;
 
 import play.libs.F.Promise;

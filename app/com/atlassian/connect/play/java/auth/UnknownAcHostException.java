@@ -1,4 +1,4 @@
-package com.atlassian.connect.play.java.oauth;
+package com.atlassian.connect.play.java.auth;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

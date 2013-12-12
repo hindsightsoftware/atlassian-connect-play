@@ -1,4 +1,4 @@
-package com.atlassian.connect.play.java.oauth;
+package com.atlassian.connect.play.java.auth.oauth;
 
 public final class InvalidOAuthRequestException extends RuntimeException
 {

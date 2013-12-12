@@ -1,6 +1,6 @@
 package com.atlassian.connect.play.java;
 
-import com.atlassian.connect.play.java.oauth.OAuthRequestValidatorAction;
+import com.atlassian.connect.play.java.auth.oauth.OAuthRequestValidatorAction;
 import play.mvc.With;
 
 import java.lang.annotation.ElementType;

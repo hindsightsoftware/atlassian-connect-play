@@ -1,10 +1,10 @@
-package com.atlassian.connect.play.java.oauth;
+package com.atlassian.connect.play.java.auth;
 
 import com.atlassian.connect.play.java.BaseUrl;
 import com.atlassian.fugue.Option;
 import com.google.common.collect.Multimap;
 
-interface RequestHelper<R>
+public interface RequestHelper<R>
 {
     String getHttpMethod(R request);
 

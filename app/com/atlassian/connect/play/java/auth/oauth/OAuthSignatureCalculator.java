@@ -1,4 +1,4 @@
-package com.atlassian.connect.play.java.oauth;
+package com.atlassian.connect.play.java.auth.oauth;
 
 import com.atlassian.connect.play.java.AC;
 import com.google.common.base.Supplier;

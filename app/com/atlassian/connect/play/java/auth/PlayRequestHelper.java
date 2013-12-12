@@ -1,6 +1,7 @@
-package com.atlassian.connect.play.java.oauth;
+package com.atlassian.connect.play.java.auth;
 
 import com.atlassian.connect.play.java.BaseUrl;
+import com.atlassian.connect.play.java.auth.RequestHelper;
 import com.atlassian.fugue.Option;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
