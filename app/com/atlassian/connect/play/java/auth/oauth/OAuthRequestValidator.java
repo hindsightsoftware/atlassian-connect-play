@@ -4,6 +4,7 @@ import com.atlassian.connect.play.java.BaseUrl;
 import com.atlassian.connect.play.java.PublicKeyStore;
 import com.atlassian.connect.play.java.auth.AbstractRequestValidator;
 import com.atlassian.connect.play.java.auth.RequestHelper;
+import com.atlassian.connect.play.java.auth.UnauthorisedRequestException;
 import com.google.common.collect.Multimap;
 import net.oauth.*;
 import net.oauth.signature.RSA_SHA1;
@@ -34,7 +35,7 @@ final class OAuthRequestValidator<R> extends AbstractRequestValidator<R> {
      *
      * @param request the request to validate
      * @return the OAuth consumer key set in the request.
-     * @throws InvalidOAuthRequestException if the request is invalid.
+     * @throws com.atlassian.connect.play.java.auth.InvalidAuthenticationRequestException if the request is invalid.
      */
     @Override
     public String validate(R request)
@@ -60,7 +61,7 @@ final class OAuthRequestValidator<R> extends AbstractRequestValidator<R> {
         catch (OAuthProblemException e)
         {
             LOGGER.warn("The request is not a valid OAuth request", e);
-            throw new UnauthorisedOAuthRequestException(format("Validation failed: \nproblem: %s\nparameters: %s\n", e.getProblem(), e.getParameters()), e);
+            throw new UnauthorisedRequestException(format("Validation failed: \nproblem: %s\nparameters: %s\n", e.getProblem(), e.getParameters()), e);
         }
         catch (OAuthException | IOException | URISyntaxException e)
         {

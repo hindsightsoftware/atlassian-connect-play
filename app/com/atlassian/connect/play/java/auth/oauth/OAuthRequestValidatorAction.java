@@ -3,7 +3,9 @@ package com.atlassian.connect.play.java.auth.oauth;
 import com.atlassian.connect.play.java.AC;
 import com.atlassian.connect.play.java.AcHost;
 import com.atlassian.connect.play.java.PublicKeyStore;
+import com.atlassian.connect.play.java.auth.InvalidAuthenticationRequestException;
 import com.atlassian.connect.play.java.auth.PlayRequestHelper;
+import com.atlassian.connect.play.java.auth.UnauthorisedRequestException;
 import com.atlassian.connect.play.java.auth.UnknownAcHostException;
 import com.google.common.base.Function;
 
@@ -30,11 +32,11 @@ public final class OAuthRequestValidatorAction extends Action.Simple
         {
             return Promise.pure((SimpleResult)badRequest("Unknown host for consumer key: " + e.getConsumerKey()));
         }
-        catch (InvalidOAuthRequestException e)
+        catch (InvalidAuthenticationRequestException e)
         {
             return Promise.pure((SimpleResult)badRequest("Bad request: " + e.getMessage()));
         }
-        catch (UnauthorisedOAuthRequestException e)
+        catch (UnauthorisedRequestException e)
         {
             return Promise.pure((SimpleResult)unauthorized("Unauthorised: " + e.getMessage()));
         }
