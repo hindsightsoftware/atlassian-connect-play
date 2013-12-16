@@ -1,7 +1,9 @@
 package com.atlassian.connect.play.java.auth.jwt;
 
+import com.atlassian.jwt.CanonicalHttpRequest;
 import com.atlassian.jwt.Jwt;
 import com.atlassian.jwt.SigningAlgorithm;
+import com.atlassian.jwt.core.HttpRequestCanonicalizer;
 import com.atlassian.jwt.core.http.auth.JwtAuthenticator;
 import com.atlassian.jwt.core.reader.JwtIssuerSharedSecretService;
 import com.atlassian.jwt.core.reader.JwtIssuerValidator;
@@ -10,7 +12,9 @@ import com.atlassian.jwt.core.writer.JsonSmartJwtJsonBuilderFactory;
 import com.atlassian.jwt.core.writer.NimbusJwtWriterFactory;
 import com.atlassian.jwt.exception.JwtIssuerLacksSharedSecretException;
 import com.atlassian.jwt.exception.JwtUnknownIssuerException;
+import com.atlassian.jwt.httpclient.CanonicalHttpUriRequest;
 import com.atlassian.jwt.reader.JwtReaderFactory;
+import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,6 +24,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import play.libs.F;
 import play.mvc.Results;
 
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.TimeUnit;
 
 import static com.atlassian.jwt.JwtConstants.JWT_PARAM_NAME;
@@ -38,6 +44,10 @@ import static play.mvc.Results.Status;
 public class PlayJwtAuthenticatorTest {
     private static final String PASSWORD = "secret";
     private static final SigningAlgorithm ALGORITHM = SigningAlgorithm.HS256;
+    private static final String ISSUER = "joe";
+    private static final String METHOD = "GET";
+    private static final String PATH = "/foo";
+    private static final String SUBJECT = "fred";
 
     @Mock
     private JwtIssuerSharedSecretService jwtIssuerSharedSecretService;
@@ -53,13 +63,16 @@ public class PlayJwtAuthenticatorTest {
     private JsonSmartJwtJsonBuilderFactory builderFactory = new JsonSmartJwtJsonBuilderFactory();
     private NimbusJwtWriterFactory writerFactory = new NimbusJwtWriterFactory();
 
-    private String createJwt() {
+    private String createJwt() throws UnsupportedEncodingException, NoSuchAlgorithmException {
+        CanonicalHttpRequest canonicalHttpRequest  = new CanonicalHttpUriRequest(METHOD, PATH, "/");
+        String hash = HttpRequestCanonicalizer.computeCanonicalRequestHash(canonicalHttpRequest);
         long now = System.currentTimeMillis();
         String json = builderFactory.jsonBuilder()
-                .issuer("joe")
+                .issuer(ISSUER)
                 .issuedAt(now)
                 .expirationTime(now + TimeUnit.MINUTES.toSeconds(10))
-                .subject("fred")
+                .subject(SUBJECT)
+                .claim("qsh", hash)
                 .build();
         return writerFactory.macSigningWriter(ALGORITHM, PASSWORD).jsonToJwt(json);
     }
@@ -73,6 +86,9 @@ public class PlayJwtAuthenticatorTest {
     private Either<Status, Jwt> authenticate(String parameterJwt, String headerJwt) throws JwtUnknownIssuerException, JwtIssuerLacksSharedSecretException {
         when(request.getQueryString(anyString())).thenReturn(parameterJwt);
         when(request.headers().get(anyString())).thenReturn(headerJwt == null ? new String[]{} : new String[]{headerJwt});
+        when(request.method()).thenReturn(METHOD);
+        when(request.path()).thenReturn(PATH);
+        when(request.queryString()).thenReturn(ImmutableMap.<String, String[]>of());
         when(jwtIssuerValidator.isValid(anyString())).thenReturn(true);
         when(jwtIssuerSharedSecretService.getSharedSecret(anyString())).thenReturn(PASSWORD);
         Response response = new Response();
@@ -102,17 +118,23 @@ public class PlayJwtAuthenticatorTest {
     }
 
     @Test
-    public void validatesWithIssueValidator() throws JwtIssuerLacksSharedSecretException, JwtUnknownIssuerException {
-        String jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJqb2UiLAogImV4cCI6MTMwMDgxOTM4MCwKICJodHRwOi8vZXhhbXBsZS5jb20vaXNfcm9vdCI6dHJ1ZX0.FiSys799P0mmChbQXoj76wsXrjnPP7HDlIW76orDjV8";
-
-        Either<Status, Jwt> result = authenticate(createJwt(), null);
-        verify(jwtIssuerValidator).isValid("joe");
-//        assertThat(result.right.isDefined(), equalTo(true));
+    public void validatesWithIssueValidator() throws JwtIssuerLacksSharedSecretException, JwtUnknownIssuerException, UnsupportedEncodingException, NoSuchAlgorithmException {
+        authenticate(createJwt(), null);
+        verify(jwtIssuerValidator).isValid(ISSUER);
     }
 
     @Test
-    public void blah() throws JwtIssuerLacksSharedSecretException, JwtUnknownIssuerException {
-        Either<Status, Jwt> result = authenticate(createJwt(), null);
-        assertThat(result.right.isDefined(), equalTo(true));
+    public void containsJwtWhenValidationSucceeds() throws JwtIssuerLacksSharedSecretException, JwtUnknownIssuerException, UnsupportedEncodingException, NoSuchAlgorithmException {
+        assertThat(authenticate(createJwt(), null).right.isDefined(), equalTo(true));
+    }
+
+    @Test
+    public void jwtContainsCorrectIssuer() throws JwtIssuerLacksSharedSecretException, JwtUnknownIssuerException, UnsupportedEncodingException, NoSuchAlgorithmException {
+        assertThat(authenticate(createJwt(), null).right.get().getIssuer(), equalTo(ISSUER));
+    }
+
+    @Test
+    public void jwtContainsCorrectSubject() throws JwtIssuerLacksSharedSecretException, JwtUnknownIssuerException, UnsupportedEncodingException, NoSuchAlgorithmException {
+        assertThat(authenticate(createJwt(), null).right.get().getSubject(), equalTo(SUBJECT));
     }
 }
