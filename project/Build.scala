@@ -6,7 +6,7 @@ object ApplicationBuild extends Build {
 
   val appName         = "ac-play-java"
   val appVersion      = "0.6.5-SNAPSHOT"
-  val atlassianJwtVersion = "1.0-m3"
+  val atlassianJwtVersion = "1.0-m4-SNAPSHOT"
 
   val appDependencies = Seq(
     "postgresql" % "postgresql" % "8.4-701.jdbc3",
@@ -17,9 +17,9 @@ object ApplicationBuild extends Build {
     "org.bouncycastle" % "bcprov-jdk16" % "1.46",
     "org.hibernate" % "hibernate-entitymanager" % "4.2.1.Final",
     "xml-apis" % "xml-apis" % "1.4.01",
-    "com.atlassian.jwt" % "jwt-api" % atlassianJwtVersion,
-    "com.atlassian.jwt" % "jwt-core" % atlassianJwtVersion,
-    "com.atlassian.jwt" % "jwt-http-client" % atlassianJwtVersion,
+    "com.atlassian.jwt" % "jwt-api" % atlassianJwtVersion withSources(),
+    "com.atlassian.jwt" % "jwt-core" % atlassianJwtVersion withSources(),
+    "com.atlassian.jwt" % "jwt-http-client" % atlassianJwtVersion withSources(),
     javaCore,
     javaJdbc,
     javaJpa,
