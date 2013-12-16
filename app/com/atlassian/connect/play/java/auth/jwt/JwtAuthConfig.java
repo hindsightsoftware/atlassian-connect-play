@@ -20,10 +20,6 @@ public class JwtAuthConfig {
         return new NimbusJwtReaderFactory(acPlayJwtIssuerService, acPlayJwtIssuerService);
     }
 
-//    public static JwtRequestValidator2 getJwtRequestValidator() {
-//        return validator;
-//    }
-
     public static JwtAuthenticator<Request, Response, JwtAuthenticationResult> getJwtAuthenticator() {
         return jwtAuthenticator;
     }

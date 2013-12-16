@@ -28,10 +28,11 @@ public class PlayJwtAuthenticator extends AbstractJwtAuthenticator<Request, Resp
     public PlayJwtAuthenticator(JwtRequestExtractor<Request> jwtExtractor,
                                 AuthenticationResultHandler<Response, JwtAuthenticationResult> authenticationResultHandler,
                                 JwtReaderFactory jwtReaderFactory) {
-        super(new PlayJwtRequestExtractor(), new PlayAuthenticationResultHandler());
+        super(jwtExtractor, authenticationResultHandler);
         this.jwtReaderFactory = jwtReaderFactory;
     }
 
+    // TODO: where was the oauth validators setting the principal?
     @Override
     protected Principal authenticate(Request request, Jwt jwt) throws JwtUserRejectedException {
         Principal userPrincipal = new SimplePrincipal(jwt.getSubject());

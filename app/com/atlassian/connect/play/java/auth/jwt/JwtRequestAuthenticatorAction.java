@@ -18,7 +18,7 @@ import static play.libs.F.Either;
 import static play.mvc.Http.Request;
 import static play.mvc.Http.Response;
 
-public final class JwtRequestValidatorAction extends Action.Simple
+public final class JwtRequestAuthenticatorAction extends Action.Simple
 {
     private final JwtAuthenticator<Request, Response, JwtAuthenticationResult> authenticator = JwtAuthConfig.getJwtAuthenticator();
 
@@ -37,6 +37,8 @@ public final class JwtRequestValidatorAction extends Action.Simple
             AC.refreshToken(false);
 
             return delegate.call(context);
+
+            // TODO: make sure these are no longer used and remove them
         }
         catch (UnknownAcHostException e)
         {
