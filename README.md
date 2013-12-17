@@ -19,6 +19,8 @@ More details can be found in the [AC Play Java Benefits](#markdown-header-ac-pla
 ## Release Notes
 0.6.4 Upgrades to Play 2.2. **Note this is a backwards incompatible change**.
 
+_Note: The module requires Java 7 in order for your project to compile._
+
 ## Getting started
 
 ### Create your Java Play application
@@ -57,8 +59,6 @@ Note that I actually also add my local maven repository for good measure and eas
 Where _<version>_ is the latest version of this module. The latest published version of the Atlassian Connect Play module can be found in the [Atlassian Maven repository][atlassian-maven-repo]. The current latest version is 0.6.4.
 Note _withSources()_ is optional. It will download the source which can help with debugging.
 
-_Note: The module requires Java 7 in order for your project to compile._
-
 #### Add the module's routes to your `conf/routes` configuration
 
 Comment the default application index and add the module's routes:
@@ -90,7 +90,7 @@ using a local postgres installation:
 
 Note that the postgres driver is already a dependency of the module, so you don't need to add a dependency for it.
 
-If you don't have postgres installed you can get it [here](http://www.postgresql.org/). Follow the instructions to create and start a new server. You'll need to create a new user and database. Make sure that you marry up the values in `conf/application.conf` with the values you use in postgres.
+You can [get postgres from the official website](http://www.postgresql.org/) in case you don't have it installed. Follow the instructions to create and start a new server. You'll need to create a new user and database. Make sure that you marry up the values in `conf/application.conf` with the values you use in postgres.
 
 The play library uses JPA for persistence so you'll have to create a persistence.xml file in conf/META-INF:
 
@@ -164,7 +164,7 @@ trigger tokens to be refreshed client-side automatically, however if `@ac.page` 
 ### Creation of RSA key pair
 [rsaCreation]:
 This module will, in [dev mode][dev], generate an RSA key pair, as pem files to be used by your add-on for OAuth signing
-and validation.
+and validation. You will find the generated pem files `public-key.pem` and `private-key.pem` in the root directory of your Play project.
 
 Note that the module will automatically add those generated files to `.gitignore` so that you don't accidentally commit
 them to your git repository.
@@ -279,11 +279,9 @@ Support for JavaScript [Soy][soy] templates and experimental AUI features can be
 * Enable soy templates support `@ac.aui.scripts("5.2", "1.8.3", false, true)`
 
 ## How to deploy to Heroku
-Deploying Play apps on Heroku is covered [here](https://devcenter.heroku.com/articles/play-support).
-
 Before you start, install Git and the [Heroku Toolbelt](https://toolbelt.heroku.com/).
 
-If you aren't using git to track your add-on, now is a good time to do so as it is required for Heroku.
+If you aren't using git to track your add-on, now is a good time to do so as it is required for Heroku. Ensure you are in the root directory of your Play project and run the following commands:
 
 	git config --global user.name "John Doe"
 	git config --global user.email johndoe@example.com
@@ -297,10 +295,12 @@ Next, create the app on Heroku:
 
     heroku apps:create <add-on-name>
 
-Then set the public and private key as environment variables in Heroku (you don't ever want to commit these `*.pem` files into your scm).
+Then set the public and private key as environment variables in Heroku (you don't ever want to commit these `*.pem` files into your scm). Remember, the two pem files were automatically generated in the root of your Play project. 
 
     heroku config:set AC_PUBLIC_KEY="`cat public-key.pem`" --app <add-on-name>
     heroku config:set AC_PRIVATE_KEY="`cat private-key.pem`" --app <add-on-name>
+
+We recommend that you don't use the automatically generated key pair in production. You can use any RSA key pair generation tool such as [JSEncrypt](http://travistidwell.com/jsencrypt/demo/) to generate a production key pair. 
 
 A good practice is also to externalize your Play application secret as an environment variable in Heroku.
 
@@ -329,7 +329,9 @@ If you aren't already there, switch to your project home directory. From there, 
 
 It will take a minute or two for Heroku to spin up your add-on. When it's done, you'll be given the URL where your add-on is deployed, however, you'll still need to register it on your Atlassian instance.
 
-If you're running an OnDemand instance of JIRA or Confluence locally, you can install from UPM. See complete [instructions in the Atlassian Connect doc](https://developer.atlassian.com/display/AC/Hello+World#HelloWorld-Registertheadd-on) for more information.
+If you're running an OnDemand instance of JIRA or Confluence locally, you can install it from the add-on administration console. See complete [instructions in the Atlassian Connect doc](https://developer.atlassian.com/display/AC/Hello+World#HelloWorld-Registertheadd-on) for more information.
+
+For further detail, we recommend reading [Heroku Play Framework Support documentation](https://devcenter.heroku.com/articles/play-support).
 
 ## Links
 [play-doc]: http://www.playframework.com/documentation/2.2.x/Home "Play Documentation"
