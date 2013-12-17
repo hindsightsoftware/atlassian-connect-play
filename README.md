@@ -57,6 +57,8 @@ Note that I actually also add my local maven repository for good measure and eas
 Where _<version>_ is the latest version of this module. The latest published version of the Atlassian Connect Play module can be found in the [Atlassian Maven repository][atlassian-maven-repo]. The current latest version is 0.6.4.
 Note _withSources()_ is optional. It will download the source which can help with debugging.
 
+_Note: The module requires Java 7 in order for your project to compile._
+
 #### Add the module's routes to your `conf/routes` configuration
 
 Comment the default application index and add the module's routes:
@@ -275,6 +277,59 @@ Support for JavaScript [Soy][soy] templates and experimental AUI features can be
 
 * Enable experimental AUI features `@ac.aui.styles("5.2", true)` and `@ac.aui.scripts("5.2", "1.8.3", true)`
 * Enable soy templates support `@ac.aui.scripts("5.2", "1.8.3", false, true)`
+
+## How to deploy to Heroku
+Deploying Play apps on Heroku is covered [here](https://devcenter.heroku.com/articles/play-support).
+
+Before you start, install Git and the [Heroku Toolbelt](https://toolbelt.heroku.com/).
+
+If you aren't using git to track your add-on, now is a good time to do so as it is required for Heroku.
+
+	git config --global user.name "John Doe"
+	git config --global user.email johndoe@example.com
+	ssh-keygen -t rsa
+	git init
+	git add .
+	git commit . -m "some message"
+	heroku keys:add
+
+Next, create the app on Heroku:
+
+    heroku apps:create <add-on-name>
+
+Then set the public and private key as environment variables in Heroku (you don't ever want to commit these `*.pem` files into your scm).
+
+    heroku config:set AC_PUBLIC_KEY="`cat public-key.pem`" --app <add-on-name>
+    heroku config:set AC_PRIVATE_KEY="`cat private-key.pem`" --app <add-on-name>
+
+A good practice is also to externalize your Play application secret as an environment variable in Heroku.
+
+In your Play application's `conf/application.conf`, replace
+
+	application.secret=abc123...
+
+with 
+
+	application.secret=${APP_SECRET}
+
+Then set the application environment variable in Heroku:
+
+	heroku config:add APP_SECRET=abc123...
+
+Next, let's store our registration information in a Postgres database. In development, you were likely using the memory store. In production, you'll want to use a real database.
+
+    heroku addons:add heroku-postgresql:dev --app <add-on-name>
+
+Lastly, let's add the project files to Heroku and deploy! 
+
+If you aren't already there, switch to your project home directory. From there, run these commands:
+
+    git remote add heroku git@heroku.com:<add-on-name>.git
+    git push heroku master
+
+It will take a minute or two for Heroku to spin up your add-on. When it's done, you'll be given the URL where your add-on is deployed, however, you'll still need to register it on your Atlassian instance.
+
+If you're running an OnDemand instance of JIRA or Confluence locally, you can install from UPM. See complete [instructions in the Atlassian Connect doc](https://developer.atlassian.com/display/AC/Hello+World#HelloWorld-Registertheadd-on) for more information.
 
 ## Links
 [play-doc]: http://www.playframework.com/documentation/2.2.x/Home "Play Documentation"
