@@ -333,7 +333,6 @@ If you're running an OnDemand instance of JIRA or Confluence locally, you can in
 
 For further detail, we recommend reading [Heroku Play Framework Support documentation](https://devcenter.heroku.com/articles/play-support).
 
-## Links
 [play-doc]: http://www.playframework.com/documentation/2.2.x/Home "Play Documentation"
 [sbt]: http://www.scala-sbt.org/ "Simple Build Tool"
 [jdbc]: http://www.playframework.com/documentation/2.2.x/SettingsJDBC
