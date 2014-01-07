@@ -2,6 +2,8 @@ package com.atlassian.connect.play.java;
 
 import com.atlassian.connect.play.java.model.AcHostModel;
 import com.atlassian.connect.play.java.auth.oauth.OAuthSignatureCalculator;
+import com.atlassian.connect.play.java.service.AcHostService;
+import com.atlassian.connect.play.java.service.AcHostServiceImpl;
 import com.atlassian.connect.play.java.token.Token;
 import com.atlassian.connect.play.java.util.OAuthKeys;
 import com.atlassian.fugue.Option;
@@ -30,6 +32,7 @@ import static com.atlassian.fugue.Option.some;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
+import static play.libs.F.Promise;
 import static play.mvc.Http.Context.Implicit.request;
 
 public final class AC
@@ -45,6 +48,9 @@ public final class AC
 
     public static final Supplier<String> publicKey = OAuthKeys.publicKey;
     public static final Supplier<String> privateKey = OAuthKeys.privateKey;
+
+    // TODO: DI of some sort would be nice
+    private static final AcHostService acHostService = new AcHostServiceImpl();
 
     public static boolean isDev()
     {
@@ -137,6 +143,11 @@ public final class AC
         {
             throw new RuntimeException(throwable);
         }
+    }
+
+    public static Promise<Boolean> registerHost(AcHost acHost)
+    {
+        return acHostService.registerHost(acHost);
     }
 
     public static void refreshToken(boolean allowInsecurePolling)

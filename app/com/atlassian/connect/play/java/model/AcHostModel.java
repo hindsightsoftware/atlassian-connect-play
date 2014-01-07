@@ -47,6 +47,11 @@ public final class AcHostModel implements AcHost
 
     @Required
     @MaxLength (512)
+    @Column (nullable = false, length = 512) // TODO: may have to be nullable at least as we transition from oauth
+    public String sharedSecret;
+
+    @Required
+    @MaxLength (512)
     @Column (unique = true, nullable = false, length = 512)
     public String baseUrl;
 
@@ -83,6 +88,11 @@ public final class AcHostModel implements AcHost
     public String getPublicKey()
     {
         return publicKey;
+    }
+
+    @Override
+    public String getSharedSecret() {
+        return sharedSecret;
     }
 
     public String getConsumerInfoUrl()

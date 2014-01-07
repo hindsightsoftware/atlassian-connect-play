@@ -13,4 +13,6 @@ public interface AcHost
     String getBaseUrl();
 
     String getPublicKey();
+
+    String getSharedSecret();
 }
