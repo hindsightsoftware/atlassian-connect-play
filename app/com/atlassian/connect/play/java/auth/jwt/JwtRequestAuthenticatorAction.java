@@ -15,42 +15,52 @@ import play.mvc.Http;
 import play.mvc.SimpleResult;
 
 import static play.libs.F.Either;
+import static play.mvc.Http.Context;
 import static play.mvc.Http.Request;
 import static play.mvc.Http.Response;
 
 public final class JwtRequestAuthenticatorAction extends Action.Simple
 {
-    private final JwtAuthenticator<Request, Response, JwtAuthenticationResult> authenticator = JwtAuthConfig.getJwtAuthenticator();
+    private static final JwtAuthenticator<Request, Response, JwtAuthenticationResult> authenticator = JwtAuthConfig.getJwtAuthenticator();
 
     @Override
-    public Promise<SimpleResult> call(Http.Context context) throws Throwable
+    public Promise<SimpleResult> call(Context context) throws Throwable
     {
-        try
+        return new AuthenticationHelper().authenticate(context, delegate);
+    }
+
+    // exists to make it easier to test
+    static class AuthenticationHelper {
+        public Promise<SimpleResult> authenticate(Context context, Action delegate) throws Throwable
         {
-            Either<Status, Jwt> authResult = authenticator.authenticate(context.request(), context.response()).getResult();
-            if (authResult.left.isDefined()) {
-                return Promise.pure((SimpleResult)authResult.left.get());
+            try
+            {
+                Either<Status, Jwt> authResult = authenticator.authenticate(context.request(), context.response()).getResult();
+                if (authResult.left.isDefined()) {
+                    return Promise.pure((SimpleResult)authResult.left.get());
+                }
+
+                Jwt jwt = authResult.right.get();
+                AC.setAcHost(jwt.getIssuer());
+                AC.refreshToken(false);
+
+                return delegate.call(context);
+
+                // TODO: make sure these are no longer used and remove them
             }
+            catch (UnknownAcHostException e)
+            {
+                return Promise.pure((SimpleResult)badRequest("Unknown host for consumer key: " + e.getConsumerKey()));
+            }
+            catch (InvalidAuthenticationRequestException e)
+            {
+                return Promise.pure((SimpleResult)badRequest("Bad request: " + e.getMessage()));
+            }
+            catch (UnauthorisedRequestException e)
+            {
+                return Promise.pure((SimpleResult)unauthorized("Unauthorised: " + e.getMessage()));
+            }
+        }
 
-            Jwt jwt = authResult.right.get();
-            AC.setAcHost(jwt.getIssuer());
-            AC.refreshToken(false);
-
-            return delegate.call(context);
-
-            // TODO: make sure these are no longer used and remove them
-        }
-        catch (UnknownAcHostException e)
-        {
-            return Promise.pure((SimpleResult)badRequest("Unknown host for consumer key: " + e.getConsumerKey()));
-        }
-        catch (InvalidAuthenticationRequestException e)
-        {
-            return Promise.pure((SimpleResult)badRequest("Bad request: " + e.getMessage()));
-        }
-        catch (UnauthorisedRequestException e)
-        {
-            return Promise.pure((SimpleResult)unauthorized("Unauthorised: " + e.getMessage()));
-        }
     }
 }
