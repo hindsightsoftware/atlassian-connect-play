@@ -4,5 +4,6 @@ import com.atlassian.connect.play.java.AcHost;
 
 public interface AcHostRepository {
 
-    void save(AcHost acHost);
+    // Throwable cause that's what play throws!!!!
+    void save(AcHost acHost) throws Throwable;
 }

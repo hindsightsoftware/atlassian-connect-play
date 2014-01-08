@@ -97,6 +97,10 @@ public class AcController {
 
         final JsonNode remoteApp = request().body().asJson();
 
+        if (remoteApp == null) {
+            return Promise.pure((Result)Results.badRequest("can't extract registration request json"));
+        }
+
         // TODO check the key is the same as this app's
         getAttributeAsText(remoteApp, "key");
 
@@ -141,6 +145,7 @@ public class AcController {
     }
 
     private static String getAttributeAsText(JsonNode json, String name) {
-        return json.get(name).textValue();
+        JsonNode jsonNode = json.get(name);
+        return jsonNode == null ? null : jsonNode.textValue();
     }
 }

@@ -95,4 +95,6 @@ public class AcHostServiceImplTest {
         Boolean result = acHostService.registerHost(acHostModel).get(1, TimeUnit.SECONDS);
         assertThat(result, is(true));
     }
+
+    // TODO: negative test cases for registerHost
 }
