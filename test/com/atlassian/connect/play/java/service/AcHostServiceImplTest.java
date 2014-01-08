@@ -3,7 +3,6 @@ package com.atlassian.connect.play.java.service;
 import com.atlassian.connect.play.java.AcHost;
 import com.atlassian.connect.play.java.model.AcHostModel;
 import com.google.common.base.Charsets;
-import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -11,18 +10,16 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.w3c.dom.Document;
-import play.libs.F;
 import play.libs.XML;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.concurrent.TimeUnit;
 
 import static org.apache.commons.lang.StringUtils.stripToEmpty;
 import static org.hamcrest.CoreMatchers.endsWith;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.startsWith;
-import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -34,6 +31,7 @@ import static play.libs.WS.WSRequestHolder;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AcHostServiceImplTest {
+    private static final String TEST_PUBLIC_KEY = "REAL-PK-GOES-HERE";
     private static Document testClientInfoDocument;
 
     @Mock
@@ -44,6 +42,9 @@ public class AcHostServiceImplTest {
 
     @Mock
     private Response response;
+
+    @Mock
+    private AcHostRepository acHostRepository;
 
     private AcHostServiceImpl acHostService;
     private AcHostModel acHostModel;
@@ -56,8 +57,10 @@ public class AcHostServiceImplTest {
 
     @Before
     public void init() {
-        acHostService = new AcHostServiceImpl(httpClient);
+        acHostService = new AcHostServiceImpl(httpClient, acHostRepository);
         acHostModel = new AcHostModel();
+        acHostModel.publicKey = TEST_PUBLIC_KEY;
+
         when(httpClient.url(anyString(), any(AcHost.class))).thenReturn(requestHolder);
         when(requestHolder.get()).thenReturn(Promise.pure(response));
         when(response.getStatus()).thenReturn(200);
@@ -75,10 +78,21 @@ public class AcHostServiceImplTest {
     public void extractsCorrectPublicKey() {
         Promise<String> publicKeyPromise = acHostService.fetchPublicKeyFromRemoteHost(acHostModel);
         String publicKey = stripToEmpty(publicKeyPromise.get(1, TimeUnit.SECONDS));
-        assertThat(publicKey, startsWith("FOO"));
-        assertThat(publicKey, endsWith("BAR"));
+
+        assertThat(publicKey, is(TEST_PUBLIC_KEY));
     }
 
     // TODO: negative test cases for fetchPublicKeyFromRemoteHost
 
+    @Test
+    public void savesAcHostWhenPublicKeysMatch() {
+        acHostService.registerHost(acHostModel).get(1, TimeUnit.SECONDS);
+        verify(acHostRepository).save(acHostModel);
+    }
+
+    @Test
+    public void returnsTrueOnSuccess() {
+        Boolean result = acHostService.registerHost(acHostModel).get(1, TimeUnit.SECONDS);
+        assertThat(result, is(true));
+    }
 }

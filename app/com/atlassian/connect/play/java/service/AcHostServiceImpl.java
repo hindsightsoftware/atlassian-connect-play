@@ -1,21 +1,17 @@
 package com.atlassian.connect.play.java.service;
 
-import com.atlassian.connect.play.java.AC;
 import com.atlassian.connect.play.java.AcHost;
 import com.atlassian.connect.play.java.model.AcHostModel;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
+import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
-import play.libs.F;
-import play.libs.WS;
-import play.mvc.Http;
-import play.mvc.Results;
 
+import static org.apache.commons.lang.StringUtils.stripToNull;
 import static play.libs.F.Function;
 import static play.libs.F.Promise;
 import static play.libs.WS.Response;
-import static play.libs.WS.WSRequestHolder;
 import static play.mvc.Http.Status.OK;
 
 public class AcHostServiceImpl implements AcHostService {
@@ -24,10 +20,15 @@ public class AcHostServiceImpl implements AcHostService {
 
     private static final String PUBLIC_KEY_ELEMENT_NAME = "publicKey";
     private final AcHostHttpClient httpClient;
+    private final AcHostRepository acHostRepository;
+
+    public AcHostServiceImpl(AcHostHttpClient httpClient, AcHostRepository acHostRepository) {
+        this.httpClient = httpClient;
+        this.acHostRepository = acHostRepository;
+    }
 
     public AcHostServiceImpl(AcHostHttpClient httpClient) {
-
-        this.httpClient = httpClient;
+        this(httpClient, new DefaultAcHostRepository());
     }
 
     @Override
@@ -59,12 +60,13 @@ public class AcHostServiceImpl implements AcHostService {
         Promise<Boolean> hostRegistered = fetchPublicKeyFromRemoteHost(acHost).map(new Function<String, Boolean>() {
             @Override
             public Boolean apply(String fetchedPublicKey) throws Throwable {
-                boolean keysMatch = Objects.equal(fetchedPublicKey, acHost.getPublicKey());
+                // TODO: is there any need to worry about empty public keys in json and on host (i.e. does that represent any kind of attack vector)
+                boolean keysMatch = Objects.equal(stripToNull(fetchedPublicKey), stripToNull(acHost.getPublicKey()));
                 if (!keysMatch) {
                     // TODO: log
                     return false; // TODO: or throw?
                 }
-                AcHostModel.create((AcHostModel) acHost); // TODO: Dodgy cast
+                acHostRepository.save(acHost);
                 return true;
             }
         });

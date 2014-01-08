@@ -135,4 +135,12 @@ public final class AcHostModel implements AcHost
             JPA.em().remove(acHostModel);
         }
     }
+
+    public static AcHostModel fromAcHost(AcHost acHost) {
+        if (acHost instanceof AcHostModel) {
+            return (AcHostModel) acHost;
+        }
+
+        throw new IllegalStateException("Not implemented yet");
+    }
 }
