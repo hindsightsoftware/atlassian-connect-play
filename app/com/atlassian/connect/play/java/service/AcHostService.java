@@ -12,10 +12,11 @@ public interface AcHostService {
     /**
      * Retrieves the public key from the remote host (via a REST url)
      *
-     * @param hostBaseUrl
+     *
+     * @param acHost
      * @return
      */
-    Promise<String> fetchPublicKeyFromRemoteHost(String hostBaseUrl);
+    Promise<String> fetchPublicKeyFromRemoteHost(AcHost acHost);
 
     /**
      * Registers a new host, or updates the details from an existing host

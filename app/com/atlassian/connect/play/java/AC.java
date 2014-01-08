@@ -123,7 +123,7 @@ public final class AC
 
     public static AcHost setAcHost(String consumerKey)
     {
-        return setAcHost(getAcHost(consumerKey).getOrError(Suppliers.ofInstance("An error occured getting the host application")));
+        return setAcHost(getAcHost(consumerKey).getOrError(Suppliers.ofInstance("An error occurred getting the host application")));
     }
 
     public static Option<? extends AcHost> getAcHost(final String consumerKey)
