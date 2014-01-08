@@ -2,6 +2,7 @@ package com.atlassian.connect.play.java;
 
 import com.atlassian.connect.play.java.model.AcHostModel;
 import com.atlassian.connect.play.java.auth.oauth.OAuthSignatureCalculator;
+import com.atlassian.connect.play.java.service.AcHostHttpClient;
 import com.atlassian.connect.play.java.service.AcHostService;
 import com.atlassian.connect.play.java.service.AcHostServiceImpl;
 import com.atlassian.connect.play.java.token.Token;
@@ -33,6 +34,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
 import static play.libs.F.Promise;
+import static play.libs.WS.WSRequestHolder;
 import static play.mvc.Http.Context.Implicit.request;
 
 public final class AC
@@ -50,7 +52,22 @@ public final class AC
     public static final Supplier<String> privateKey = OAuthKeys.privateKey;
 
     // TODO: DI of some sort would be nice
-    private static final AcHostService acHostService = new AcHostServiceImpl();
+    private static final AcHostService acHostService = new AcHostServiceImpl(new AcHostHttpClient() {
+        @Override
+        public WSRequestHolder url(String url) {
+            return AC.url(url);
+        }
+
+        @Override
+        public WSRequestHolder url(String url, AcHost acHost) {
+            return AC.url(url, acHost);
+        }
+
+        @Override
+        public WSRequestHolder url(String url, AcHost acHost, Option<String> userId) {
+            return AC.url(url, acHost, userId);
+        }
+    });
 
     public static boolean isDev()
     {
@@ -71,17 +88,17 @@ public final class AC
         return user;
     }
 
-    public static WS.WSRequestHolder url(String url)
+    public static WSRequestHolder url(String url)
     {
         return url(url, checkNotNull(getAcHost(), "No AcHost found in HttpContext"));
     }
 
-    public static WS.WSRequestHolder url(String url, AcHost acHost)
+    public static WSRequestHolder url(String url, AcHost acHost)
     {
         return url(url, acHost, getUser());
     }
 
-    public static WS.WSRequestHolder url(String url, AcHost acHost, Option<String> userId)
+    public static WSRequestHolder url(String url, AcHost acHost, Option<String> userId)
     {
         checkNotNull(url, "Url must be non-null");
         checkNotNull(acHost, "acHost must be non-null");
@@ -90,7 +107,7 @@ public final class AC
 
         LOGGER.debug(format("Creating request to '%s'", absoluteUrl));
 
-        final WS.WSRequestHolder request = WS.url(absoluteUrl)
+        final WSRequestHolder request = WS.url(absoluteUrl)
                 .setTimeout(DEFAULT_TIMEOUT.intValue())
                 .setFollowRedirects(false) // because we need to sign again in those cases.
                 .sign(new OAuthSignatureCalculator());

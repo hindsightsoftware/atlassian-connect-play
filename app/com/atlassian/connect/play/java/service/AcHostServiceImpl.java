@@ -3,6 +3,7 @@ package com.atlassian.connect.play.java.service;
 import com.atlassian.connect.play.java.AC;
 import com.atlassian.connect.play.java.AcHost;
 import com.atlassian.connect.play.java.model.AcHostModel;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -18,13 +19,20 @@ import static play.libs.WS.WSRequestHolder;
 import static play.mvc.Http.Status.OK;
 
 public class AcHostServiceImpl implements AcHostService {
-    private static final String CONSUMER_INFO_URL = "/plugins/servlet/oauth/consumer-info";
+    @VisibleForTesting
+    static final String CONSUMER_INFO_URL = "/plugins/servlet/oauth/consumer-info";
+
     private static final String PUBLIC_KEY_ELEMENT_NAME = "publicKey";
+    private final AcHostHttpClient httpClient;
+
+    public AcHostServiceImpl(AcHostHttpClient httpClient) {
+
+        this.httpClient = httpClient;
+    }
 
     @Override
     public Promise<String> fetchPublicKeyFromRemoteHost(AcHost acHost) {
-        // ouch ugly circular dependency here.
-        Promise<Response> responsePromise = AC.url(CONSUMER_INFO_URL, acHost).get();
+        Promise<Response> responsePromise = httpClient.url(CONSUMER_INFO_URL, acHost).get();
 
         Promise<String> publicKeyPromise = responsePromise.map(new Function<Response, String>() {
             @Override
