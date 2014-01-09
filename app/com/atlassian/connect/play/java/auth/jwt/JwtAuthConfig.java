@@ -10,11 +10,11 @@ import static play.mvc.Http.Response;
 
 // TODO: add spring DI or similar
 public class JwtAuthConfig {
+    private static ACPlayJwtIssuerService acPlayJwtIssuerService = new ACPlayJwtIssuerService();
+
     private static final PlayJwtAuthenticator jwtAuthenticator =
             new PlayJwtAuthenticator(new PlayJwtRequestExtractor(), new PlayAuthenticationResultHandler(),
                     createReaderFactory());
-
-    private static ACPlayJwtIssuerService acPlayJwtIssuerService = new ACPlayJwtIssuerService();
 
     private static JwtReaderFactory createReaderFactory() {
         return new NimbusJwtReaderFactory(acPlayJwtIssuerService, acPlayJwtIssuerService);

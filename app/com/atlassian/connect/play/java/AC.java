@@ -59,8 +59,8 @@ public final class AC
         }
 
         @Override
-        public WSRequestHolder url(String url, AcHost acHost) {
-            return AC.url(url, acHost);
+        public WSRequestHolder url(String url, AcHost acHost, boolean signRequest) {
+            return AC.url(url, acHost, signRequest);
         }
 
         @Override
@@ -95,10 +95,20 @@ public final class AC
 
     public static WSRequestHolder url(String url, AcHost acHost)
     {
-        return url(url, acHost, getUser());
+        return url(url, acHost, true);
+    }
+
+    public static WSRequestHolder url(String url, AcHost acHost, boolean signRequest)
+    {
+        return url(url, acHost, getUser(), signRequest);
     }
 
     public static WSRequestHolder url(String url, AcHost acHost, Option<String> userId)
+    {
+        return url(url, acHost, userId, true);
+    }
+
+    public static WSRequestHolder url(String url, AcHost acHost, Option<String> userId, boolean signRequest)
     {
         checkNotNull(url, "Url must be non-null");
         checkNotNull(acHost, "acHost must be non-null");
@@ -108,9 +118,12 @@ public final class AC
         LOGGER.debug(format("Creating request to '%s'", absoluteUrl));
 
         final WSRequestHolder request = WS.url(absoluteUrl)
-                .setTimeout(DEFAULT_TIMEOUT.intValue())
-                .setFollowRedirects(false) // because we need to sign again in those cases.
-                .sign(new OAuthSignatureCalculator());
+                .setTimeout(DEFAULT_TIMEOUT.intValue());
+
+        if (signRequest) {
+            request.setFollowRedirects(false) // because we need to sign again in those cases.
+                    .sign(new OAuthSignatureCalculator());
+        }
 
         if (userId.isDefined())
         {

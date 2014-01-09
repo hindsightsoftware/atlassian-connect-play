@@ -13,7 +13,7 @@ import static play.libs.WS.WSRequestHolder;
 public interface AcHostHttpClient {
     WSRequestHolder url(String url);
 
-    WSRequestHolder url(String url, AcHost acHost);
+    WSRequestHolder url(String url, AcHost acHost, boolean signRequest);
 
     WSRequestHolder url(String url, AcHost acHost, Option<String> userId);
 }

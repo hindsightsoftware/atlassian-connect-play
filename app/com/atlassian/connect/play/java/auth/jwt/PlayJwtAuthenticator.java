@@ -19,6 +19,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.util.Map;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static play.mvc.Http.Request;
 import static play.mvc.Http.Response;
 
@@ -29,7 +30,7 @@ public class PlayJwtAuthenticator extends AbstractJwtAuthenticator<Request, Resp
                                 AuthenticationResultHandler<Response, JwtAuthenticationResult> authenticationResultHandler,
                                 JwtReaderFactory jwtReaderFactory) {
         super(jwtExtractor, authenticationResultHandler);
-        this.jwtReaderFactory = jwtReaderFactory;
+        this.jwtReaderFactory = checkNotNull(jwtReaderFactory);
     }
 
     // TODO: where was the oauth validators setting the principal?

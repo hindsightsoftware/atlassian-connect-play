@@ -33,7 +33,7 @@ public class AcHostServiceImpl implements AcHostService {
 
     @Override
     public Promise<String> fetchPublicKeyFromRemoteHost(AcHost acHost) {
-        Promise<Response> responsePromise = httpClient.url(CONSUMER_INFO_URL, acHost).get();
+        Promise<Response> responsePromise = httpClient.url(CONSUMER_INFO_URL, acHost, false).get();
 
         Promise<String> publicKeyPromise = responsePromise.map(new Function<Response, String>() {
             @Override
