@@ -18,7 +18,7 @@ public class ACPlayJwtIssuerService implements JwtIssuerSharedSecretService, Jwt
             @Override
             public String apply(AcHost host)
             {
-                return host.getPublicKey(); // TODO: may need to change this name (assuming we store the shared secret in the same column as the public key for oauth)
+                return host.getSharedSecret();
             }
         }).getOrNull();
     }
