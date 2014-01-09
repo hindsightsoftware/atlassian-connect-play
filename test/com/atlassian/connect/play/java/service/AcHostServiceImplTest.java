@@ -22,6 +22,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -61,7 +62,7 @@ public class AcHostServiceImplTest {
         acHostModel = new AcHostModel();
         acHostModel.publicKey = TEST_PUBLIC_KEY;
 
-        when(httpClient.url(anyString(), any(AcHost.class))).thenReturn(requestHolder);
+        when(httpClient.url(anyString(), any(AcHost.class), anyBoolean())).thenReturn(requestHolder);
         when(requestHolder.get()).thenReturn(Promise.pure(response));
         when(response.getStatus()).thenReturn(200);
         when(response.asXml()).thenReturn(testClientInfoDocument);
@@ -70,7 +71,7 @@ public class AcHostServiceImplTest {
     @Test
     public void sendsCorrectHttpRequest() {
         acHostService.fetchPublicKeyFromRemoteHost(acHostModel);
-        verify(httpClient).url(AcHostServiceImpl.CONSUMER_INFO_URL, acHostModel);
+        verify(httpClient).url(AcHostServiceImpl.CONSUMER_INFO_URL, acHostModel, false);
         verify(requestHolder).get();
     }
 
@@ -85,7 +86,7 @@ public class AcHostServiceImplTest {
     // TODO: negative test cases for fetchPublicKeyFromRemoteHost
 
     @Test
-    public void savesAcHostWhenPublicKeysMatch() {
+    public void savesAcHostWhenPublicKeysMatch() throws Throwable {
         acHostService.registerHost(acHostModel).get(1, TimeUnit.SECONDS);
         verify(acHostRepository).save(acHostModel);
     }

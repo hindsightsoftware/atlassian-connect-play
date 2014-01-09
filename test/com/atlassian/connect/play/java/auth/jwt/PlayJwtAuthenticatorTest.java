@@ -29,7 +29,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.TimeUnit;
 
 import static com.atlassian.jwt.JwtConstants.JWT_PARAM_NAME;
-import static com.atlassian.jwt.core.http.JwtHttpConstants.AUTHORIZATION_HEADER;
+import static com.atlassian.jwt.JwtConstants.HttpRequests.AUTHORIZATION_HEADER;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
