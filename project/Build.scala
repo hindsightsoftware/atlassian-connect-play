@@ -6,7 +6,7 @@ object ApplicationBuild extends Build {
 
   val appName         = "ac-play-java"
   val appVersion      = "0.6.5-SNAPSHOT"
-  val atlassianJwtVersion = "1.0-m6-SNAPSHOT"
+  val atlassianJwtVersion = "1.0-m7-SNAPSHOT"
 
   val appDependencies = Seq(
     "postgresql" % "postgresql" % "8.4-701.jdbc3",
@@ -35,6 +35,7 @@ object ApplicationBuild extends Build {
     ebeanEnabled := false,
     resolvers += "Typesafe's Repository" at "http://repo.typesafe.com/typesafe/maven-releases",
     resolvers += "Atlassian's Maven Public Repository" at "https://maven.atlassian.com/content/groups/public",
+//    resolvers += "Local Maven Repository" at "file://" + Path.userHome + "/.m2/repository",
     organization := "com.atlassian.connect",
     publishTo <<= version { (v: String) =>
       val repo = "https://maven.atlassian.com/"

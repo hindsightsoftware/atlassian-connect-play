@@ -42,6 +42,7 @@ public final class JwtRequestAuthenticatorAction extends Action.Simple
 
                 Jwt jwt = authResult.right.get();
                 AC.setAcHost(jwt.getIssuer());
+                AC.setUser(jwt.getSubject());
                 AC.refreshToken(false);
 
                 return delegate.call(context);

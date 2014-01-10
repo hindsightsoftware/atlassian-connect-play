@@ -1,5 +1,8 @@
 package com.atlassian.connect.play.java;
 
+import com.atlassian.connect.play.java.auth.jwt.JwtAuthConfig;
+import com.atlassian.connect.play.java.auth.jwt.JwtAuthorizationGenerator;
+import com.atlassian.connect.play.java.auth.jwt.JwtSignatureCalculator;
 import com.atlassian.connect.play.java.model.AcHostModel;
 import com.atlassian.connect.play.java.auth.oauth.OAuthSignatureCalculator;
 import com.atlassian.connect.play.java.service.AcHostHttpClient;
@@ -52,6 +55,7 @@ public final class AC
     public static final Supplier<String> privateKey = OAuthKeys.privateKey;
 
     // TODO: DI of some sort would be nice
+    private static final JwtAuthorizationGenerator jwtAuthorisationGenerator = JwtAuthConfig.getJwtAuthorizationGenerator();
     private static final AcHostService acHostService = new AcHostServiceImpl(new AcHostHttpClient() {
         @Override
         public WSRequestHolder url(String url) {
@@ -79,13 +83,12 @@ public final class AC
 
     public static Option<String> getUser()
     {
-        final Option<String> user = option(request().getQueryString(AC_USER_ID_PARAM));
-        //user might have been set via com.atlassian.connect.play.java.token.PageTokenValidatorAction
-        if (user.isEmpty())
-        {
-            return Option.option((String) getHttpContext().args.get(AC_USER_ID_PARAM));
-        }
-        return user;
+        return Option.option((String) getHttpContext().args.get(AC_USER_ID_PARAM));
+    }
+
+    public static void setUser(String user)
+    {
+        getHttpContext().args.put(AC_USER_ID_PARAM, user);
     }
 
     public static WSRequestHolder url(String url)
@@ -122,13 +125,9 @@ public final class AC
 
         if (signRequest) {
             request.setFollowRedirects(false) // because we need to sign again in those cases.
-                    .sign(new OAuthSignatureCalculator());
+            .sign(new JwtSignatureCalculator(jwtAuthorisationGenerator));
         }
 
-        if (userId.isDefined())
-        {
-            request.setQueryParameter(AC_USER_ID_PARAM, userId.get());
-        }
         return request;
     }
 

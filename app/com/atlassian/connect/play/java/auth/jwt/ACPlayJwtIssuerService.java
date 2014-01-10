@@ -2,7 +2,6 @@ package com.atlassian.connect.play.java.auth.jwt;
 
 import com.atlassian.connect.play.java.AC;
 import com.atlassian.connect.play.java.AcHost;
-import com.atlassian.connect.play.java.PublicKeyStore;
 import com.atlassian.jwt.core.reader.JwtIssuerSharedSecretService;
 import com.atlassian.jwt.core.reader.JwtIssuerValidator;
 import com.atlassian.jwt.exception.JwtIssuerLacksSharedSecretException;
