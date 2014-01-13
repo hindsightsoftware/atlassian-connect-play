@@ -1,6 +1,7 @@
 package com.atlassian.connect.play.java.controllers;
 
 import com.atlassian.connect.play.java.AC;
+import com.atlassian.connect.play.java.auth.PublicKeyVerificationFailureException;
 import com.atlassian.connect.play.java.model.AcHostModel;
 import com.atlassian.fugue.Option;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -23,6 +24,9 @@ import static java.lang.Boolean.FALSE;
 import static java.lang.String.format;
 import static play.libs.F.Promise;
 import static play.mvc.Controller.request;
+import static play.mvc.Results.badRequest;
+import static play.mvc.Results.internalServerError;
+import static play.mvc.Results.ok;
 
 public class AcController {
     public static Result index() {
@@ -85,7 +89,7 @@ public class AcController {
         return new Supplier<Result>() {
             @Override
             public Result get() {
-                return Results.ok(internal_descriptor.render());
+                return ok(internal_descriptor.render());
             }
         };
     }
@@ -98,7 +102,7 @@ public class AcController {
         final JsonNode remoteApp = request().body().asJson();
 
         if (remoteApp == null) {
-            return Promise.pure((Result)Results.badRequest("can't extract registration request json"));
+            return Promise.pure((Result) badRequest("can't extract registration request json"));
         }
 
         // TODO check the key is the same as this app's
@@ -107,10 +111,23 @@ public class AcController {
         final AcHostModel acHost = populateHostModel(remoteApp);
 
         Promise<Boolean> hostRegistered = AC.registerHost(acHost);
-        return hostRegistered.map(new F.Function<Boolean, Result>() {
+        Promise<Result> resultPromise = hostRegistered.map(new F.Function<Boolean, Result>() {
             @Override
             public Result apply(Boolean isRegistered) throws Throwable {
-                return isRegistered ? Results.ok() : Results.badRequest(); // TODO: better feedback. Need to return something other than boolean from the service
+                return isRegistered ? ok() : badRequest(); // TODO: better feedback. Need to return something other than boolean from the service
+            }
+        });
+
+        return resultPromise.recover(new F.Function<Throwable, Result>() {
+            @Override
+            public Result apply(Throwable throwable) throws Throwable {
+                LOGGER.warn("Failed to register host (key = " + acHost.getKey() + ")", throwable);
+
+                if (throwable instanceof PublicKeyVerificationFailureException)
+                {
+                    return internalServerError("failed to fetch public key from host for verification");
+                }
+                return badRequest("Unable to register host. Request invalid"); // TODO: better analysis of failure and feedback to caller
             }
         });
     }
