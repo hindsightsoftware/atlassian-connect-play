@@ -6,7 +6,7 @@ object ApplicationBuild extends Build {
 
   val appName         = "ac-play-java"
   val appVersion      = "0.6.5-SNAPSHOT"
-  val atlassianJwtVersion = "1.0-m7-SNAPSHOT"
+  val atlassianJwtVersion = "1.0-m7"
 
   val appDependencies = Seq(
     "postgresql" % "postgresql" % "8.4-701.jdbc3",
@@ -19,7 +19,6 @@ object ApplicationBuild extends Build {
     "xml-apis" % "xml-apis" % "1.4.01",
     "com.atlassian.jwt" % "jwt-api" % atlassianJwtVersion withSources(),
     "com.atlassian.jwt" % "jwt-core" % atlassianJwtVersion withSources(),
-    "com.atlassian.jwt" % "jwt-http-client" % atlassianJwtVersion withSources(),
     "commons-lang" % "commons-lang" % "2.6" withSources(),
     "org.hamcrest" % "hamcrest-all" % "1.3" % "test" withSources(),
     "org.mockito" % "mockito-core" % "1.9.5" % "test" withSources(),
