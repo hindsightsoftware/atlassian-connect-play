@@ -1,6 +1,7 @@
 package com.atlassian.connect.play.java.service;
 
 import com.atlassian.connect.play.java.AcHost;
+import com.atlassian.connect.play.java.auth.PublicKeyVerificationFailureException;
 import com.atlassian.connect.play.java.model.AcHostModel;
 import com.google.common.base.Charsets;
 import org.junit.Before;
@@ -34,6 +35,7 @@ import static play.libs.WS.WSRequestHolder;
 public class AcHostServiceImplTest {
     private static final String TEST_PUBLIC_KEY = "REAL-PK-GOES-HERE";
     private static Document testClientInfoDocument;
+    private static Document testDodgyClientInfoDocument;
 
     @Mock
     private AcHostHttpClient httpClient;
@@ -53,6 +55,7 @@ public class AcHostServiceImplTest {
     @BeforeClass
     public static void loadTestData() throws FileNotFoundException {
         testClientInfoDocument = XML.fromInputStream(new FileInputStream("test/resources/consumer-info.xml"), Charsets.UTF_8.name());
+        testDodgyClientInfoDocument = XML.fromInputStream(new FileInputStream("test/resources/dodgy-consumer-info.xml"), Charsets.UTF_8.name());
     }
 
 
@@ -83,7 +86,27 @@ public class AcHostServiceImplTest {
         assertThat(publicKey, is(TEST_PUBLIC_KEY));
     }
 
-    // TODO: negative test cases for fetchPublicKeyFromRemoteHost
+    @Test(expected = PublicKeyVerificationFailureException.class)
+    public void returnsFailurePromiseWhenFailToFetchPublicKey() {
+        when(response.getStatus()).thenReturn(401);
+        Promise<String> publicKeyPromise = acHostService.fetchPublicKeyFromRemoteHost(acHostModel);
+        publicKeyPromise.get(1, TimeUnit.SECONDS);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void returnsFailurePromiseWhenFailToParseXml() {
+        when(response.asXml()).thenThrow(new RuntimeException("blah"));
+        Promise<String> publicKeyPromise = acHostService.fetchPublicKeyFromRemoteHost(acHostModel);
+        publicKeyPromise.get(1, TimeUnit.SECONDS);
+    }
+
+    @Test(expected = PublicKeyVerificationFailureException.class)
+    public void returnsFailurePromiseWhenPublicKeyNotFoundInXml() {
+        when(response.asXml()).thenReturn(testDodgyClientInfoDocument);
+        Promise<String> publicKeyPromise = acHostService.fetchPublicKeyFromRemoteHost(acHostModel);
+        publicKeyPromise.get(1, TimeUnit.SECONDS);
+    }
+
 
     @Test
     public void savesAcHostWhenPublicKeysMatch() throws Throwable {

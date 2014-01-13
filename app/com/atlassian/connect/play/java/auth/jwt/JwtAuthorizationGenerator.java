@@ -62,7 +62,6 @@ public class JwtAuthorizationGenerator {
         this.jwtWriterFactory = checkNotNull(jwtWriterFactory);
     }
 
-    // TODO: issuer is AcHost.getClientKey()
     public Option<String> generate(HttpMethod httpMethod, URI url, Map<String, List<String>> parameters, AcHost acHost,
                                    Option<String> userId)
             throws JwtIssuerLacksSharedSecretException, JwtUnknownIssuerException {

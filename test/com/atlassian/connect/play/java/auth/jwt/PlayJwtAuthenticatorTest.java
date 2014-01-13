@@ -72,10 +72,11 @@ public class PlayJwtAuthenticatorTest {
                 .issuedAt(now)
                 .expirationTime(now + TimeUnit.MINUTES.toSeconds(10))
                 .subject(SUBJECT)
-                .claim("qsh", hash)
+                .queryHash(hash)
                 .build();
         return writerFactory.macSigningWriter(ALGORITHM, PASSWORD).jsonToJwt(json);
     }
+
     @Before
     public void init() {
         JwtReaderFactory readerFactory = new NimbusJwtReaderFactory(jwtIssuerValidator, jwtIssuerSharedSecretService);

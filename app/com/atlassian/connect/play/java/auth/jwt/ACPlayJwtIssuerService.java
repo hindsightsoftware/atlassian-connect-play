@@ -11,6 +11,9 @@ import com.google.common.base.Function;
 import com.google.common.base.Supplier;
 import play.Logger;
 
+/**
+ * Supports the JwtAuthenticator by providing access to the shared secret for an issuer and checking validity of the isser
+ */
 public class ACPlayJwtIssuerService implements JwtIssuerSharedSecretService, JwtIssuerValidator {
     private final static Logger.ALogger LOGGER = Utils.LOGGER;
 
@@ -23,7 +26,7 @@ public class ACPlayJwtIssuerService implements JwtIssuerSharedSecretService, Jwt
             {
                 String sharedSecret = host.getSharedSecret();
                 if (sharedSecret == null) {
-                    LOGGER.warn("The issuer " + issuer + " does not have a shared secret in the database. Need to reinstall the addon to the host");
+                    LOGGER.warn("The issuer " + issuer + " does not have a shared secret in the database. Need to reinstall the addon in this host");
                 }
                 return sharedSecret;
             }

@@ -1,6 +1,7 @@
 package com.atlassian.connect.play.java.service;
 
 import com.atlassian.connect.play.java.AcHost;
+import com.atlassian.connect.play.java.auth.PublicKeyVerificationFailureException;
 import com.atlassian.connect.play.java.model.AcHostModel;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
@@ -45,7 +46,7 @@ public class AcHostServiceImpl implements AcHostService {
                         return publicKeyElements.item(0).getTextContent();
                     }
                 }
-                return null; // TODO: The play doco is so appalling that I'm not sure whether I should throw an exception to indicate failure or what
+                throw new PublicKeyVerificationFailureException("Failed to fetch public key for verification. Response status: " + response.getStatus());
             }
         });
 
