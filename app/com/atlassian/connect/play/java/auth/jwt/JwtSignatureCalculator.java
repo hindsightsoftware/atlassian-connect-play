@@ -27,9 +27,10 @@ import java.util.Map;
 import static com.atlassian.connect.play.java.util.Utils.LOGGER;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
+import static play.libs.WS.SignatureCalculator;
 import static play.libs.WS.WSRequest;
 
-public final class JwtSignatureCalculator implements WS.SignatureCalculator
+public final class JwtSignatureCalculator implements SignatureCalculator
 {
     private final JwtAuthorizationGenerator jwtAuthorizationGenerator;
 

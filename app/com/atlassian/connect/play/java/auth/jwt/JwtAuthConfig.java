@@ -5,7 +5,6 @@ import com.atlassian.jwt.core.reader.NimbusJwtReaderFactory;
 import com.atlassian.jwt.core.writer.NimbusJwtWriterFactory;
 import com.atlassian.jwt.reader.JwtReaderFactory;
 import com.atlassian.jwt.writer.JwtWriterFactory;
-import play.mvc.Http;
 
 import static play.mvc.Http.Request;
 import static play.mvc.Http.Response;
@@ -19,7 +18,7 @@ public class JwtAuthConfig {
                     createReaderFactory());
 
     private static JwtAuthorizationGenerator jwtAuthorizationGenerator =
-            new JwtAuthorizationGenerator(acPlayJwtIssuerService, createWriterFactory());
+            new JwtAuthorizationGenerator(createWriterFactory());
 
     private static JwtReaderFactory createReaderFactory() {
         return new NimbusJwtReaderFactory(acPlayJwtIssuerService, acPlayJwtIssuerService);

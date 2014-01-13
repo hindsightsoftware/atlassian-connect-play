@@ -3,7 +3,6 @@ package com.atlassian.connect.play.java.auth.jwt;
 import com.atlassian.connect.play.java.AC;
 import com.atlassian.connect.play.java.AcHost;
 import com.atlassian.connect.play.java.http.HttpMethod;
-import com.atlassian.connect.play.java.util.Utils;
 import com.atlassian.fugue.Option;
 import com.atlassian.jwt.SigningAlgorithm;
 import com.atlassian.jwt.core.TimeUtil;
@@ -51,15 +50,18 @@ public class JwtAuthorizationGenerator {
      * Default of 3 minutes.
      */
     private static final int JWT_EXPIRY_WINDOW_SECONDS_DEFAULT = 60 * 3;
-    private static final int JWT_EXPIRY_WINDOW_SECONDS = Play.application().configuration().getInt(JWT_EXPIRY_SECONDS_PROPERTY, JWT_EXPIRY_WINDOW_SECONDS_DEFAULT);
+    private final int jwtExpiryWindowSeconds;
 
-    private final ACPlayJwtIssuerService issuerService;
     private final JwtWriterFactory jwtWriterFactory;
     private static final Logger LOG = LoggerFactory.getLogger(JwtAuthorizationGenerator.class);
 
-    public JwtAuthorizationGenerator(ACPlayJwtIssuerService issuerService, JwtWriterFactory jwtWriterFactory) {
-        this.issuerService = checkNotNull(issuerService);
+    public JwtAuthorizationGenerator(JwtWriterFactory jwtWriterFactory) {
+        this(jwtWriterFactory, Play.application().configuration().getInt(JWT_EXPIRY_SECONDS_PROPERTY, JWT_EXPIRY_WINDOW_SECONDS_DEFAULT));
+    }
+
+    public JwtAuthorizationGenerator(JwtWriterFactory jwtWriterFactory, int jwtExpiryWindowSeconds) {
         this.jwtWriterFactory = checkNotNull(jwtWriterFactory);
+        this.jwtExpiryWindowSeconds = jwtExpiryWindowSeconds;
     }
 
     public Option<String> generate(HttpMethod httpMethod, URI url, Map<String, List<String>> parameters, AcHost acHost,
@@ -84,7 +86,7 @@ public class JwtAuthorizationGenerator {
 
         JwtJsonBuilder jsonBuilder = new JsonSmartJwtJsonBuilder()
                 .issuedAt(TimeUtil.currentTimeSeconds())
-                .expirationTime(TimeUtil.currentTimePlusNSeconds(JWT_EXPIRY_WINDOW_SECONDS))
+                .expirationTime(TimeUtil.currentTimePlusNSeconds(jwtExpiryWindowSeconds))
                 .issuer(AC.PLUGIN_KEY);
 
         if (null != userKeyValue) {
