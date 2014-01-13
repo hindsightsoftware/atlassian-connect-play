@@ -110,11 +110,11 @@ public class AcController {
 
         final AcHostModel acHost = populateHostModel(remoteApp);
 
-        Promise<Boolean> hostRegistered = AC.registerHost(acHost);
-        Promise<Result> resultPromise = hostRegistered.map(new F.Function<Boolean, Result>() {
+        Promise<Void> hostRegistered = AC.registerHost(acHost);
+        Promise<Result> resultPromise = hostRegistered.map(new F.Function<Void, Result>() {
             @Override
-            public Result apply(Boolean isRegistered) throws Throwable {
-                return isRegistered ? ok() : badRequest(); // TODO: better feedback. Need to return something other than boolean from the service
+            public Result apply(Void nada) throws Throwable {
+                return ok();
             }
         });
 

@@ -4,10 +4,8 @@ import com.atlassian.connect.play.java.AcHost;
 import com.atlassian.connect.play.java.auth.InvalidAuthenticationRequestException;
 import com.atlassian.connect.play.java.auth.MismatchPublicKeyException;
 import com.atlassian.connect.play.java.auth.PublicKeyVerificationFailureException;
-import com.atlassian.connect.play.java.model.AcHostModel;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
-import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
@@ -56,13 +54,13 @@ public class AcHostServiceImpl implements AcHostService {
     }
 
     @Override
-    public Promise<Boolean> registerHost(final AcHost acHost) {
+    public Promise<Void> registerHost(final AcHost acHost) {
         if (stripToNull(acHost.getPublicKey()) == null) {
             throw new InvalidAuthenticationRequestException("No public key provided in registration request");
         }
-        Promise<Boolean> hostRegistered = fetchPublicKeyFromRemoteHost(acHost).map(new Function<String, Boolean>() {
+        Promise<Void> hostRegistered = fetchPublicKeyFromRemoteHost(acHost).map(new Function<String, Void>() {
             @Override
-            public Boolean apply(String fetchedPublicKey) throws Throwable {
+            public Void apply(String fetchedPublicKey) throws Throwable {
                 fetchedPublicKey = stripToNull(fetchedPublicKey);
                 String providedPublicKey = stripToNull(acHost.getPublicKey());
                 boolean keysMatch = Objects.equal(fetchedPublicKey, providedPublicKey);
@@ -70,7 +68,7 @@ public class AcHostServiceImpl implements AcHostService {
                     throw new MismatchPublicKeyException(providedPublicKey, fetchedPublicKey);
                 }
                 acHostRepository.save(acHost);
-                return true;
+                return null;
             }
         });
 

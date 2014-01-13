@@ -123,12 +123,6 @@ public class AcHostServiceImplTest {
         verify(acHostRepository).save(acHostModel);
     }
 
-    @Test
-    public void returnsTrueOnSuccess() {
-        Boolean result = acHostService.registerHost(acHostModel).get(1, TimeUnit.SECONDS);
-        assertThat(result, is(true));
-    }
-
     @Test(expected = InvalidAuthenticationRequestException.class)
     public void returnsFailurePromiseWhenNoPublicKeyProvided() {
         acHostModel.publicKey = "  ";

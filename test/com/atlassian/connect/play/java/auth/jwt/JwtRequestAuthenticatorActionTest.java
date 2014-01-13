@@ -17,7 +17,7 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static play.libs.F.Promise;
 import static play.mvc.Http.Context;
 
-//@Ignore // need to do the registration first
+@Ignore // need to do the registration first
 @RunWith(MockitoJUnitRunner.class)
 public class JwtRequestAuthenticatorActionTest {
 

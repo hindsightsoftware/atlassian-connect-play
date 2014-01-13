@@ -174,7 +174,7 @@ public final class AC
         }
     }
 
-    public static Promise<Boolean> registerHost(AcHost acHost)
+    public static Promise<Void> registerHost(AcHost acHost)
     {
         return acHostService.registerHost(acHost);
     }

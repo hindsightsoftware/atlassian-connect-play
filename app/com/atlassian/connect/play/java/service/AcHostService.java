@@ -21,8 +21,9 @@ public interface AcHostService {
     /**
      * Registers a new host, or updates the details from an existing host
      *
+     *
      * @param acHost
      * @return
      */
-    Promise<Boolean> registerHost(AcHost acHost);
+    Promise<Void> registerHost(AcHost acHost);
 }
