@@ -1,6 +1,8 @@
 package com.atlassian.connect.play.java.service;
 
 import com.atlassian.connect.play.java.AcHost;
+import com.atlassian.connect.play.java.auth.InvalidAuthenticationRequestException;
+import com.atlassian.connect.play.java.auth.MismatchPublicKeyException;
 import com.atlassian.connect.play.java.auth.PublicKeyVerificationFailureException;
 import com.atlassian.connect.play.java.model.AcHostModel;
 import com.google.common.annotations.VisibleForTesting;
@@ -55,17 +57,17 @@ public class AcHostServiceImpl implements AcHostService {
 
     @Override
     public Promise<Boolean> registerHost(final AcHost acHost) {
-        // TODO: validate host model against public key. This is not mentioned in https://developer.atlassian.com/static/connect/docs/pages/concepts/authentication.html
-        // first check public key is correct by checking against <host baseUrl>/plugins/servlet/oauth/consumer-info
-        // What other checks? Are there any holes here?
+        if (stripToNull(acHost.getPublicKey()) == null) {
+            throw new InvalidAuthenticationRequestException("No public key provided in registration request");
+        }
         Promise<Boolean> hostRegistered = fetchPublicKeyFromRemoteHost(acHost).map(new Function<String, Boolean>() {
             @Override
             public Boolean apply(String fetchedPublicKey) throws Throwable {
-                // TODO: is there any need to worry about empty public keys in json and on host (i.e. does that represent any kind of attack vector)
-                boolean keysMatch = Objects.equal(stripToNull(fetchedPublicKey), stripToNull(acHost.getPublicKey()));
+                fetchedPublicKey = stripToNull(fetchedPublicKey);
+                String providedPublicKey = stripToNull(acHost.getPublicKey());
+                boolean keysMatch = Objects.equal(fetchedPublicKey, providedPublicKey);
                 if (!keysMatch) {
-                    // TODO: log
-                    return false; // TODO: or throw?
+                    throw new MismatchPublicKeyException(providedPublicKey, fetchedPublicKey);
                 }
                 acHostRepository.save(acHost);
                 return true;

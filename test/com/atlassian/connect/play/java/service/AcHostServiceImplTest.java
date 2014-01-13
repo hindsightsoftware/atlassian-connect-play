@@ -1,6 +1,8 @@
 package com.atlassian.connect.play.java.service;
 
 import com.atlassian.connect.play.java.AcHost;
+import com.atlassian.connect.play.java.auth.InvalidAuthenticationRequestException;
+import com.atlassian.connect.play.java.auth.MismatchPublicKeyException;
 import com.atlassian.connect.play.java.auth.PublicKeyVerificationFailureException;
 import com.atlassian.connect.play.java.model.AcHostModel;
 import com.google.common.base.Charsets;
@@ -36,6 +38,8 @@ public class AcHostServiceImplTest {
     private static final String TEST_PUBLIC_KEY = "REAL-PK-GOES-HERE";
     private static Document testClientInfoDocument;
     private static Document testDodgyClientInfoDocument;
+    private static Document testMismatchedPKClientInfoDocument;
+
 
     @Mock
     private AcHostHttpClient httpClient;
@@ -54,8 +58,13 @@ public class AcHostServiceImplTest {
 
     @BeforeClass
     public static void loadTestData() throws FileNotFoundException {
-        testClientInfoDocument = XML.fromInputStream(new FileInputStream("test/resources/consumer-info.xml"), Charsets.UTF_8.name());
-        testDodgyClientInfoDocument = XML.fromInputStream(new FileInputStream("test/resources/dodgy-consumer-info.xml"), Charsets.UTF_8.name());
+        testClientInfoDocument = fetchTestDocument("consumer-info.xml");
+        testDodgyClientInfoDocument = fetchTestDocument("dodgy-consumer-info.xml");
+        testMismatchedPKClientInfoDocument = fetchTestDocument("mismatched-pk-consumer-info.xml");
+    }
+
+    private static Document fetchTestDocument(String filename) throws FileNotFoundException {
+        return XML.fromInputStream(new FileInputStream("test/resources/" + filename), Charsets.UTF_8.name());
     }
 
 
@@ -120,5 +129,21 @@ public class AcHostServiceImplTest {
         assertThat(result, is(true));
     }
 
-    // TODO: negative test cases for registerHost
+    @Test(expected = InvalidAuthenticationRequestException.class)
+    public void returnsFailurePromiseWhenNoPublicKeyProvided() {
+        acHostModel.publicKey = "  ";
+        acHostService.registerHost(acHostModel).get(1, TimeUnit.SECONDS);
+    }
+
+    @Test(expected = MismatchPublicKeyException.class)
+    public void returnsFailurePromiseWhenPublicKeyMismatched() {
+        when(response.asXml()).thenReturn(testMismatchedPKClientInfoDocument);
+        acHostService.registerHost(acHostModel).get(1, TimeUnit.SECONDS);
+    }
+
+    @Test(expected = PublicKeyVerificationFailureException.class)
+    public void returnsFailurePromiseWhenFailToFetchPublicKeyDuringRegistration() {
+        when(response.getStatus()).thenReturn(401);
+        acHostService.registerHost(acHostModel).get(1, TimeUnit.SECONDS);
+    }
 }
