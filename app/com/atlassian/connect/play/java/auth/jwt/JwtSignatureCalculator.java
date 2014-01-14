@@ -47,8 +47,7 @@ public final class JwtSignatureCalculator implements SignatureCalculator
         }
         catch (URISyntaxException e)
         {
-            // this shouldn't happen as the message is not being read from any IO streams, but the OAuth library throws
-            // these around like they're candy, but far less sweet and tasty.
+            // this will happen if the baseUrl is invalid
             throw new RuntimeException(e);
         }
     }

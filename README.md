@@ -21,6 +21,8 @@ More details can be found in the [AC Play Java Benefits](#markdown-header-ac-pla
 
 * See [Authentication Documentation for details](https://developer.atlassian.com/static/connect/docs/pages/concepts/authentication.html)
 
+* Note: we recommend you set the ac logging to trace while debugging jwt code
+
 See changelog.md for more details
 
 ## Getting started

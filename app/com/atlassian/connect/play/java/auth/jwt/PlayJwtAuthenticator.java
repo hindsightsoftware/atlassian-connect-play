@@ -39,7 +39,7 @@ public class PlayJwtAuthenticator extends AbstractJwtAuthenticator<Request, Resp
     @Override
     protected Principal authenticate(Request request, Jwt jwt) throws JwtUserRejectedException {
         // we don't do any further validation of the user here. If the host vouches for them then ok by us
-        return new SimplePrincipal(jwt.getSubject());
+        return jwt.getSubject() == null ? null : new SimplePrincipal(jwt.getSubject());
     }
 
     @Override
