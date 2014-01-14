@@ -76,13 +76,13 @@ public class JwtAuthorizationGenerator {
         final URI uriWithoutProductContext = new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(),
                 pathWithoutProductContext, uri.getQuery(), uri.getFragment());
 
-        LOGGER.debug("Creating Jwt signature for:");
-        LOGGER.debug(format("httpMethod: '%s'", httpMethodStr));
-        LOGGER.debug(format("URL: '%s'", url));
-        LOGGER.debug(format("uriWithoutProductContext: '%s'", uriWithoutProductContext));
-        LOGGER.debug(format("acHost: '%s'", acHost));
-        LOGGER.debug(format("userId: '%s'", userId));
-        LOGGER.debug(format("Parameters: %s", parameters));
+        LOGGER.trace("Creating Jwt signature for:");
+        LOGGER.trace(format("httpMethod: '%s'", httpMethodStr));
+        LOGGER.trace(format("URL: '%s'", url));
+        LOGGER.trace(format("uriWithoutProductContext: '%s'", uriWithoutProductContext));
+        LOGGER.trace(format("acHost: '%s'", acHost));
+        LOGGER.trace(format("userId: '%s'", userId));
+        LOGGER.trace(format("Parameters: %s", parameters));
 
         return generate(method, uriWithoutProductContext, parameters, acHost, userId);
     }

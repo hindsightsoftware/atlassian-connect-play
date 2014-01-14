@@ -26,14 +26,14 @@ public class ACPlayJwtIssuerService implements JwtIssuerSharedSecretService, Jwt
             {
                 String sharedSecret = host.getSharedSecret();
                 if (sharedSecret == null) {
-                    LOGGER.warn("The issuer " + issuer + " does not have a shared secret in the database. Need to reinstall the addon in this host");
+                    LOGGER.warn("The issuer " + issuer + " does not have a shared secret in the database. Please reinstall the addon in this host");
                 }
                 return sharedSecret;
             }
         }).getOrElse(new Supplier<String>() {
             @Override
             public String get() {
-                LOGGER.warn("The issuer " + issuer + " cannot be found in the database. Might be a host that has not registered");
+                LOGGER.warn("The issuer " + issuer + " cannot be found in the database. It might be a host that has not registered");
                 return null;
             }
         });
