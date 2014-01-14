@@ -45,6 +45,7 @@ public class JwtAuthorizationGeneratorTest {
     private static final Option<String> FREDDY = Option.some("freddy");
     private static final String NOT_SO_SECRET_SECRET = "notSoSecretSecret";
     private static final String MY_PLUGIN_KEY = "myPluginKey";
+    private static final String PRODUCT_CONTEXT = "/pc";
 
     @Mock
     private JwtWriterFactory jwtWriterFactory;// = new NimbusJwtWriterFactory();
@@ -55,12 +56,12 @@ public class JwtAuthorizationGeneratorTest {
     private JwtAuthorizationGenerator jwtAuthorizationGenerator;
 
     private AcHostModel acHost;
-    private URI aUrl;
+    private String aUrl;
 
     @Before
     public void init() throws URISyntaxException {
         jwtAuthorizationGenerator = new JwtAuthorizationGenerator(jwtWriterFactory, 60 * 3);
-        aUrl = new URI("/foo");
+        aUrl = PRODUCT_CONTEXT + "/foo";
         FakeApplication fakeApplication = Helpers.fakeApplication();
         Helpers.start(fakeApplication);
         acHost = new AcHostModel();
@@ -77,23 +78,21 @@ public class JwtAuthorizationGeneratorTest {
     }
 
     @Test
-    public void callsWriterWithCorrectIssuer() throws JwtUnknownIssuerException, JwtIssuerLacksSharedSecretException {
+    public void callsWriterWithCorrectIssuer() throws JwtUnknownIssuerException, JwtIssuerLacksSharedSecretException, URISyntaxException {
         generate();
         verify(jwtWriter).jsonToJwt(argThat(isJwtWithIssValue(MY_PLUGIN_KEY)));
     }
 
     @Test
-    public void callsWriterWithCorrectSubject() throws JwtUnknownIssuerException, JwtIssuerLacksSharedSecretException {
+    public void callsWriterWithCorrectSubject() throws JwtUnknownIssuerException, JwtIssuerLacksSharedSecretException, URISyntaxException {
         generate();
         verify(jwtWriter).jsonToJwt(argThat(isJwtWithSubValue(FREDDY.get())));
     }
 
     // TODO: tests for exp and iat
 
-    // TODO: test extra code via new generate method
-
-    private Option<String> generate() throws JwtIssuerLacksSharedSecretException, JwtUnknownIssuerException {
-        return jwtAuthorizationGenerator.generate(HttpMethod.GET, aUrl, ImmutableMap.<String, List<String>>of(), acHost, FREDDY);
+    private Option<String> generate() throws JwtIssuerLacksSharedSecretException, JwtUnknownIssuerException, URISyntaxException {
+        return jwtAuthorizationGenerator.generate("GET", aUrl, ImmutableMap.<String, List<String>>of(), acHost, FREDDY);
     }
 
     private Matcher<String> isJwtWithIssValue(String issuer) {
