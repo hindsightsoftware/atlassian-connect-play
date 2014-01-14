@@ -4,7 +4,6 @@ import com.atlassian.connect.play.java.auth.jwt.JwtAuthConfig;
 import com.atlassian.connect.play.java.auth.jwt.JwtAuthorizationGenerator;
 import com.atlassian.connect.play.java.auth.jwt.JwtSignatureCalculator;
 import com.atlassian.connect.play.java.model.AcHostModel;
-import com.atlassian.connect.play.java.auth.oauth.OAuthSignatureCalculator;
 import com.atlassian.connect.play.java.service.AcHostHttpClient;
 import com.atlassian.connect.play.java.service.AcHostService;
 import com.atlassian.connect.play.java.service.AcHostServiceImpl;
@@ -24,21 +23,15 @@ import play.mvc.Http;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.atlassian.connect.play.java.Constants.AC_DEV;
-import static com.atlassian.connect.play.java.Constants.AC_HOST_PARAM;
-import static com.atlassian.connect.play.java.Constants.AC_PLUGIN_KEY;
-import static com.atlassian.connect.play.java.Constants.AC_TOKEN;
-import static com.atlassian.connect.play.java.Constants.AC_USER_ID_PARAM;
+import static com.atlassian.connect.play.java.Constants.*;
 import static com.atlassian.connect.play.java.util.Utils.LOGGER;
 import static com.atlassian.fugue.Option.none;
-import static com.atlassian.fugue.Option.option;
 import static com.atlassian.fugue.Option.some;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
 import static play.libs.F.Promise;
 import static play.libs.WS.WSRequestHolder;
-import static play.mvc.Http.Context.Implicit.request;
 
 public final class AC
 {
