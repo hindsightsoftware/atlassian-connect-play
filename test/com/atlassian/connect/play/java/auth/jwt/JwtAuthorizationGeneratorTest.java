@@ -90,6 +90,8 @@ public class JwtAuthorizationGeneratorTest {
 
     // TODO: tests for exp and iat
 
+    // TODO: test extra code via new generate method
+
     private Option<String> generate() throws JwtIssuerLacksSharedSecretException, JwtUnknownIssuerException {
         return jwtAuthorizationGenerator.generate(HttpMethod.GET, aUrl, ImmutableMap.<String, List<String>>of(), acHost, FREDDY);
     }

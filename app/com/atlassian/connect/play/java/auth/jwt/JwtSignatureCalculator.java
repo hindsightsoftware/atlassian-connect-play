@@ -1,28 +1,15 @@
 package com.atlassian.connect.play.java.auth.jwt;
 
 import com.atlassian.connect.play.java.AC;
-import com.atlassian.connect.play.java.AcHost;
-import com.atlassian.connect.play.java.http.HttpMethod;
 import com.atlassian.fugue.Option;
 import com.atlassian.jwt.exception.JwtIssuerLacksSharedSecretException;
 import com.atlassian.jwt.exception.JwtUnknownIssuerException;
-import com.google.common.base.Supplier;
-import com.google.common.base.Suppliers;
-import com.google.common.collect.Maps;
 import com.ning.http.client.FluentStringsMap;
-import net.oauth.*;
-import net.oauth.signature.RSA_SHA1;
-import play.libs.WS;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static com.atlassian.connect.play.java.util.Utils.LOGGER;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -50,27 +37,7 @@ public final class JwtSignatureCalculator implements SignatureCalculator
     {
         try
         {
-            final FluentStringsMap params = getQueryParams(request);
-
-            final HttpMethod method = HttpMethod.valueOf(request.getMethod());
-            final String url = request.getUrl();
-
-            final URI uri = new URI(url);
-            final String pathWithoutProductContext = uri.getPath().substring(url.indexOf('/', 1));
-            final URI uriWithoutProductContext = new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(),
-                    pathWithoutProductContext, uri.getQuery(), uri.getFragment());
-            final AcHost acHost = AC.getAcHost();
-            final Option<String> userId = AC.getUser();
-
-            LOGGER.debug("Creating Jwt signature for:");
-            LOGGER.debug(format("Method: '%s'", method));
-            LOGGER.debug(format("URL: '%s'", url));
-            LOGGER.debug(format("uriWithoutProductContext: '%s'", uriWithoutProductContext));
-            LOGGER.debug(format("acHost: '%s'", acHost));
-            LOGGER.debug(format("userId: '%s'", userId));
-            LOGGER.debug(format("Parameters: %s", params));
-
-            Option<String> jwt = jwtAuthorizationGenerator.generate(method, uriWithoutProductContext, params, acHost, userId);
+            Option<String> jwt = jwtAuthorizationGenerator.generate(request.getMethod(), request.getUrl(), getQueryParams(request), AC.getAcHost(), AC.getUser());
             return jwt.getOrNull();
         }
         catch (JwtIssuerLacksSharedSecretException | JwtUnknownIssuerException e)

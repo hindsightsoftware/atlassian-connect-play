@@ -105,10 +105,7 @@ public class AcController {
             return Promise.pure((Result) badRequest("can't extract registration request json"));
         }
 
-        // TODO check the key is the same as this app's
-        getAttributeAsText(remoteApp, "key");
-
-        final AcHostModel acHost = populateHostModel(remoteApp);
+        final AcHostModel acHost = AcHostModel.fromJson(remoteApp);
 
         Promise<Void> hostRegistered = AC.registerHost(acHost);
         Promise<Result> resultPromise = hostRegistered.map(new F.Function<Void, Result>() {
@@ -132,37 +129,10 @@ public class AcController {
         });
     }
 
-    private static AcHostModel populateHostModel(JsonNode remoteApp) {
-        final String clientKey = getAttributeAsText(remoteApp, "clientKey");
-        final String baseUrl = getAttributeAsText(remoteApp, "baseUrl");
-
-        // TODO: The consequence of this is that we will overwrite registrations each time. Is that what we want?
-        final AcHostModel acHost = AcHostModel.findByKey(clientKey)
-                .orElse(new Supplier<Option<AcHostModel>>() {
-                    @Override
-                    public Option<AcHostModel> get() {
-                        return AcHostModel.findByUrl(baseUrl);
-                    }
-                })
-                .getOrElse(new AcHostModel());
-
-        acHost.key = clientKey;
-        acHost.baseUrl = baseUrl;
-        acHost.publicKey = getAttributeAsText(remoteApp, "publicKey");
-        acHost.sharedSecret = getAttributeAsText(remoteApp, "sharedSecret");
-        acHost.name = getAttributeAsText(remoteApp, "productType");
-        acHost.description = getAttributeAsText(remoteApp, "description");
-        return acHost;
-    }
-
     private static AssetsBuilder delegate = new AssetsBuilder();
 
     public static Action<AnyContent> asset(String path, String file) {
         return delegate.at(path, file);
     }
 
-    private static String getAttributeAsText(JsonNode json, String name) {
-        JsonNode jsonNode = json.get(name);
-        return jsonNode == null ? null : jsonNode.textValue();
-    }
 }

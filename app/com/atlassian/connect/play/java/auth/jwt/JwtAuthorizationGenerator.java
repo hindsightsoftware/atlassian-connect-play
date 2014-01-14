@@ -29,6 +29,7 @@ import play.Play;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -37,6 +38,7 @@ import static com.atlassian.connect.play.java.util.Utils.LOGGER;
 import static com.atlassian.jwt.JwtConstants.HttpRequests.JWT_AUTH_HEADER_PREFIX;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.lang.String.format;
 
 /**
  * Set the system property {@link JwtAuthorizationGenerator#JWT_EXPIRY_SECONDS_PROPERTY} with an integer value to control the size of the expiry window
@@ -64,9 +66,31 @@ public class JwtAuthorizationGenerator {
         this.jwtExpiryWindowSeconds = jwtExpiryWindowSeconds;
     }
 
+    public Option<String> generate(String httpMethodStr, String url, Map<String, List<String>> parameters, AcHost acHost,
+                                   Option<String> userId)
+            throws JwtIssuerLacksSharedSecretException, JwtUnknownIssuerException, URISyntaxException {
+        final HttpMethod method = HttpMethod.valueOf(httpMethodStr);
+
+        final URI uri = new URI(url);
+        final String pathWithoutProductContext = uri.getPath().substring(url.indexOf('/', 1));
+        final URI uriWithoutProductContext = new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(),
+                pathWithoutProductContext, uri.getQuery(), uri.getFragment());
+
+        LOGGER.debug("Creating Jwt signature for:");
+        LOGGER.debug(format("httpMethod: '%s'", httpMethodStr));
+        LOGGER.debug(format("URL: '%s'", url));
+        LOGGER.debug(format("uriWithoutProductContext: '%s'", uriWithoutProductContext));
+        LOGGER.debug(format("acHost: '%s'", acHost));
+        LOGGER.debug(format("userId: '%s'", userId));
+        LOGGER.debug(format("Parameters: %s", parameters));
+
+        return generate(method, uriWithoutProductContext, parameters, acHost, userId);
+    }
+
     public Option<String> generate(HttpMethod httpMethod, URI url, Map<String, List<String>> parameters, AcHost acHost,
                                    Option<String> userId)
             throws JwtIssuerLacksSharedSecretException, JwtUnknownIssuerException {
+
         checkArgument(null != parameters, "Parameters Map argument cannot be null");
 
         Map<String, String[]> paramsAsArrays = Maps.transformValues(parameters, new Function<List<String>, String[]>() {
@@ -79,7 +103,7 @@ public class JwtAuthorizationGenerator {
                 acHost));
     }
 
-    String encodeJwt(HttpMethod httpMethod, URI targetPath, Map<String, String[]> params, String userKeyValue,
+    private String encodeJwt(HttpMethod httpMethod, URI targetPath, Map<String, String[]> params, String userKeyValue,
                      AcHost acHost) throws JwtUnknownIssuerException, JwtIssuerLacksSharedSecretException {
         checkArgument(null != httpMethod, "HttpMethod argument cannot be null");
         checkArgument(null != targetPath, "URI argument cannot be null");
@@ -117,7 +141,7 @@ public class JwtAuthorizationGenerator {
     }
 
 
-    public String issueJwt(String jsonPayload, AcHost acHost) throws JwtSigningException, JwtIssuerLacksSharedSecretException, JwtUnknownIssuerException {
+    private String issueJwt(String jsonPayload, AcHost acHost) throws JwtSigningException, JwtIssuerLacksSharedSecretException, JwtUnknownIssuerException {
         return getJwtWriter(acHost).jsonToJwt(jsonPayload);
     }
 

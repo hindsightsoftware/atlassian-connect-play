@@ -15,4 +15,6 @@ public interface AcHost
     String getPublicKey();
 
     String getSharedSecret();
+
+    String getConsumerInfoUrl();
 }

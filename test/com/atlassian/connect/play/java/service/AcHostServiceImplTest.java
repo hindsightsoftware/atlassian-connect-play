@@ -36,6 +36,7 @@ import static play.libs.WS.WSRequestHolder;
 @RunWith(MockitoJUnitRunner.class)
 public class AcHostServiceImplTest {
     private static final String TEST_PUBLIC_KEY = "REAL-PK-GOES-HERE";
+    private static final String BASE_URL = "base";
     private static Document testClientInfoDocument;
     private static Document testDodgyClientInfoDocument;
     private static Document testMismatchedPKClientInfoDocument;
@@ -73,6 +74,7 @@ public class AcHostServiceImplTest {
         acHostService = new AcHostServiceImpl(httpClient, acHostRepository);
         acHostModel = new AcHostModel();
         acHostModel.publicKey = TEST_PUBLIC_KEY;
+        acHostModel.baseUrl = BASE_URL;
 
         when(httpClient.url(anyString(), any(AcHost.class), anyBoolean())).thenReturn(requestHolder);
         when(requestHolder.get()).thenReturn(Promise.pure(response));
@@ -83,7 +85,7 @@ public class AcHostServiceImplTest {
     @Test
     public void sendsCorrectHttpRequest() {
         acHostService.fetchPublicKeyFromRemoteHost(acHostModel);
-        verify(httpClient).url(AcHostServiceImpl.CONSUMER_INFO_URL, acHostModel, false);
+        verify(httpClient).url(BASE_URL + AcHostModel.CONSUMER_INFO_URL, acHostModel, false);
         verify(requestHolder).get();
     }
 

@@ -1,0 +1,9 @@
+{
+    "key": "atlassian-connect-jira-addon-jwt",
+    "clientKey": "1234567890",
+    "publicKey": "PK GOES HERE",
+    "sharedSecret": "SHARED SECRET",
+    "baseUrl": "http://jira.atlassian.com:2990/jira",
+    "productType": "jira",
+    "eventType": "installed"
+}
