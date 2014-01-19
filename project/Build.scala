@@ -6,6 +6,7 @@ object ApplicationBuild extends Build {
 
   val appName         = "ac-play-java"
   val appVersion      = "0.6.5-SNAPSHOT"
+  val atlassianJwtVersion = "1.0-m7"
 
   val appDependencies = Seq(
     "postgresql" % "postgresql" % "8.4-701.jdbc3",
@@ -16,6 +17,11 @@ object ApplicationBuild extends Build {
     "org.bouncycastle" % "bcprov-jdk16" % "1.46",
     "org.hibernate" % "hibernate-entitymanager" % "4.2.1.Final",
     "xml-apis" % "xml-apis" % "1.4.01",
+    "com.atlassian.jwt" % "jwt-api" % atlassianJwtVersion withSources(),
+    "com.atlassian.jwt" % "jwt-core" % atlassianJwtVersion withSources(),
+    "commons-lang" % "commons-lang" % "2.6" withSources(),
+    "org.hamcrest" % "hamcrest-all" % "1.3" % "test" withSources(),
+    "org.mockito" % "mockito-core" % "1.9.5" % "test" withSources(),
     javaCore,
     javaJdbc,
     javaJpa,
@@ -28,6 +34,7 @@ object ApplicationBuild extends Build {
     ebeanEnabled := false,
     resolvers += "Typesafe's Repository" at "http://repo.typesafe.com/typesafe/maven-releases",
     resolvers += "Atlassian's Maven Public Repository" at "https://maven.atlassian.com/content/groups/public",
+//    resolvers += "Local Maven Repository" at "file://" + Path.userHome + "/.m2/repository",
     organization := "com.atlassian.connect",
     publishTo <<= version { (v: String) =>
       val repo = "https://maven.atlassian.com/"

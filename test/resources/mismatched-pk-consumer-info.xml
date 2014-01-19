@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<consumer>
+    <key>Confluence:8179004655</key>
+    <name>Confluence</name>
+    <publicKey>
+        THIS-IS-THE-WRONG-PK
+    </publicKey>
+    <description>host.consumer.default.description</description>
+</consumer>
