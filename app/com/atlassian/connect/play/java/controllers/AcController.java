@@ -3,6 +3,7 @@ package com.atlassian.connect.play.java.controllers;
 import com.atlassian.connect.play.java.AC;
 import com.atlassian.connect.play.java.auth.PublicKeyVerificationFailureException;
 import com.atlassian.connect.play.java.model.AcHostModel;
+import com.atlassian.connect.play.java.util.DescriptorUtils;
 import com.atlassian.fugue.Option;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Function;
@@ -16,6 +17,8 @@ import play.mvc.BodyParser;
 import play.mvc.Result;
 import play.mvc.Results;
 import views.xml.ac.internal.internal_descriptor;
+
+import java.io.IOException;
 
 import static com.atlassian.connect.play.java.util.Utils.LOGGER;
 import static com.atlassian.fugue.Option.option;
@@ -38,15 +41,15 @@ public class AcController {
             return descriptor.get();
         } else if (isAcceptHtml()) {
             return home.get();
-        } else if (isAcceptXml()) {
+        } else if (isAcceptJson()) {
             return descriptor.get();
         } else {
             throw new IllegalStateException("Why do we end up here!");
         }
     }
 
-    private static boolean isAcceptXml() {
-        return request().accepts("application/xml");
+    private static boolean isAcceptJson() {
+        return request().accepts("application/json");
     }
 
     private static boolean isAcceptHtml() {
@@ -73,7 +76,13 @@ public class AcController {
     }
 
     public static Result descriptor() {
-        return descriptorSupplier().get();
+        try {
+            return ok(DescriptorUtils.substituteVariablesInDefaultFile());
+        } catch (IOException e) {
+            LOGGER.error("Failed to create substituted descriptor", e);
+            return internalServerError("Failed to create substituted descriptor: " + e.getMessage());
+//            throw new RuntimeException("Failed to create substituted descriptor", e);
+        }
     }
 
     public static Supplier<Result> home() {
@@ -120,8 +129,7 @@ public class AcController {
             public Result apply(Throwable throwable) throws Throwable {
                 LOGGER.warn("Failed to register host (key = " + acHost.getKey() + ")", throwable);
 
-                if (throwable instanceof PublicKeyVerificationFailureException)
-                {
+                if (throwable instanceof PublicKeyVerificationFailureException) {
                     return internalServerError("failed to fetch public key from host for verification");
                 }
                 return badRequest("Unable to register host. Request invalid"); // TODO: better analysis of failure and feedback to caller
