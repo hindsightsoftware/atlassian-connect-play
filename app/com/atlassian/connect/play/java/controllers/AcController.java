@@ -41,15 +41,15 @@ public class AcController {
             return descriptor.get();
         } else if (isAcceptHtml()) {
             return home.get();
-        } else if (isAcceptXml()) {
+        } else if (isAcceptJson()) {
             return descriptor.get();
         } else {
             throw new IllegalStateException("Why do we end up here!");
         }
     }
 
-    private static boolean isAcceptXml() {
-        return request().accepts("application/xml");
+    private static boolean isAcceptJson() {
+        return request().accepts("application/json");
     }
 
     private static boolean isAcceptHtml() {
@@ -80,8 +80,8 @@ public class AcController {
             return ok(DescriptorUtils.substituteVariablesInDefaultFile());
         } catch (IOException e) {
             LOGGER.error("Failed to create substituted descriptor", e);
-//            return internalServerError("Failed to create substituted descriptor: " + e.getMessage());
-            throw new RuntimeException("Failed to create substituted descriptor", e);
+            return internalServerError("Failed to create substituted descriptor: " + e.getMessage());
+//            throw new RuntimeException("Failed to create substituted descriptor", e);
         }
     }
 
