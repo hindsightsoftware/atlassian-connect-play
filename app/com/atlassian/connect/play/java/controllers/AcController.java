@@ -83,7 +83,6 @@ public class AcController {
 //            return internalServerError("Failed to create substituted descriptor: " + e.getMessage());
             throw new RuntimeException("Failed to create substituted descriptor", e);
         }
-//        return descriptorSupplier().get();
     }
 
     public static Supplier<Result> home() {

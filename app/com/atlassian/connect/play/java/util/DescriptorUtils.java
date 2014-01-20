@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class DescriptorUtils {
+    public static final String ATLASSIAN_CONNECT_JSON_FILE_NAME = "atlassian-connect.json";
 
     public static String substituteVariables(String sourceJson) {
         return StringUtils.replace(sourceJson, "${localBaseUrl}", AC.baseUrl.get());
@@ -19,6 +20,6 @@ public class DescriptorUtils {
     }
 
     public static String substituteVariablesInDefaultFile() throws IOException {
-        return substituteVariablesInFile(new File("atlassian-connect.json"));
+        return substituteVariablesInFile(new File(ATLASSIAN_CONNECT_JSON_FILE_NAME));
     }
 }
