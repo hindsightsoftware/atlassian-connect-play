@@ -7,7 +7,7 @@ add-on developers:
 
 * [Creation of RSA key pair](#markdown-header-creation-of-rsa-key-pair)
 * [Auto-install of Addon](#markdown-header-auto-install)
-* [Addon descriptor template](#markdown-header-add-on-descriptor-template)
+* [atlassian-connect.json](#markdown-header-add-on-descriptor-template)
 * [Validates incoming OAuth request](#markdown-header-validates-incoming-oauth-request)
 * [Enables multi-tenancy](#markdown-header-enables-multi-tenancy)
 * [Make calls back to the host application](#markdown-header-make-calls-back-to-the-host-application)
@@ -190,25 +190,23 @@ Here is the list of applications the module will scan for:
 * http://localhost:2990/jira
 * http://localhost:5990/refapp
 
-### Add-on descriptor template
+### atlassian-connect.json
 [descriptorTemplate]:
 
-This module provides an add-on descriptor template `@ac.descriptor(){}{}` so that you don't need to worry about the default
-descriptor configuration:
+The `atlassian-connect.json` describes what your add-on will do. There are three main parts to the descriptor: meta information that describes your add-on (i.e., name, description, key, etc.), permissions and authentication information, and a list of the components your add-on will extend. This descriptor is sent to the host (i.e., JIRA or Confluence) when your add-on is installed.
 
-* defining the `remote-plugin-container` with the correct base URL and public RSA key. Note that the base URL is computed
+AC Play supports variable substitution for `atlassian-connect.json`. Currently it supports the variable `${localBaseUrl}` which maps to the base url defined for the application. Note that the base URL is computed
 by the app and can be further defined using the `BASE_URL` environment variable.
-* defining the registration `webhook` so that installation events of the add-on in host application are automatically
-handled.
 
-Note that by default the module will serve the _simplest_ descriptor based on this template when installed, which gives
-you the minimum working Atlassian Connect add-on.
-
-If you follow the instuctions in Getting Started then you can view the descriptor xml by navigating to /descriptor (e.g If running as localhost [http://localhost:9000/descriptor](http://localhost:9000/descriptor)). Or alternatively use
+If you follow the instuctions in Getting Started then you can view the descriptor json by navigating to `/atlassian-connect.json` (e.g If running as localhost [http://localhost:9000/atlassian-connect.json](http://localhost:9000/atlassian-connect.json)). Or alternatively use
 
 ```
-curl -H "Accept: application/xml"  http://localhost:9000/
+curl -H "Accept: application/json"  http://localhost:9000/
 ```
+
+
+To see all of the available settings in the `atlassian-connect.json`, visit the module sections of the [atlassian-connect documentation](https://developer.atlassian.com/static/connect/docs/)
+
 
 ### Validates incoming OAuth request
 [requestValidation]:
