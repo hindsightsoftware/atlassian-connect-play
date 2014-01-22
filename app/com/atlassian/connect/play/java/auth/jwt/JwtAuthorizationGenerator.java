@@ -92,6 +92,7 @@ public class JwtAuthorizationGenerator {
             throws JwtIssuerLacksSharedSecretException, JwtUnknownIssuerException {
 
         checkArgument(null != parameters, "Parameters Map argument cannot be null");
+        checkNotNull(acHost);
 
         Map<String, String[]> paramsAsArrays = Maps.transformValues(parameters, new Function<List<String>, String[]>() {
             @Override

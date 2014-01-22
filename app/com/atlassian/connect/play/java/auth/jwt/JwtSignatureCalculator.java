@@ -37,7 +37,7 @@ public final class JwtSignatureCalculator implements SignatureCalculator
     {
         try
         {
-            Option<String> jwt = jwtAuthorizationGenerator.generate(request.getMethod(), request.getUrl(), getQueryParams(request), AC.getAcHost(), AC.getUser());
+            Option<String> jwt = jwtAuthorizationGenerator.generate(request.getMethod(), request.getUrl(), getQueryParams(request), AC.getAcHostOrThrow(), AC.getUser());
             return jwt.getOrNull();
         }
         catch (JwtIssuerLacksSharedSecretException | JwtUnknownIssuerException e)

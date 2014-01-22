@@ -4,7 +4,6 @@ import com.atlassian.connect.play.java.AC;
 import com.atlassian.connect.play.java.auth.PublicKeyVerificationFailureException;
 import com.atlassian.connect.play.java.model.AcHostModel;
 import com.atlassian.connect.play.java.util.DescriptorUtils;
-import com.atlassian.fugue.Option;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
@@ -15,8 +14,6 @@ import play.db.jpa.Transactional;
 import play.libs.F;
 import play.mvc.BodyParser;
 import play.mvc.Result;
-import play.mvc.Results;
-import views.xml.ac.internal.internal_descriptor;
 
 import java.io.IOException;
 
@@ -27,9 +24,7 @@ import static java.lang.Boolean.FALSE;
 import static java.lang.String.format;
 import static play.libs.F.Promise;
 import static play.mvc.Controller.request;
-import static play.mvc.Results.badRequest;
-import static play.mvc.Results.internalServerError;
-import static play.mvc.Results.ok;
+import static play.mvc.Results.*;
 
 public class AcController {
     public static Result index() {
@@ -98,7 +93,7 @@ public class AcController {
         return new Supplier<Result>() {
             @Override
             public Result get() {
-                return ok(internal_descriptor.render());
+                return descriptor();
             }
         };
     }

@@ -143,6 +143,12 @@ public final class AC
         return (AcHost) getHttpContext().args.get(AC_HOST_PARAM);
     }
 
+    public static AcHost getAcHostOrThrow()
+    {
+        AcHost acHost = getAcHost();
+        return checkNotNull(acHost);
+    }
+
     public static AcHost setAcHost(String consumerKey)
     {
         return setAcHost(getAcHost(consumerKey).getOrError(Suppliers.ofInstance("An error occurred getting the host application")));
