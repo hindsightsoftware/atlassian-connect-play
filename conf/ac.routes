@@ -1,7 +1,8 @@
 # AC routes
 
 GET      /                                  com.atlassian.connect.play.java.controllers.AcController.index()
-POST     /remote_plugin_enabled             com.atlassian.connect.play.java.controllers.AcController.registration()
+GET      /atlassian-connect.json            com.atlassian.connect.play.java.controllers.AcController.descriptor()
+POST     /installed                         com.atlassian.connect.play.java.controllers.AcController.registration()
 
 GET      /@connect                          com.atlassian.connect.play.java.controllers.AcDocumentation.index()
 PUT      /@connect                          com.atlassian.connect.play.java.controllers.UpmController.install()

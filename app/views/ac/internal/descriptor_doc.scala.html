@@ -6,8 +6,7 @@
     <h3>Override the root URL</h3>
     <p>In your <code>routes</code> file:</p>
     @ac.aui.message() {
-        <code><pre>GET       /                           controllers.Application.index()
-GET       /descriptor                 controllers.Application.descriptor()</code></pre>
+        <code><pre>GET       /                           controllers.Application.index()</code></pre>
     }
     <p>Make sure this comes <em>before</em> the included routes from this module, represented by:</p>
     @ac.aui.message() {
@@ -15,22 +14,13 @@ GET       /descriptor                 controllers.Application.descriptor()</code
     }
 
     <h3>Define your descriptor template</h3>
-    <p>Create template <code>app/views/descriptor.scala.xml</code>, with the following content:</p>
+    <p>Create a filed called <code>atlassian-connect.json</code> in the root directory of your play app.
+       The contents of this file is described in detail in the <a href="https://developer.atlassian.com/static/connect/docs/">atlassian-connect documentation</a>.
+    </p>
+    <p>It is recommended to define the base url as follows so that it is automatically populated for your environment</p>
 
     @ac.aui.message() {
-        <code><pre>
-@@ac.descriptor() { @@* using the base descriptor template. *@@
-    &lt;plugin-info>
-        &lt;description>This is my awesome plugin built using Play!&lt;/description>
-        &lt;version>1.0-SNAPSHOT&lt;/version>
-        &lt;permissions>
-            &lt;permission>create_oauth_link&lt;/permission> @@* this permission is needed to create the OAuth link between the plugin and the host application. *@@
-        &lt;/permissions>
-    &lt;/plugin-info>
-} {
-    @@* your modules will go there *@@
-}
-            </pre></code>
+        <code><pre>"baseUrl": "${localBaseUrl}"</pre></code>
     }
 
     <h3>Define your <code>Application.index</code> controller</h3>
@@ -50,12 +40,12 @@ public class Application extends Controller {
 
     public static Result index() {
         return AcController.index(
-                AcController.home(), // we keep the HTML home page from the module, as this is our documentation for now
-                descriptorSupplier());       // serve the descriptor when accept header is 'application/xml', try 'curl -H "Accept: application/xml" http://localhost:9000'
+                AcController.home(),    // we keep the HTML home page from the module, as this is our documentation for now
+                descriptorSupplier());  // serve the descriptor when accept header is 'application/json', try 'curl -H "Accept: application/json" http://localhost:9000'
     }
 
     public static Result descriptor() {
-        return ok(views.xml.descriptor.render());
+        return AcController.descriptor();
     }
 
     private static Supplier<Result> descriptorSupplier() {
@@ -70,7 +60,7 @@ public class Application extends Controller {
     }
 
     @ac.aui.message() {
-        <p>You can view your current descriptor <a href="/descriptor">here</a></p>
+        <p>You can view your current descriptor <a href="/atlassian-connect.json">here</a></p>
     }
 
     @ac.aui.success("That's it!") {

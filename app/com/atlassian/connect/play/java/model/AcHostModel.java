@@ -2,6 +2,9 @@ package com.atlassian.connect.play.java.model;
 
 import com.atlassian.connect.play.java.AcHost;
 import com.atlassian.fugue.Option;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Supplier;
 import play.db.jpa.JPA;
 
 import java.util.List;
@@ -31,6 +34,14 @@ import static play.data.validation.Constraints.Required;
 })
 public final class AcHostModel implements AcHost
 {
+    @VisibleForTesting
+    public static final String CONSUMER_INFO_URL = "/plugins/servlet/oauth/consumer-info";
+
+    private static final String CLIENT_KEY = "clientKey";
+    private static final String BASE_URL = "baseUrl";
+    private static final String PUBLIC_KEY = "publicKey";
+    private static final String SHARED_SECRET = "sharedSecret";
+    private static final String PRODUCT_TYPE = "productType";
     @Id
     @SequenceGenerator (name = "ac_host_gen", sequenceName = "ac_host_seq")
     @GeneratedValue (generator = "ac_host_gen")
@@ -44,6 +55,11 @@ public final class AcHostModel implements AcHost
     @MaxLength (512)
     @Column (nullable = false, length = 512)
     public String publicKey;
+
+    @Required
+    @MaxLength (512)
+    @Column (nullable = false, length = 512) // TODO: may have to be nullable at least as we transition from oauth
+    public String sharedSecret;
 
     @Required
     @MaxLength (512)
@@ -85,9 +101,15 @@ public final class AcHostModel implements AcHost
         return publicKey;
     }
 
+    @Override
+    public String getSharedSecret() {
+        return sharedSecret;
+    }
+
+    @Override
     public String getConsumerInfoUrl()
     {
-        return baseUrl + "/plugins/servlet/oauth/consumer-info";
+        return baseUrl + CONSUMER_INFO_URL;
     }
 
     public static List<AcHostModel> all()
@@ -106,7 +128,7 @@ public final class AcHostModel implements AcHost
     public static Option<AcHostModel> findByUrl(String baseUrl)
     {
         final List<AcHostModel> resultList = JPA.em().createNamedQuery("AcHostModel.findByUrl", AcHostModel.class).
-                setParameter("baseUrl", baseUrl).
+                setParameter(BASE_URL, baseUrl).
                 getResultList();
         return resultList.isEmpty() ? none(AcHostModel.class) : option(resultList.get(0));
     }
@@ -125,4 +147,47 @@ public final class AcHostModel implements AcHost
             JPA.em().remove(acHostModel);
         }
     }
+
+    public static AcHostModel fromAcHost(AcHost acHost) {
+        if (acHost instanceof AcHostModel) {
+            return (AcHostModel) acHost;
+        }
+
+        throw new IllegalStateException("Not implemented yet");
+    }
+
+    public static AcHostModel fromJson(final JsonNode json) {
+        // TODO: The consequence of this is that we will overwrite registrations each time. Is that what we want?
+        // TODO: don't like the looking up in the middle of the json unmarshalling. Pull out somewhere else
+        final AcHostModel acHost = AcHostModel.findByKey(getAttributeAsText(json, CLIENT_KEY))
+                .orElse(new Supplier<Option<AcHostModel>>() {
+                    @Override
+                    public Option<AcHostModel> get() {
+                        return AcHostModel.findByUrl(getAttributeAsText(json, BASE_URL));
+                    }
+                })
+                .getOrElse(new AcHostModel());
+
+        return fromJson(json, acHost);
+    }
+
+    @VisibleForTesting
+    static AcHostModel fromJson(JsonNode json, AcHostModel acHost) {
+//        // TODO check the key is the same as this app's
+//        getAttributeAsText(json, "key");
+
+        acHost.key = getAttributeAsText(json, CLIENT_KEY);
+        acHost.baseUrl = getAttributeAsText(json, BASE_URL);
+        acHost.publicKey = getAttributeAsText(json, PUBLIC_KEY);
+        acHost.sharedSecret = getAttributeAsText(json, SHARED_SECRET);
+        acHost.name = getAttributeAsText(json, PRODUCT_TYPE);
+//        acHost.description = getAttributeAsText(json, "description");
+        return acHost;
+    }
+
+    private static String getAttributeAsText(JsonNode json, String name) {
+        JsonNode jsonNode = json.get(name);
+        return jsonNode == null ? null : jsonNode.textValue();
+    }
+
 }
