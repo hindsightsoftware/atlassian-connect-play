@@ -1,5 +1,4 @@
 10000:com.atlassian.connect.play.java.plugin.PluginKeyPlugin
 20000:com.atlassian.connect.play.java.plugin.AcBaseUrlPlugin
-30000:com.atlassian.connect.play.java.plugin.KeyPairPlugin
 40000:com.atlassian.connect.play.java.plugin.TokenPlugin
 50000:com.atlassian.connect.play.java.plugin.AcAutoInstallPlugin
