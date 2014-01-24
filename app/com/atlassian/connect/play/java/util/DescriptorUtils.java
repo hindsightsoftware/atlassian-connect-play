@@ -8,11 +8,14 @@ import org.apache.commons.lang.StringUtils;
 import java.io.File;
 import java.io.IOException;
 
+import static org.apache.commons.lang.StringUtils.replace;
+
 public class DescriptorUtils {
     public static final String ATLASSIAN_CONNECT_JSON_FILE_NAME = "atlassian-connect.json";
 
     public static String substituteVariables(String sourceJson) {
-        return StringUtils.replace(sourceJson, "${localBaseUrl}", AC.baseUrl.get());
+        String s = replace(sourceJson, "${localBaseUrl}", AC.baseUrl.get());
+        return replace(s, "${addonKey}", AC.PLUGIN_KEY); // ouch very hacky. TODO: implement a proper solution for this
     }
 
     public static String substituteVariablesInFile(File sourceJsonFile) throws IOException {
