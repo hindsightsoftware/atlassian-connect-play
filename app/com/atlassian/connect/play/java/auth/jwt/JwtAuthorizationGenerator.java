@@ -3,6 +3,7 @@ package com.atlassian.connect.play.java.auth.jwt;
 import com.atlassian.connect.play.java.AC;
 import com.atlassian.connect.play.java.AcHost;
 import com.atlassian.connect.play.java.http.HttpMethod;
+import com.atlassian.connect.play.java.util.Utils;
 import com.atlassian.fugue.Option;
 import com.atlassian.jwt.SigningAlgorithm;
 import com.atlassian.jwt.core.TimeUtil;
@@ -55,7 +56,7 @@ public class JwtAuthorizationGenerator {
     private final int jwtExpiryWindowSeconds;
 
     private final JwtWriterFactory jwtWriterFactory;
-    private static final Logger LOG = LoggerFactory.getLogger(JwtAuthorizationGenerator.class);
+    private static final play.Logger.ALogger LOG = Utils.LOGGER;
 
     public JwtAuthorizationGenerator(JwtWriterFactory jwtWriterFactory) {
         this(jwtWriterFactory, Play.application().configuration().getInt(JWT_EXPIRY_SECONDS_PROPERTY, JWT_EXPIRY_WINDOW_SECONDS_DEFAULT));
@@ -72,17 +73,21 @@ public class JwtAuthorizationGenerator {
         final HttpMethod method = HttpMethod.valueOf(httpMethodStr);
 
         final URI uri = new URI(url);
-        final String pathWithoutProductContext = uri.getPath().substring(url.indexOf('/', 1));
-        final URI uriWithoutProductContext = new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(),
-                pathWithoutProductContext, uri.getQuery(), uri.getFragment());
+        String path = uri.getPath();
+        final String pathWithoutProductContext = path.substring(path.indexOf('/', 1));
 
         LOGGER.trace("Creating Jwt signature for:");
         LOGGER.trace(format("httpMethod: '%s'", httpMethodStr));
         LOGGER.trace(format("URL: '%s'", url));
-        LOGGER.trace(format("uriWithoutProductContext: '%s'", uriWithoutProductContext));
         LOGGER.trace(format("acHost: '%s'", acHost));
         LOGGER.trace(format("userId: '%s'", userId));
         LOGGER.trace(format("Parameters: %s", parameters));
+        LOGGER.trace(format("pathWithoutProductContext: '%s'", pathWithoutProductContext));
+
+        final URI uriWithoutProductContext = new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(),
+                pathWithoutProductContext, uri.getQuery(), uri.getFragment());
+
+        LOGGER.trace(format("uriWithoutProductContext: '%s'", uriWithoutProductContext));
 
         return generate(method, uriWithoutProductContext, parameters, acHost, userId);
     }

@@ -56,7 +56,7 @@ public class JwtAuthorizationGeneratorTest {
     @Before
     public void init() throws URISyntaxException {
         jwtAuthorizationGenerator = new JwtAuthorizationGenerator(jwtWriterFactory, 60 * 3);
-        aUrl = PRODUCT_CONTEXT + "/foo";
+        aUrl = "http://somehost:3421" + PRODUCT_CONTEXT + "/foo";
         FakeApplication fakeApplication = Helpers.fakeApplication();
         Helpers.start(fakeApplication);
         acHost = new AcHostModel();
@@ -69,6 +69,12 @@ public class JwtAuthorizationGeneratorTest {
 
     @Test
     public void startsWithJwtAuthPrefix() throws URISyntaxException, JwtUnknownIssuerException, JwtIssuerLacksSharedSecretException {
+        assertThat(generate().get(), startsWith(JWT_AUTH_HEADER_PREFIX));
+    }
+
+    @Test
+    public void worksWithRelativePath() throws URISyntaxException, JwtUnknownIssuerException, JwtIssuerLacksSharedSecretException {
+        aUrl = PRODUCT_CONTEXT + "/foo";
         assertThat(generate().get(), startsWith(JWT_AUTH_HEADER_PREFIX));
     }
 
