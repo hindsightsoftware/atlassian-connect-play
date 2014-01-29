@@ -73,8 +73,10 @@ public class JwtAuthorizationGenerator {
         final HttpMethod method = HttpMethod.valueOf(httpMethodStr);
 
         final URI uri = new URI(url);
-        String path = uri.getPath();
-        final String pathWithoutProductContext = path.substring(path.indexOf('/', 1));
+        final String path = uri.getPath();
+        final URI baseUrl = new URI(acHost.getBaseUrl());
+        final String productContext = baseUrl.getPath();
+        final String pathWithoutProductContext = path.substring(productContext.length());
 
         LOGGER.trace("Creating Jwt signature for:");
         LOGGER.trace(format("httpMethod: '%s'", httpMethodStr));

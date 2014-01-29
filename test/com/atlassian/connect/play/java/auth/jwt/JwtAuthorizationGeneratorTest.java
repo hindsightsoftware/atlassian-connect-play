@@ -41,6 +41,9 @@ public class JwtAuthorizationGeneratorTest {
     private static final String NOT_SO_SECRET_SECRET = "notSoSecretSecret";
     private static final String MY_PLUGIN_KEY = "myPluginKey";
     private static final String PRODUCT_CONTEXT = "/pc";
+    private static final String HOST = "http://somehost:3421";
+    private static final String BASE_URL = HOST + PRODUCT_CONTEXT;
+
 
     @Mock
     private JwtWriterFactory jwtWriterFactory;// = new NimbusJwtWriterFactory();
@@ -55,12 +58,17 @@ public class JwtAuthorizationGeneratorTest {
 
     @Before
     public void init() throws URISyntaxException {
+        init(BASE_URL);
+    }
+
+    private void init(String baseUrl) throws URISyntaxException {
         jwtAuthorizationGenerator = new JwtAuthorizationGenerator(jwtWriterFactory, 60 * 3);
-        aUrl = "http://somehost:3421" + PRODUCT_CONTEXT + "/foo";
+        aUrl = baseUrl + "/foo";
         FakeApplication fakeApplication = Helpers.fakeApplication();
         Helpers.start(fakeApplication);
         acHost = new AcHostModel();
         acHost.sharedSecret = NOT_SO_SECRET_SECRET;
+        acHost.baseUrl = baseUrl;
 
         when(jwtWriterFactory.macSigningWriter(any(SigningAlgorithm.class), anyString())).thenReturn(jwtWriter);
 
@@ -104,6 +112,20 @@ public class JwtAuthorizationGeneratorTest {
 
     @Test
     public void callsWriterWithCorrectQueryHash() throws JwtUnknownIssuerException, JwtIssuerLacksSharedSecretException, URISyntaxException {
+        generate();
+        verify(jwtWriter).jsonToJwt(argThat(isJwtWithStringFieldValue("qsh", "dc884e24fe0f4113b128fd19b1426d7d841b6fabc03e79c2d4f27774964a5935")));
+    }
+
+    @Test
+    public void worksWithEmptyProductContext() throws JwtUnknownIssuerException, JwtIssuerLacksSharedSecretException, URISyntaxException {
+        init(HOST);
+        generate();
+        verify(jwtWriter).jsonToJwt(argThat(isJwtWithStringFieldValue("qsh", "dc884e24fe0f4113b128fd19b1426d7d841b6fabc03e79c2d4f27774964a5935")));
+    }
+
+    @Test
+    public void worksWithSingleSlashProductContext() throws JwtUnknownIssuerException, JwtIssuerLacksSharedSecretException, URISyntaxException {
+        init(HOST + "/");
         generate();
         verify(jwtWriter).jsonToJwt(argThat(isJwtWithStringFieldValue("qsh", "dc884e24fe0f4113b128fd19b1426d7d841b6fabc03e79c2d4f27774964a5935")));
     }

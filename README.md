@@ -199,7 +199,7 @@ Here is the list of applications the module will scan for:
 * http://localhost:5990/refapp
 
 ### atlassian-connect.json
-[descriptorTemplate]:
+[addOnDescriptorTemplate]:
 
 The `atlassian-connect.json` describes what your add-on will do. There are three main parts to the descriptor: meta information that describes your add-on (i.e., name, description, key, etc.), permissions and authentication information, and a list of the components your add-on will extend. This descriptor is sent to the host (i.e., JIRA or Confluence) when your add-on is installed.
 
