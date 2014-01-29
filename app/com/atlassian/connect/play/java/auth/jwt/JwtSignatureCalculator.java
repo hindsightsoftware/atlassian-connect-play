@@ -1,10 +1,12 @@
 package com.atlassian.connect.play.java.auth.jwt;
 
 import com.atlassian.connect.play.java.AC;
+import com.atlassian.connect.play.java.AcHost;
 import com.atlassian.fugue.Option;
 import com.atlassian.jwt.exception.JwtIssuerLacksSharedSecretException;
 import com.atlassian.jwt.exception.JwtUnknownIssuerException;
 import com.ning.http.client.FluentStringsMap;
+import play.mvc.Http;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -20,9 +22,13 @@ import static play.libs.WS.WSRequest;
 public final class JwtSignatureCalculator implements SignatureCalculator
 {
     private final JwtAuthorizationGenerator jwtAuthorizationGenerator;
+    private final AcHost acHost;
+    private final Option<String> userId;
 
-    public JwtSignatureCalculator(JwtAuthorizationGenerator jwtAuthorizationGenerator) {
+    public JwtSignatureCalculator(JwtAuthorizationGenerator jwtAuthorizationGenerator, AcHost acHost, Option<String> userId) {
         this.jwtAuthorizationGenerator = checkNotNull(jwtAuthorizationGenerator);
+        this.acHost = checkNotNull(acHost);
+        this.userId = userId;
     }
 
     @Override
@@ -37,7 +43,8 @@ public final class JwtSignatureCalculator implements SignatureCalculator
     {
         try
         {
-            Option<String> jwt = jwtAuthorizationGenerator.generate(request.getMethod(), request.getUrl(), getQueryParams(request), AC.getAcHostOrThrow(), AC.getUser());
+            Option<String> jwt = jwtAuthorizationGenerator.generate(request.getMethod(), request.getUrl(),
+                    getQueryParams(request), acHost, userId);
             return jwt.getOrNull();
         }
         catch (JwtIssuerLacksSharedSecretException | JwtUnknownIssuerException e)

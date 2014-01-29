@@ -118,7 +118,7 @@ public final class AC
 
         if (signRequest) {
             request.setFollowRedirects(false) // because we need to sign again in those cases.
-            .sign(new JwtSignatureCalculator(jwtAuthorisationGenerator));
+            .sign(new JwtSignatureCalculator(jwtAuthorisationGenerator, acHost, userId));
         }
 
         return request;
