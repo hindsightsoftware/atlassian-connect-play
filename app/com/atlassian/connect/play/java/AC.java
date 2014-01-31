@@ -8,9 +8,7 @@ import com.atlassian.connect.play.java.service.AcHostHttpClient;
 import com.atlassian.connect.play.java.service.AcHostService;
 import com.atlassian.connect.play.java.service.AcHostServiceImpl;
 import com.atlassian.connect.play.java.token.Token;
-import com.atlassian.connect.play.java.util.OAuthKeys;
 import com.atlassian.fugue.Option;
-import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import org.apache.commons.codec.binary.Base64;
 import play.Play;
@@ -43,9 +41,6 @@ public final class AC
     // the base URL
     public static BaseUrl baseUrl;
     public static long tokenExpiry;
-
-    public static final Supplier<String> publicKey = OAuthKeys.publicKey;
-    public static final Supplier<String> privateKey = OAuthKeys.privateKey;
 
     // TODO: DI of some sort would be nice
     private static final JwtAuthorizationGenerator jwtAuthorisationGenerator = JwtAuthConfig.getJwtAuthorizationGenerator();

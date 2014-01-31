@@ -5,7 +5,6 @@
 This is a Play module to help develop Atlassian Connect add-ons. Here are a few of the useful features it brings to
 add-on developers:
 
-* [Creation of RSA key pair](#markdown-header-creation-of-rsa-key-pair)
 * [Auto-install of Addon](#markdown-header-auto-install)
 * [atlassian-connect.json](#markdown-header-add-on-descriptor-template)
 * [Validates incoming OAuth request](#markdown-header-validates-incoming-oauth-request)
@@ -172,19 +171,6 @@ trigger tokens to be refreshed client-side automatically, however if `@ac.page` 
 
 ## AC Play Java Benefits
 [benefits]:
-
-### Creation of RSA key pair
-[rsaCreation]:
-This module will, in [dev mode][dev], generate an RSA key pair, as pem files to be used by your add-on for OAuth signing
-and validation. You will find the generated pem files `public-key.pem` and `private-key.pem` in the root directory of your Play project.
-
-Note that the module will automatically add those generated files to `.gitignore` so that you don't accidentally commit
-them to your git repository.
-
-In production the location of the RSA key pair should be specified via environment variables. This can be done in 2 different ways:
-
-* Specify location of pem key files via the `OAUTH_LOCAL_PUBLIC_KEY_FILE` and `OAUTH_LOCAL_PRIVATE_KEY_FILE` environment variables
-* Specify the key contents directly via the `OAUTH_LOCAL_PUBLIC_KEY` and `OAUTH_LOCAL_PRIVATE_KEY` environment variables
 
 ### Auto-install
 [autoInstall]:
