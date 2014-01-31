@@ -81,7 +81,7 @@ public class JwtAuthorizationGenerator {
         LOGGER.trace("Creating Jwt signature for:");
         LOGGER.trace(format("httpMethod: '%s'", httpMethodStr));
         LOGGER.trace(format("URL: '%s'", url));
-        LOGGER.trace(format("acHost: '%s'", acHost));
+        LOGGER.trace(format("acHost key: '%s'", acHost.getKey()));
         LOGGER.trace(format("userId: '%s'", userId));
         LOGGER.trace(format("Parameters: %s", parameters));
         LOGGER.trace(format("pathWithoutProductContext: '%s'", pathWithoutProductContext));
