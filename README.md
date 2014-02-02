@@ -7,7 +7,7 @@ add-on developers:
 
 * [Auto-install of Addon](#markdown-header-auto-install)
 * [atlassian-connect.json](#markdown-header-add-on-descriptor-template)
-* [Validates incoming OAuth request](#markdown-header-validates-incoming-oauth-request)
+* [Validates incoming JWT request](#markdown-header-validates-incoming-JWT-request)
 * [Enables multi-tenancy](#markdown-header-enables-multi-tenancy)
 * [Make calls back to the host application](#markdown-header-make-calls-back-to-the-host-application)
 * [Easy integration of AUI](#markdown-header-easy-integration-of-aui)
@@ -67,7 +67,7 @@ Note that I actually also add my local maven repository for good measure and eas
         // your other dependencies go there
 	)
 
-Where _<version>_ is the latest version of this module. The latest published version of the Atlassian Connect Play module can be found in the [Atlassian Maven repository][atlassian-maven-repo]. The current latest version is 0.7.0-BETA.
+Where _<version>_ is the latest version of this module. The latest published version of the Atlassian Connect Play module can be found in the [Atlassian Maven repository][atlassian-maven-repo]. The current latest version is 0.7.0-BETA-8.
 Note _withSources()_ is optional. It will download the source which can help with debugging.
 
 #### Add the module's routes to your `conf/routes` configuration
@@ -146,12 +146,11 @@ Follow the instructions on that page on defining your own descriptor.
 
 ## A note on Security
 
-Most requests to the remote Play application will be properly signed with OAuth headers coming from the Atlassian application.
-This Play module will take care of authenticating these requests.  However any subsequent requests within the original page will require
-more work to authenticate remotely.
+Most requests to the remote Play application will be properly signed with JWT headers coming from the Atlassian application.
+This Play module will take care of authenticating these requests.  However any subsequent requests within the original page will require more work to authenticate remotely.
 
 For example a remote admin page may include a horizontal navbar including links to various other remote admin pages. When a user clicks
-on any of these links they will load within the iframe without any additional OAuth headers being sent to the remote server.  To overcome
+on any of these links they will load within the iframe without any additional JWT headers being sent to the remote server.  To overcome
 this, this module provides a secure token mechanism.  If you use `@ac.page` to decorate your pages all links, forms and ajax requests will
 automatically be decorated with this secure token.  If `@ac.page` is not used any requests will have to be decorated manually. This can be
 done by adding the following request parameters:
@@ -202,16 +201,16 @@ curl -H "Accept: application/json"  http://localhost:9000/
 To see all of the available settings in the `atlassian-connect.json`, visit the module sections of the [atlassian-connect documentation](https://developer.atlassian.com/static/connect/docs/)
 
 
-### Validates incoming OAuth request
+### Validates incoming JWT request
 [requestValidation]:
 
-Thanks to the `@CheckValidOAuthRequest` annotation, you can ensure incoming requests are valid and coming from a known
+Thanks to the `@AuthenticateJwtRequest` annotation, you can ensure incoming requests are valid and coming from a known
 trusted host application. This also...
 
 ### Enables multi-tenancy
 [multiTenancy]:
 
-You can in the context of an OAuth request identify the host application the request is coming from `AC#getAcHost()`
+You can in the context of an JWT request identify the host application the request is coming from `AC#getAcHost()`
 and also the user on whose behalf the request is made `AC#getUser()`.
 
 For multi-tenancy, the important thing is to identify the `key` of the host application available from the `AcHost`
@@ -228,8 +227,7 @@ gives you:
 in the context of the current request.
 * default timeout. You never know what might be going on the network, never make an HTTP request without a timeout.
 * user identification. The request is going to be made as the current user in the HTTP request context.
-* OAuth signing. Your request will be automatically signed, given the key pair you have defined (or we have defined for you
-in dev mode).
+* JWT signing. Your request will be automatically signed with the shared secret that was stored in the database when your addon was installed on the host.
 
 #### Using the product REST API
 
@@ -243,15 +241,9 @@ For example, to view details of a specific jira issue.
 
     AC.url("/rest/api/2/issue/ISSUE-KEY").get();
 
-You also need to add the permission:
+You also need to add the required scopes to your atlassian-connect.json file:
 ````
-<!--! This plugin needs several permissions: -->
-<permissions>
-    <!--! * Create a trusted link in JIRA that will allow authenticated REST calls -->
-    <permission>create_oauth_link</permission>
-    <!--! * Query JIRA issues, projects, and issue types -->
-    <permission>browse_projects</permission>
-</permissions>
+    "scopes": ["READ"]
 ````
 
 ### Easy integration of [AUI][aui]
@@ -290,13 +282,6 @@ If you aren't using git to track your add-on, now is a good time to do so as it 
 Next, create the app on Heroku:
 
     heroku apps:create <add-on-name>
-
-Then set the public and private key as environment variables in Heroku (you don't ever want to commit these `*.pem` files into your scm). Remember, the two pem files were automatically generated in the root of your Play project. 
-
-    heroku config:set AC_PUBLIC_KEY="`cat public-key.pem`" --app <add-on-name>
-    heroku config:set AC_PRIVATE_KEY="`cat private-key.pem`" --app <add-on-name>
-
-We recommend that you don't use the automatically generated key pair in production. You can use any RSA key pair generation tool such as [JSEncrypt](http://travistidwell.com/jsencrypt/demo/) to generate a production key pair. 
 
 A good practice is also to externalize your Play application secret as an environment variable in Heroku.
 
