@@ -7,7 +7,7 @@ add-on developers:
 
 * [Auto-install of Addon](#markdown-header-auto-install)
 * [atlassian-connect.json](#markdown-header-add-on-descriptor-template)
-* [Validates incoming JWT request](#markdown-header-validates-incoming-JWT-request)
+* [Validates incoming JWT request](#markdown-header-validates-incoming-jwt-request)
 * [Enables multi-tenancy](#markdown-header-enables-multi-tenancy)
 * [Make calls back to the host application](#markdown-header-make-calls-back-to-the-host-application)
 * [Easy integration of AUI](#markdown-header-easy-integration-of-aui)
