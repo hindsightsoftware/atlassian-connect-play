@@ -20,13 +20,13 @@ More details can be found in the [AC Play Java Benefits](#markdown-header-ac-pla
 
 * Switch from OAuth to JWT for authentication
 
-  * See [Authentication Documentation for details](https://developer.atlassian.com/static/connect/docs/pages/concepts/authentication.html)
+    * See [Authentication Documentation for details](https://developer.atlassian.com/static/connect/docs/pages/concepts/authentication.html)
 
-  * Note: we recommend you set the ac logging to trace while debugging jwt code
+    * Note: we recommend you set the ac logging to trace while debugging jwt code
 
 * Switch from XML Descriptors to JSON. 
 
-  * See [atlassian-connect.json](#markdown-header-add-on-descriptor-template) for details. 
+    * See [atlassian-connect.json](#markdown-header-add-on-descriptor-template) for details. 
 
 See changelog.md for more details
 
