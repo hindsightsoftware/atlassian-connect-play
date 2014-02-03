@@ -27,4 +27,17 @@
         the <code>BASE_URL</code> environment variable which will then be used as the base URL for your add-on.
     </p>
 
+    <h3>Define your own error pages</h3>
+    <p>
+        Before you follow <a href="http://www.playframework.com/documentation/2.2.1/JavaGlobal">Play Framework's tutorial
+        on defining your own error pages</a>, define the <code>application.global</code> setting.
+        Play Framework searches for the <code>Global</code> class in the root package by default. Atlassian Connect Play
+        Java already defines this class, so you need to define your own class extending
+        <code>com.atlassian.connect.play.java.play.AcGlobalSettings</code> and set the following property
+        in <code>application.conf</code>:
+        <ul>
+            <li><code>application.global = com.example.YourOwnGlobalClass</code></li>
+        </ul>
+    </p>
+
 }
