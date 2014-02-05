@@ -15,6 +15,7 @@ public class DescriptorUtils {
 
     public static String substituteVariables(String sourceJson) {
         String s = replace(sourceJson, "${localBaseUrl}", AC.baseUrl.get());
+        s = replace(s, "${addonName}", AC.PLUGIN_NAME);
         return replace(s, "${addonKey}", AC.PLUGIN_KEY); // ouch very hacky. TODO: implement a proper solution for this
     }
 
