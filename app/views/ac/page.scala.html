@@ -1,6 +1,7 @@
-@(title: String)(head: Html)(content: Html)
+@(title: String, allJsDataOptions: Option[String] = None)(head: Html)(content: Html)
 @import views.ac.BaseUrl
 @import com.atlassian.connect.play.java.AC
+@import scala._
 
 <!DOCTYPE html>
 <html>
@@ -12,10 +13,10 @@
             <meta name="acpt" content="@AC.getToken.get">
         }
 
-        @defining(BaseUrl.get()) { baseUrl =>
+        @defining(AC.baseUrl.get()) { baseUrl =>
             @if(baseUrl != null) {
             <link rel="stylesheet" href="@baseUrl/atlassian-connect/all.css">
-            <script type="text/javascript" src="@baseUrl/atlassian-connect/all.js"></script>
+            <script type="text/javascript" src="@baseUrl/atlassian-connect/all.js" data-options="@{allJsDataOptions.getOrElse(new String())}"></script>
             }
         }
 
