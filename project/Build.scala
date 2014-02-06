@@ -5,7 +5,7 @@ import play.Project._
 object ApplicationBuild extends Build {
 
   val appName         = "ac-play-java"
-  val appVersion      = "0.7.0-BETA9"
+  val appVersion      = "0.7.0-BETA10-SNAPSHOT"
   val atlassianJwtVersion = "1.0-m7"
 
   val appDependencies = Seq(
