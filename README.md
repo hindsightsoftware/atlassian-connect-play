@@ -67,7 +67,7 @@ Note that I actually also add my local maven repository for good measure and eas
         // your other dependencies go there
 	)
 
-Where _<version>_ is the latest version of this module. The latest published version of the Atlassian Connect Play module can be found in the [Atlassian Maven repository][atlassian-maven-repo]. The current latest version is 0.7.0-BETA-8.
+Where _<version>_ is the latest version of this module. The latest published version of the Atlassian Connect Play module can be found in the [Atlassian Maven repository][atlassian-maven-repo]. The current latest version is 0.7.0-BETA-9.
 Note _withSources()_ is optional. It will download the source which can help with debugging.
 
 #### Add the module's routes to your `conf/routes` configuration
