@@ -13,7 +13,7 @@
             <meta name="acpt" content="@AC.getToken.get">
         }
 
-        @defining(AC.baseUrl.get()) { baseUrl =>
+        @defining(BaseUrl.get()) { baseUrl =>
             @if(baseUrl != null) {
             <link rel="stylesheet" href="@baseUrl/atlassian-connect/all.css">
             <script type="text/javascript" src="@baseUrl/atlassian-connect/all.js" data-options="@{dataOptions.toString()}"></script>
