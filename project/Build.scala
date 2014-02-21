@@ -29,12 +29,13 @@ object ApplicationBuild extends Build {
     filters
   )
 
-  val main = play.Project(appName, appVersion, appDependencies).settings(
+
+  val customSettings = net.virtualvoid.sbt.graph.Plugin.graphSettings ++ Seq[Setting[_]](
     //we're using JPA so ebean can safely be disabled
     ebeanEnabled := false,
     resolvers += "Typesafe's Repository" at "http://repo.typesafe.com/typesafe/maven-releases",
     resolvers += "Atlassian's Maven Public Repository" at "https://maven.atlassian.com/content/groups/public",
-//    resolvers += "Local Maven Repository" at "file://" + Path.userHome + "/.m2/repository",
+    //    resolvers += "Local Maven Repository" at "file://" + Path.userHome + "/.m2/repository",
     organization := "com.atlassian.connect",
     publishTo <<= version { (v: String) =>
       val repo = "https://maven.atlassian.com/"
@@ -46,4 +47,6 @@ object ApplicationBuild extends Build {
 
     publishMavenStyle := true
   )
+
+  val main = play.Project(appName, appVersion, appDependencies).settings(customSettings:_*)
 }
