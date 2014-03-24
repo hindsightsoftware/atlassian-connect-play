@@ -79,11 +79,13 @@ Comment the default application index and add the module's routes:
     ->        /                           ac.Routes
 
 This will ensure that any routes that are not handled by your application are delegated to this helper module.
+
 #### Setup application key and name
 Configure yor plugin key and name in `conf/application.conf`. 
-Those values have to be eactly the same as deffined in `atlassian-plugin.json`.
-ac.key = PLUGIN-KEY
-ac.name = PLUGIN-NAME
+These are used as substitution variables in [atlassian-connect.json](#markdown-header-add-on-descriptor-template).
+
+    ac.key = PLUGIN-KEY
+    ac.name = PLUGIN-NAME
 
 #### Configure the database
 
@@ -193,8 +195,12 @@ Here is the list of applications the module will scan for:
 
 The `atlassian-connect.json` describes what your add-on will do. There are three main parts to the descriptor: meta information that describes your add-on (i.e., name, description, key, etc.), permissions and authentication information, and a list of the components your add-on will extend. This descriptor is sent to the host (i.e., JIRA or Confluence) when your add-on is installed.
 
-AC Play supports variable substitution for `atlassian-connect.json`. Currently it supports the variable `${localBaseUrl}` which maps to the base url defined for the application. Note that the base URL is computed
+AC Play supports variable substitution for `atlassian-connect.json`. Currently it supports the following variables:
+
+* `${localBaseUrl}` which maps to the base url defined for the application. Note that the base URL is computed
 by the app and can be further defined using the `BASE_URL` environment variable.
+* `${addonKey}`. This variable is populated based on the configuration variable `ac.key` (in application.conf etc)
+* `${addonName}`. This variable is populated based on the configuration variable `ac.name` (in application.conf etc)
 
 If you follow the instuctions in Getting Started then you can view the descriptor json by navigating to `/atlassian-connect.json` (e.g If running as localhost [http://localhost:9000/atlassian-connect.json](http://localhost:9000/atlassian-connect.json)). Or alternatively use
 
