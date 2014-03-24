@@ -79,6 +79,11 @@ Comment the default application index and add the module's routes:
     ->        /                           ac.Routes
 
 This will ensure that any routes that are not handled by your application are delegated to this helper module.
+#### Setup application key and name
+Configure yor plugin key and name in `conf/application.conf`. 
+Those values have to be eactly the same as deffined in `atlassian-plugin.json`.
+ac.key = PLUGIN-KEY
+ac.name = PLUGIN-NAME
 
 #### Configure the database
 
