@@ -1,5 +1,9 @@
 # Changelog - Play Java Module for Atlassian Connect
 
+## 0.7.1
+
+* changed to use new AUI CDN
+
 ## 0.7.0
 
 * **BREAKING**
