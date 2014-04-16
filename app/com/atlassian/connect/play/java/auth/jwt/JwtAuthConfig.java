@@ -17,24 +17,24 @@ import static play.mvc.Http.Response;
 public class JwtAuthConfig {
     private static ACPlayJwtIssuerService acPlayJwtIssuerService = new ACPlayJwtIssuerService();
 
-//    private static String addonContextPath() {
-//        try {
-//            return new URL(AC.baseUrl.get()).getPath();
-//        } catch (Exception e) {
-//            throw new IllegalStateException(e);
-//        }
-//    }
+    private static String addonContextPath() {
+        try {
+            return new URL(AC.baseUrl.get()).getPath();
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
-//    private static final PlayJwtRequestExtractor.AddonContextProvider contextProvider =
-//            new PlayJwtRequestExtractor.AddonContextProvider() {
-//                @Override
-//                public String get() {
-//                    return addonContextPath();
-//                }
-//            };
+    private static final PlayJwtRequestExtractor.AddonContextProvider contextProvider =
+            new PlayJwtRequestExtractor.AddonContextProvider() {
+                @Override
+                public String get() {
+                    return addonContextPath();
+                }
+            };
 
     private static final PlayJwtAuthenticator jwtAuthenticator =
-            new PlayJwtAuthenticator(new PlayJwtRequestExtractor(null), new PlayAuthenticationResultHandler(),
+            new PlayJwtAuthenticator(new PlayJwtRequestExtractor(contextProvider), new PlayAuthenticationResultHandler(),
                     createReaderFactory());
 
     private static JwtAuthorizationGenerator jwtAuthorizationGenerator =

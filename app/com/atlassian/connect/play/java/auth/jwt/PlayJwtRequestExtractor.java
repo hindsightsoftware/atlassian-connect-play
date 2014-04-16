@@ -8,31 +8,16 @@ import play.mvc.Http;
 
 import java.net.URL;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public class PlayJwtRequestExtractor extends AbstractJwtRequestExtractor<Http.Request> {
     private final AddonContextProvider contextProvider;
 
     public interface AddonContextProvider extends Supplier<String> {
     }
 
-    private static String addonContextPath() {
-        try {
-            return new URL(AC.baseUrl.get()).getPath();
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
     PlayJwtRequestExtractor(AddonContextProvider contextProvider) {
-        if (contextProvider == null) {
-            contextProvider = new AddonContextProvider() {
-                @Override
-                public String get() {
-                    return addonContextPath();
-                }
-            };
-
-        }
-        this.contextProvider = contextProvider;
+        this.contextProvider = checkNotNull(contextProvider);
     }
     @Override
     protected HttpRequestWrapper wrapRequest(Http.Request request) {
