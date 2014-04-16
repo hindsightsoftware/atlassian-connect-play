@@ -2,6 +2,7 @@ package com.atlassian.connect.play.java.auth.jwt;
 
 import com.atlassian.jwt.CanonicalHttpRequest;
 import com.atlassian.jwt.core.http.HttpRequestWrapper;
+import org.apache.commons.lang.StringUtils;
 import play.mvc.Http;
 
 import javax.annotation.Nonnull;
@@ -11,10 +12,12 @@ import java.util.Map;
 
 public class PlayRequestWrapper implements HttpRequestWrapper {
     private final Http.Request request;
+    private final String addonContext;
 
-    public PlayRequestWrapper(Http.Request request) {
+    public PlayRequestWrapper(Http.Request request, String addonContext) {
 
         this.request = request;
+        this.addonContext = addonContext;
     }
 
     @Nullable
@@ -40,7 +43,7 @@ public class PlayRequestWrapper implements HttpRequestWrapper {
             @Nullable
             @Override
             public String getRelativePath() {
-                return request.path();
+                return StringUtils.removeStart(request.path(), addonContext);
             }
 
             @Nonnull
