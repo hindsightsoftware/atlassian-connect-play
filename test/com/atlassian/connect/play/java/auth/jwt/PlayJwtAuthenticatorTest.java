@@ -47,6 +47,7 @@ public class PlayJwtAuthenticatorTest {
     private static final SigningAlgorithm ALGORITHM = SigningAlgorithm.HS256;
     private static final String ISSUER = "joe";
     private static final String METHOD = "GET";
+    private static final String ADDON_CONTEXT_PATH = "/blah";
     private static final String PATH = "/foo";
     private static final String SUBJECT = "fred";
 
@@ -93,7 +94,7 @@ public class PlayJwtAuthenticatorTest {
         when(request.getQueryString(anyString())).thenReturn(parameterJwt);
         when(request.headers().get(anyString())).thenReturn(headerJwt == null ? new String[]{} : new String[]{headerJwt});
         when(request.method()).thenReturn(METHOD);
-        when(request.path()).thenReturn(PATH);
+        when(request.path()).thenReturn(addonContext + PATH);
         when(request.queryString()).thenReturn(ImmutableMap.<String, String[]>of());
         when(jwtIssuerValidator.isValid(anyString())).thenReturn(true);
         when(jwtIssuerSharedSecretService.getSharedSecret(anyString())).thenReturn(PASSWORD);
@@ -142,5 +143,10 @@ public class PlayJwtAuthenticatorTest {
     @Test
     public void jwtContainsCorrectSubject() throws JwtIssuerLacksSharedSecretException, JwtUnknownIssuerException, UnsupportedEncodingException, NoSuchAlgorithmException {
         assertThat(authenticate(createJwt(), null, "/").right.get().getSubject(), equalTo(SUBJECT));
+    }
+
+    @Test
+    public void excludesAddonContextFromCanonicalUri() throws UnsupportedEncodingException, NoSuchAlgorithmException, JwtIssuerLacksSharedSecretException, JwtUnknownIssuerException {
+        assertThat(authenticate(createJwt(), null, ADDON_CONTEXT_PATH).right.isDefined(), equalTo(true));
     }
 }
