@@ -1,6 +1,11 @@
 package com.atlassian.connect.play.java.service;
 
 import com.atlassian.connect.play.java.AcHost;
+import com.atlassian.connect.play.java.model.AcHostModel;
+import com.atlassian.fugue.Option;
+import com.fasterxml.jackson.databind.JsonNode;
+
+import java.util.List;
 
 import static play.libs.F.Promise;
 
@@ -26,4 +31,12 @@ public interface AcHostService {
      * @return
      */
     Promise<Void> registerHost(AcHost acHost);
+
+    Option<AcHostModel> findByUrl(String baseUrl);
+
+    Option<? extends AcHost> findByKey(String consumerKey);
+
+    List<AcHostModel> all();
+
+    AcHostModel fromJson(final JsonNode json);
 }

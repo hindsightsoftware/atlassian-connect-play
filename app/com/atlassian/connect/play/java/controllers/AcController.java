@@ -3,6 +3,8 @@ package com.atlassian.connect.play.java.controllers;
 import com.atlassian.connect.play.java.AC;
 import com.atlassian.connect.play.java.auth.PublicKeyVerificationFailureException;
 import com.atlassian.connect.play.java.model.AcHostModel;
+import com.atlassian.connect.play.java.service.AcHostService;
+import com.atlassian.connect.play.java.service.InjectorFactory;
 import com.atlassian.connect.play.java.util.DescriptorUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Function;
@@ -27,6 +29,8 @@ import static play.mvc.Controller.request;
 import static play.mvc.Results.*;
 
 public class AcController {
+    private static final AcHostService acHostService = InjectorFactory.getAcHostService();
+
     public static Result index() {
         return index(home(), descriptorSupplier());
     }
@@ -109,7 +113,7 @@ public class AcController {
             return Promise.pure((Result) badRequest("can't extract registration request json"));
         }
 
-        final AcHostModel acHost = AcHostModel.fromJson(remoteApp);
+        final AcHostModel acHost = acHostService.fromJson(remoteApp);
 
         Promise<Void> hostRegistered = AC.registerHost(acHost);
         Promise<Result> resultPromise = hostRegistered.map(new F.Function<Void, Result>() {

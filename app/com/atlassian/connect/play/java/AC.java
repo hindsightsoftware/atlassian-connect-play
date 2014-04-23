@@ -7,6 +7,7 @@ import com.atlassian.connect.play.java.model.AcHostModel;
 import com.atlassian.connect.play.java.service.AcHostHttpClient;
 import com.atlassian.connect.play.java.service.AcHostService;
 import com.atlassian.connect.play.java.service.AcHostServiceImpl;
+import com.atlassian.connect.play.java.service.InjectorFactory;
 import com.atlassian.connect.play.java.token.Token;
 import com.atlassian.fugue.Option;
 import com.google.common.base.Suppliers;
@@ -44,22 +45,7 @@ public final class AC
 
     // TODO: DI of some sort would be nice
     private static final JwtAuthorizationGenerator jwtAuthorisationGenerator = JwtAuthConfig.getJwtAuthorizationGenerator();
-    private static final AcHostService acHostService = new AcHostServiceImpl(new AcHostHttpClient() {
-        @Override
-        public WSRequestHolder url(String url) {
-            return AC.url(url);
-        }
-
-        @Override
-        public WSRequestHolder url(String url, AcHost acHost, boolean signRequest) {
-            return AC.url(url, acHost, signRequest);
-        }
-
-        @Override
-        public WSRequestHolder url(String url, AcHost acHost, Option<String> userId) {
-            return AC.url(url, acHost, userId);
-        }
-    });
+    private static final AcHostService acHostService = InjectorFactory.getAcHostService();
 
     public static boolean isDev()
     {
@@ -158,7 +144,7 @@ public final class AC
                 @Override
                 public Option<? extends AcHost> apply() throws Throwable
                 {
-                    return AcHostModel.findByKey(consumerKey);
+                    return acHostService.findByKey(consumerKey);
                 }
             });
         }

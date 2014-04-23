@@ -2,6 +2,11 @@ package com.atlassian.connect.play.java.controllers;
 
 import com.atlassian.connect.play.java.AC;
 import com.atlassian.connect.play.java.AcHost;
+import com.atlassian.connect.play.java.service.AcHostHttpClient;
+import com.atlassian.connect.play.java.service.AcHostService;
+import com.atlassian.connect.play.java.service.AcHostServiceImpl;
+import com.atlassian.connect.play.java.service.InjectorFactory;
+import com.atlassian.fugue.Option;
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
 import com.atlassian.connect.play.java.model.AcHostModel;
@@ -22,10 +27,12 @@ import play.mvc.Results;
 @With(IsDevAction.class)
 public class AcAdmin
 {
+    private static final AcHostService acHostService = InjectorFactory.getAcHostService();
+
     @Transactional(readOnly = true)
     public static Result index()
     {
-        return Results.ok(views.html.ac.internal.admin.index.render(AcHostModel.all()));
+        return Results.ok(views.html.ac.internal.admin.index.render(acHostService.all()));
     }
 
     @Transactional(readOnly = true)

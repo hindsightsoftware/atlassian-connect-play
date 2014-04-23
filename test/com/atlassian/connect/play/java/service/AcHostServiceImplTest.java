@@ -5,7 +5,10 @@ import com.atlassian.connect.play.java.auth.InvalidAuthenticationRequestExceptio
 import com.atlassian.connect.play.java.auth.MismatchPublicKeyException;
 import com.atlassian.connect.play.java.auth.PublicKeyVerificationFailureException;
 import com.atlassian.connect.play.java.model.AcHostModel;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Charsets;
+import org.apache.commons.io.FileUtils;
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -13,10 +16,13 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.w3c.dom.Document;
+import play.libs.Json;
 import play.libs.XML;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import static org.apache.commons.lang.StringUtils.stripToEmpty;
@@ -141,5 +147,20 @@ public class AcHostServiceImplTest {
     public void returnsFailurePromiseWhenFailToFetchPublicKeyDuringRegistration() {
         when(response.getStatus()).thenReturn(401);
         acHostService.registerHost(acHostModel).get(1, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void unmarshalsFromInstallJson() throws IOException {
+
+        AcHostModel acHostModel = AcHostServiceImpl.fromJson(readJsonFromTestFile("installEvent.json"), new AcHostModel());
+        assertThat(acHostModel.getBaseUrl(), Matchers.is("http://jira.atlassian.com:2990/jira"));
+        assertThat(acHostModel.getKey(), Matchers.is("1234567890"));
+        assertThat(acHostModel.getName(), Matchers.is("jira"));
+        assertThat(acHostModel.getPublicKey(), Matchers.is("PK GOES HERE"));
+        assertThat(acHostModel.getSharedSecret(), Matchers.is("SHARED SECRET"));
+    }
+
+    private JsonNode readJsonFromTestFile(String filename) throws IOException {
+        return Json.parse(FileUtils.readFileToString(new File("test/resources/" + filename)));
     }
 }
