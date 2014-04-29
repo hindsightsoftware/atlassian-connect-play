@@ -16,6 +16,10 @@ add-on developers:
 More details can be found in the [AC Play Java Benefits](#markdown-header-ac-play-java-benefits) section.
 
 ## Release Notes
+0.8.0: **BREAKING** 
+
+* During JWT authentication, the full base URL (including any path) is exclueded from the qsh calculation
+
 0.7.0: **BREAKING** 
 
 * Switch from OAuth to JWT for authentication
