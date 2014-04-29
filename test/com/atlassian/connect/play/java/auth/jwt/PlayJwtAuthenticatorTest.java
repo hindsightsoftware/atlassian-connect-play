@@ -28,6 +28,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.TimeUnit;
 
+import static com.atlassian.connect.play.java.auth.jwt.PlayJwtRequestExtractor.AddonContextProvider;
 import static com.atlassian.jwt.JwtConstants.JWT_PARAM_NAME;
 import static com.atlassian.jwt.JwtConstants.HttpRequests.AUTHORIZATION_HEADER;
 import static org.hamcrest.Matchers.equalTo;
@@ -46,6 +47,7 @@ public class PlayJwtAuthenticatorTest {
     private static final SigningAlgorithm ALGORITHM = SigningAlgorithm.HS256;
     private static final String ISSUER = "joe";
     private static final String METHOD = "GET";
+    private static final String ADDON_CONTEXT_PATH = "/blah";
     private static final String PATH = "/foo";
     private static final String SUBJECT = "fred";
 
@@ -57,6 +59,8 @@ public class PlayJwtAuthenticatorTest {
 
     @Mock(answer = RETURNS_DEEP_STUBS)
     private Request request;
+
+    @Mock private AddonContextProvider contextProvider;
 
     private JwtAuthenticator<Request, Response, JwtAuthenticationResult> jwtAuthenticator;
 
@@ -80,15 +84,17 @@ public class PlayJwtAuthenticatorTest {
     @Before
     public void init() {
         JwtReaderFactory readerFactory = new NimbusJwtReaderFactory(jwtIssuerValidator, jwtIssuerSharedSecretService);
-        jwtAuthenticator = new PlayJwtAuthenticator(new PlayJwtRequestExtractor(), new PlayAuthenticationResultHandler(),
-                readerFactory);
+        jwtAuthenticator = new PlayJwtAuthenticator(new PlayJwtRequestExtractor(contextProvider),
+                new PlayAuthenticationResultHandler(), readerFactory);
     }
 
-    private Either<Status, Jwt> authenticate(String parameterJwt, String headerJwt) throws JwtUnknownIssuerException, JwtIssuerLacksSharedSecretException {
+    private Either<Status, Jwt> authenticate(String parameterJwt, String headerJwt, String addonContext)
+            throws JwtUnknownIssuerException, JwtIssuerLacksSharedSecretException {
+        when(contextProvider.get()).thenReturn(addonContext);
         when(request.getQueryString(anyString())).thenReturn(parameterJwt);
         when(request.headers().get(anyString())).thenReturn(headerJwt == null ? new String[]{} : new String[]{headerJwt});
         when(request.method()).thenReturn(METHOD);
-        when(request.path()).thenReturn(PATH);
+        when(request.path()).thenReturn(addonContext + PATH);
         when(request.queryString()).thenReturn(ImmutableMap.<String, String[]>of());
         when(jwtIssuerValidator.isValid(anyString())).thenReturn(true);
         when(jwtIssuerSharedSecretService.getSharedSecret(anyString())).thenReturn(PASSWORD);
@@ -98,44 +104,49 @@ public class PlayJwtAuthenticatorTest {
 
     @Test
     public void looksInRequestParamsForJwt() throws JwtIssuerLacksSharedSecretException, JwtUnknownIssuerException {
-        authenticate(null, null);
+        authenticate(null, null, "/");
         verify(request).getQueryString(JWT_PARAM_NAME);
     }
 
     @Test
     public void looksInHeaderForJwtWhenNotInParams() throws JwtIssuerLacksSharedSecretException, JwtUnknownIssuerException {
-        authenticate(null, null);
+        authenticate(null, null, "/");
         verify(request.headers()).get(AUTHORIZATION_HEADER);
     }
 
     @Test
     public void returnsErrorWhenNoJwtInRequest() throws JwtIssuerLacksSharedSecretException, JwtUnknownIssuerException {
-        assertThat(authenticate(null, null).left.isDefined(), equalTo(true));
+        assertThat(authenticate(null, null, "/").left.isDefined(), equalTo(true));
     }
 
     @Test
     public void returnsStatusInternalServerErrorWhenNoJwtInRequest() throws JwtIssuerLacksSharedSecretException, JwtUnknownIssuerException {
-        assertThat(authenticate(null, null).left.get().getWrappedSimpleResult().header().status(), equalTo(500));
+        assertThat(authenticate(null, null, "/").left.get().getWrappedSimpleResult().header().status(), equalTo(500));
     }
 
     @Test
     public void validatesWithIssueValidator() throws JwtIssuerLacksSharedSecretException, JwtUnknownIssuerException, UnsupportedEncodingException, NoSuchAlgorithmException {
-        authenticate(createJwt(), null);
+        authenticate(createJwt(), null, "/");
         verify(jwtIssuerValidator).isValid(ISSUER);
     }
 
     @Test
     public void containsJwtWhenValidationSucceeds() throws JwtIssuerLacksSharedSecretException, JwtUnknownIssuerException, UnsupportedEncodingException, NoSuchAlgorithmException {
-        assertThat(authenticate(createJwt(), null).right.isDefined(), equalTo(true));
+        assertThat(authenticate(createJwt(), null, "/").right.isDefined(), equalTo(true));
     }
 
     @Test
     public void jwtContainsCorrectIssuer() throws JwtIssuerLacksSharedSecretException, JwtUnknownIssuerException, UnsupportedEncodingException, NoSuchAlgorithmException {
-        assertThat(authenticate(createJwt(), null).right.get().getIssuer(), equalTo(ISSUER));
+        assertThat(authenticate(createJwt(), null, "/").right.get().getIssuer(), equalTo(ISSUER));
     }
 
     @Test
     public void jwtContainsCorrectSubject() throws JwtIssuerLacksSharedSecretException, JwtUnknownIssuerException, UnsupportedEncodingException, NoSuchAlgorithmException {
-        assertThat(authenticate(createJwt(), null).right.get().getSubject(), equalTo(SUBJECT));
+        assertThat(authenticate(createJwt(), null, "/").right.get().getSubject(), equalTo(SUBJECT));
+    }
+
+    @Test
+    public void excludesAddonContextFromCanonicalUri() throws UnsupportedEncodingException, NoSuchAlgorithmException, JwtIssuerLacksSharedSecretException, JwtUnknownIssuerException {
+        assertThat(authenticate(createJwt(), null, ADDON_CONTEXT_PATH).right.isDefined(), equalTo(true));
     }
 }
