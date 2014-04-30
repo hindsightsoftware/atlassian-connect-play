@@ -33,6 +33,8 @@ import static com.atlassian.jwt.JwtConstants.JWT_PARAM_NAME;
 import static com.atlassian.jwt.JwtConstants.HttpRequests.AUTHORIZATION_HEADER;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
@@ -148,5 +150,27 @@ public class PlayJwtAuthenticatorTest {
     @Test
     public void excludesAddonContextFromCanonicalUri() throws UnsupportedEncodingException, NoSuchAlgorithmException, JwtIssuerLacksSharedSecretException, JwtUnknownIssuerException {
         assertThat(authenticate(createJwt(), null, ADDON_CONTEXT_PATH).right.isDefined(), equalTo(true));
+    }
+
+    // If the separator is not URL encoded then the following URLs have the same query-string-hash:
+    //   https://djtest9.jira-dev.com/rest/api/2/project&a=b?x=y
+    //   https://djtest9.jira-dev.com/rest/api/2/project?a=b&x=y
+    @Test
+    public void ampersandsInPathAreNotAmbiguous() throws UnsupportedEncodingException {
+        CanonicalHttpRequest request1 = new CanonicalHttpUriRequest(METHOD, "/path&a=b", "/", ImmutableMap.<String, String[]>of("x", new String[]{"y"}));
+        CanonicalHttpRequest request2 = new CanonicalHttpUriRequest(METHOD, "/path", "/", ImmutableMap.<String, String[]>of("a", new String[]{"b"}, "x", new String[]{"y"}));
+        assertThat(HttpRequestCanonicalizer.canonicalize(request1), is(not(HttpRequestCanonicalizer.canonicalize(request2))));
+    }
+
+    @Test
+    public void anAmpersandInThePathIsUrlEncoded() throws UnsupportedEncodingException {
+        CanonicalHttpRequest request = new CanonicalHttpUriRequest("POST", "/path&a=b", "/", ImmutableMap.<String, String[]>of("x", new String[]{"y"}));
+        assertThat(HttpRequestCanonicalizer.canonicalize(request), is("POST&/path%26a=b&x=y"));
+    }
+
+    @Test
+    public void multipleAmpersandsInThePathAreAllUrlEncoded() throws UnsupportedEncodingException {
+        CanonicalHttpRequest request = new CanonicalHttpUriRequest("POST", "/path&a=b&c=d", "/", ImmutableMap.<String, String[]>of("x", new String[]{"y"}));
+        assertThat(HttpRequestCanonicalizer.canonicalize(request), is("POST&/path%26a=b%26c=d&x=y"));
     }
 }
