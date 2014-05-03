@@ -6,8 +6,6 @@ import com.atlassian.connect.play.java.auth.MismatchPublicKeyException;
 import com.atlassian.connect.play.java.auth.PublicKeyVerificationFailureException;
 import com.atlassian.connect.play.java.model.AcHostModel;
 import com.atlassian.fugue.Option;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.common.base.Supplier;
 import org.w3c.dom.Document;
@@ -22,10 +20,6 @@ import static play.libs.WS.Response;
 import static play.mvc.Http.Status.OK;
 
 public class AcHostServiceImpl implements AcHostService {
-    private static final String CLIENT_KEY = "clientKey";
-    private static final String BASE_URL = "baseUrl";
-    private static final String SHARED_SECRET = "sharedSecret";
-    private static final String PRODUCT_TYPE = "productType";
     private static final String PUBLIC_KEY_ELEMENT_NAME = "publicKey";
     private final AcHostHttpClient httpClient;
     private final AcHostRepository acHostRepository;
@@ -61,7 +55,23 @@ public class AcHostServiceImpl implements AcHostService {
     }
 
     @Override
-    public Promise<Void> registerHost(final AcHost acHost) {
+    public Promise<Void> registerHost(final String clientKey, final String baseUrl, String publicKey, String sharedSecret, String name) {
+        // TODO: The consequence of this is that we will overwrite registrations each time. Is that what we want?
+        final AcHostModel acHost = acHostRepository.findByKey(clientKey)
+                .orElse(new Supplier<Option<AcHostModel>>() {
+                    @Override
+                    public Option<AcHostModel> get() {
+                        return acHostRepository.findByUrl(baseUrl);
+                    }
+                })
+                .getOrElse(new AcHostModel());
+
+        acHost.setKey(clientKey);
+        acHost.setBaseUrl(baseUrl);
+        acHost.setPublicKey(publicKey);
+        acHost.setSharedSecret(sharedSecret);
+        acHost.setName(name);
+
         if (stripToNull(acHost.getPublicKey()) == null) {
             throw new InvalidAuthenticationRequestException("No public key provided in registration request");
         }
@@ -80,46 +90,6 @@ public class AcHostServiceImpl implements AcHostService {
         });
 
         return hostRegistered;
-    }
-
-    @Override
-    public AcHostModel fromJson(final JsonNode json) {
-        // TODO: The consequence of this is that we will overwrite registrations each time. Is that what we want?
-        // TODO: don't like the looking up in the middle of the json unmarshalling. Pull out somewhere else
-        final AcHostModel acHost = acHostRepository.findByKey(getAttributeAsText(json, CLIENT_KEY))
-                .orElse(new Supplier<Option<AcHostModel>>() {
-                    @Override
-                    public Option<AcHostModel> get() {
-                        return acHostRepository.findByUrl(getAttributeAsText(json, BASE_URL));
-                    }
-                })
-                .getOrElse(new AcHostModel());
-
-        return fromJson(json, acHost);
-    }
-
-    @VisibleForTesting
-    static AcHostModel fromJson(JsonNode json, AcHostModel acHost) {
-//        // TODO check the key is the same as this app's
-//        getAttributeAsText(json, "key");
-
-        acHost.setKey(getAttributeAsText(json, CLIENT_KEY));
-        acHost.setBaseUrl(getAttributeAsText(json, BASE_URL));
-        acHost.setPublicKey(getAttributeAsText(json, PUBLIC_KEY_ELEMENT_NAME));
-        acHost.setSharedSecret(getAttributeAsText(json, SHARED_SECRET));
-        acHost.setName(getAttributeAsText(json, PRODUCT_TYPE));
-//        acHost.description = getAttributeAsText(json, "description");
-        return acHost;
-    }
-
-    private static String getAttributeAsText(JsonNode json, String name) {
-        JsonNode jsonNode = json.get(name);
-        return jsonNode == null ? null : jsonNode.textValue();
-    }
-
-    @Override
-    public Option<AcHostModel> findByUrl(String baseUrl) {
-        return acHostRepository.findByUrl(baseUrl);
     }
 
     @Override

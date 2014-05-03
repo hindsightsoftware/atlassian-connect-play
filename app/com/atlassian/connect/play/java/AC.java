@@ -154,11 +154,6 @@ public final class AC
         }
     }
 
-    public static Promise<Void> registerHost(AcHost acHost)
-    {
-        return acHostService.registerHost(acHost);
-    }
-
     public static void refreshToken(boolean allowInsecurePolling)
     {
         final Token token = new Token(AC.getAcHost().getKey(), AC.getUser(), System.currentTimeMillis(), allowInsecurePolling);
