@@ -1,4 +1,4 @@
-@(all: List[com.atlassian.connect.play.java.model.AcHostModel])
+@(all: List[T] forSome { type T <: com.atlassian.connect.play.java.AcHost })
 
 @ac.internal.page("admin-index") {
     <script src='@com.atlassian.connect.play.java.controllers.routes.AcController.asset("js/admin.js")'></script>

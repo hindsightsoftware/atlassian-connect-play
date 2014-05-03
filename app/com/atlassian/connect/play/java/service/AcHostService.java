@@ -38,8 +38,8 @@ public interface AcHostService {
      */
     Promise<Void> registerHost(String clientKey, String baseUrl, String publicKey, String sharedSecret, String name);
 
-    Option<? extends AcHost> findByKey(String consumerKey);
+    Option<AcHost> findByKey(String consumerKey) throws Throwable;
 
-    List<AcHostModel> all();
+    List<? extends AcHost> all() throws Throwable;
 
 }

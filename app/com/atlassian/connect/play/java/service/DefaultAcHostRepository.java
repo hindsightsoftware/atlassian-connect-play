@@ -3,9 +3,6 @@ package com.atlassian.connect.play.java.service;
 import com.atlassian.connect.play.java.AcHost;
 import com.atlassian.connect.play.java.model.AcHostModel;
 import com.atlassian.fugue.Option;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Supplier;
 import play.db.jpa.JPA;
 import play.libs.F;
 
@@ -19,8 +16,7 @@ public class DefaultAcHostRepository implements AcHostRepository {
     private static final String BASE_URL = "baseUrl";
 
     @Override
-    public void save(AcHost acHost) throws Throwable {
-        final AcHostModel acHostModel = fromAcHost(acHost);
+    public void save(final AcHost acHostModel) throws Throwable {
 
         // TODO: Not sure how to do this with annotations in play. Currently this is not a container managed repo
         JPA.withTransaction(new F.Function0<Void>() {
@@ -30,7 +26,7 @@ public class DefaultAcHostRepository implements AcHostRepository {
                     JPA.em().merge(acHostModel);
                 }
                 else {
-                    create(acHostModel);
+                    JPA.em().persist(acHostModel);
                 }
                 return null;
             }
@@ -38,48 +34,65 @@ public class DefaultAcHostRepository implements AcHostRepository {
     }
 
     @Override
-    public List<AcHostModel> all() {
-        return JPA.em().createNamedQuery("AcHostModel.findAll", AcHostModel.class).getResultList();
+    public List<? extends AcHost> all() throws Throwable {
+        return JPA.withTransaction("findAll", true, new F.Function0<List<? extends AcHost>>() {
+            @Override
+            public List<? extends AcHost> apply() throws Throwable {
+                return JPA.em().createNamedQuery("AcHostModel.findAll", AcHostModel.class).getResultList();
+            }
+        });
     }
 
     @Override
-    public Option<AcHostModel> findByKey(String key) {
-        final List<AcHostModel> resultList = JPA.em().createNamedQuery("AcHostModel.findByKey", AcHostModel.class).
-                setParameter("key", key).
-                getResultList();
-        return resultList.isEmpty() ? none(AcHostModel.class) : option(resultList.get(0));
-    }
-
-    @Override
-    public Option<AcHostModel> findByUrl(String baseUrl) {
-        final List<AcHostModel> resultList = JPA.em().createNamedQuery("AcHostModel.findByUrl", AcHostModel.class).
-                setParameter(BASE_URL, baseUrl).
-                getResultList();
-        return resultList.isEmpty() ? none(AcHostModel.class) : option(resultList.get(0));
-    }
-
-    @Override
-    public void create(AcHostModel hostModel) {
-        JPA.em().persist(hostModel);
-    }
-
-    @Override
-    public void delete(Long id) {
-        final AcHostModel acHostModel = JPA.em().find(AcHostModel.class, id);
-
-        if (acHostModel != null)
+    public Option<AcHost> findByKey(final String key) throws Throwable {
+        return JPA.withTransaction("findByKey", true, new F.Function0<Option<AcHost>>()
         {
-            JPA.em().remove(acHostModel);
-        }
+            @Override
+            public Option<AcHost> apply() throws Throwable
+            {
+                final List<AcHostModel> resultList = JPA.em().createNamedQuery("AcHostModel.findByKey", AcHostModel.class).
+                        setParameter("key", key).
+                        getResultList();
+                return resultList.isEmpty() ? none(AcHost.class) : option((AcHost)resultList.get(0));
+            }
+        });
     }
 
     @Override
-    public AcHostModel fromAcHost(AcHost acHost) {
-        if (acHost instanceof AcHostModel) {
-            return (AcHostModel) acHost;
-        }
+    public Option<AcHost> findByUrl(final String baseUrl) throws Throwable {
+        return JPA.withTransaction("findByUrl", true, new F.Function0<Option<AcHost>>()
+        {
+            @Override
+            public Option<AcHost> apply() throws Throwable
+            {
+                final List<AcHostModel> resultList = JPA.em().createNamedQuery("AcHostModel.findByUrl", AcHostModel.class).
+                        setParameter(BASE_URL, baseUrl).
+                        getResultList();
+                return resultList.isEmpty() ? none(AcHost.class) : option((AcHost)resultList.get(0));
+            }
+        });
 
-        throw new IllegalStateException("Not implemented yet");
+    }
+
+    @Override
+    public void delete(final Long id) throws Throwable {
+        JPA.withTransaction(new F.Function0<Void>() {
+            @Override
+            public Void apply() throws Throwable {
+                final AcHostModel acHostModel = JPA.em().find(AcHostModel.class, id);
+
+                if (acHostModel != null)
+                {
+                    JPA.em().remove(acHostModel);
+                }
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public AcHost create() {
+        return new AcHostModel();
     }
 
 }

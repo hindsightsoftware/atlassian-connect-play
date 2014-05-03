@@ -68,7 +68,7 @@ public class AcHostServiceImplTest {
 
 
     @Before
-    public void init() {
+    public void init() throws Throwable {
         acHostService = new AcHostServiceImpl(httpClient, acHostRepository);
         acHostModel = new AcHostModel();
         acHostModel.setPublicKey(TEST_PUBLIC_KEY);
@@ -78,8 +78,8 @@ public class AcHostServiceImplTest {
         when(requestHolder.get()).thenReturn(Promise.pure(response));
         when(response.getStatus()).thenReturn(200);
         when(response.asXml()).thenReturn(testClientInfoDocument);
-        when(acHostRepository.findByKey(any(String.class))).thenReturn(none(AcHostModel.class));
-        when(acHostRepository.findByUrl(eq(acHostModel.getBaseUrl()))).thenReturn(option(acHostModel));
+        when(acHostRepository.findByKey(any(String.class))).thenReturn(none(AcHost.class));
+        when(acHostRepository.findByUrl(eq(acHostModel.getBaseUrl()))).thenReturn(option((AcHost)acHostModel));
     }
 
     @Test

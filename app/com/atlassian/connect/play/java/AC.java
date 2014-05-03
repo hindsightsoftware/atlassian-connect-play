@@ -139,14 +139,7 @@ public final class AC
     {
         try
         {
-            return JPA.withTransaction(new F.Function0<Option<? extends AcHost>>()
-            {
-                @Override
-                public Option<? extends AcHost> apply() throws Throwable
-                {
-                    return acHostService.findByKey(consumerKey);
-                }
-            });
+            return acHostService.findByKey(consumerKey);
         }
         catch (Throwable throwable)
         {

@@ -11,7 +11,6 @@ import com.google.common.base.Supplier;
 import controllers.AssetsBuilder;
 import play.api.mvc.Action;
 import play.api.mvc.AnyContent;
-import play.db.jpa.Transactional;
 import play.libs.F;
 import play.mvc.BodyParser;
 import play.mvc.Result;
@@ -110,7 +109,6 @@ public class AcController {
     }
 
     @BodyParser.Of(BodyParser.Json.class)
-    @Transactional
     public static Promise<Result> registration() {
         LOGGER.info("Registering host application!");
 

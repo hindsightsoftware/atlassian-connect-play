@@ -2,17 +2,12 @@ package com.atlassian.connect.play.java.controllers;
 
 import com.atlassian.connect.play.java.AC;
 import com.atlassian.connect.play.java.AcHost;
-import com.atlassian.connect.play.java.service.AcHostHttpClient;
 import com.atlassian.connect.play.java.service.AcHostService;
-import com.atlassian.connect.play.java.service.AcHostServiceImpl;
 import com.atlassian.connect.play.java.service.InjectorFactory;
-import com.atlassian.fugue.Option;
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
-import com.atlassian.connect.play.java.model.AcHostModel;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import play.db.jpa.Transactional;
 import play.libs.F;
 import play.libs.F.Promise;
 import play.libs.Json;
@@ -22,6 +17,8 @@ import play.mvc.Result;
 import play.mvc.With;
 
 import static java.lang.String.format;
+import static play.mvc.Results.internalServerError;
+
 import play.mvc.Results;
 
 @With(IsDevAction.class)
@@ -29,13 +26,15 @@ public class AcAdmin
 {
     private static final AcHostService acHostService = InjectorFactory.getAcHostService();
 
-    @Transactional(readOnly = true)
     public static Result index()
     {
-        return Results.ok(views.html.ac.internal.admin.index.render(acHostService.all()));
+        try {
+            return Results.ok(views.html.ac.internal.admin.index.render(acHostService.all()));
+        } catch (Throwable throwable) {
+            return internalServerError(message("Error accessing the database", throwable.getMessage()));
+        }
     }
 
-    @Transactional(readOnly = true)
     public static Promise<Result> clearMacroCache(final String key)
     {
         return AC.getAcHost(key).fold(

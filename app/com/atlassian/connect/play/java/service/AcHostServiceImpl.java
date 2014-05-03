@@ -4,7 +4,6 @@ import com.atlassian.connect.play.java.AcHost;
 import com.atlassian.connect.play.java.auth.InvalidAuthenticationRequestException;
 import com.atlassian.connect.play.java.auth.MismatchPublicKeyException;
 import com.atlassian.connect.play.java.auth.PublicKeyVerificationFailureException;
-import com.atlassian.connect.play.java.model.AcHostModel;
 import com.atlassian.fugue.Option;
 import com.google.common.base.Objects;
 import com.google.common.base.Supplier;
@@ -13,6 +12,7 @@ import org.w3c.dom.NodeList;
 
 import java.util.List;
 
+import static com.atlassian.fugue.Option.none;
 import static org.apache.commons.lang.StringUtils.stripToNull;
 import static play.libs.F.Function;
 import static play.libs.F.Promise;
@@ -57,14 +57,22 @@ public class AcHostServiceImpl implements AcHostService {
     @Override
     public Promise<Void> registerHost(final String clientKey, final String baseUrl, String publicKey, String sharedSecret, String name) {
         // TODO: The consequence of this is that we will overwrite registrations each time. Is that what we want?
-        final AcHostModel acHost = acHostRepository.findByKey(clientKey)
-                .orElse(new Supplier<Option<AcHostModel>>() {
-                    @Override
-                    public Option<AcHostModel> get() {
-                        return acHostRepository.findByUrl(baseUrl);
-                    }
-                })
-                .getOrElse(new AcHostModel());
+        Option<AcHost> acHostOption;
+        try {
+            acHostOption = acHostRepository.findByKey(clientKey);
+        } catch (Throwable throwable) {
+            return Promise.throwing(throwable);
+        }
+        final AcHost acHost = acHostOption.orElse(new Supplier<Option<AcHost>>() {
+            @Override
+            public Option<AcHost> get() {
+                try {
+                    return acHostRepository.findByUrl(baseUrl);
+                } catch (Throwable e) {
+                    return none(AcHost.class);
+                }
+            }
+        }).getOrElse(acHostRepository.create());
 
         acHost.setKey(clientKey);
         acHost.setBaseUrl(baseUrl);
@@ -93,12 +101,12 @@ public class AcHostServiceImpl implements AcHostService {
     }
 
     @Override
-    public Option<? extends AcHost> findByKey(String consumerKey) {
+    public Option<AcHost> findByKey(String consumerKey) throws Throwable {
         return acHostRepository.findByKey(consumerKey);
     }
 
     @Override
-    public List<AcHostModel> all() {
+    public List<? extends AcHost> all() throws Throwable{
         return acHostRepository.all();
     }
 
