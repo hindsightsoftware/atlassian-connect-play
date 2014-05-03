@@ -79,8 +79,8 @@ public class AcHostServiceImplTest {
     public void init() {
         acHostService = new AcHostServiceImpl(httpClient, acHostRepository);
         acHostModel = new AcHostModel();
-        acHostModel.publicKey = TEST_PUBLIC_KEY;
-        acHostModel.baseUrl = BASE_URL;
+        acHostModel.setPublicKey(TEST_PUBLIC_KEY);
+        acHostModel.setBaseUrl(BASE_URL);
 
         when(httpClient.url(anyString(), any(AcHost.class), anyBoolean())).thenReturn(requestHolder);
         when(requestHolder.get()).thenReturn(Promise.pure(response));
@@ -91,7 +91,7 @@ public class AcHostServiceImplTest {
     @Test
     public void sendsCorrectHttpRequest() {
         acHostService.fetchPublicKeyFromRemoteHost(acHostModel);
-        verify(httpClient).url(BASE_URL + AcHostModel.CONSUMER_INFO_URL, acHostModel, false);
+        verify(httpClient).url(BASE_URL + AcHost.CONSUMER_INFO_URL, acHostModel, false);
         verify(requestHolder).get();
     }
 
@@ -133,7 +133,7 @@ public class AcHostServiceImplTest {
 
     @Test(expected = InvalidAuthenticationRequestException.class)
     public void returnsFailurePromiseWhenNoPublicKeyProvided() {
-        acHostModel.publicKey = "  ";
+        acHostModel.setPublicKey("  ");
         acHostService.registerHost(acHostModel).get(1, TimeUnit.SECONDS);
     }
 

@@ -67,8 +67,8 @@ public class JwtAuthorizationGeneratorTest {
         FakeApplication fakeApplication = Helpers.fakeApplication();
         Helpers.start(fakeApplication);
         acHost = new AcHostModel();
-        acHost.sharedSecret = NOT_SO_SECRET_SECRET;
-        acHost.baseUrl = baseUrl;
+        acHost.setSharedSecret(NOT_SO_SECRET_SECRET);
+        acHost.setBaseUrl(baseUrl);
 
         when(jwtWriterFactory.macSigningWriter(any(SigningAlgorithm.class), anyString())).thenReturn(jwtWriter);
 

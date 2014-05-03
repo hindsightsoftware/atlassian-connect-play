@@ -32,37 +32,35 @@ import static play.data.validation.Constraints.Required;
         @NamedQuery (name = "AcHostModel.findByKey", query = "SELECT a FROM AcHostModel a where a.key = :key"),
         @NamedQuery (name = "AcHostModel.findByUrl", query = "SELECT a FROM AcHostModel a where a.baseUrl = :baseUrl")
 })
-public final class AcHostModel implements AcHost
+public final class AcHostModel extends AcHost
 {
-    @VisibleForTesting
-    public static final String CONSUMER_INFO_URL = "/plugins/servlet/oauth/consumer-info";
 
     @Id
     @SequenceGenerator (name = "ac_host_gen", sequenceName = "ac_host_seq")
     @GeneratedValue (generator = "ac_host_gen")
-    public Long id;
+    private Long id;
 
     @Required
     @Column (unique = true, nullable = false)
-    public String key;
+    private String key;
 
     @Required
     @MaxLength (512)
     @Column (nullable = false, length = 512)
-    public String publicKey;
+    private String publicKey;
 
     @Required
     @MaxLength (512)
     @Column (nullable = false, length = 512) // TODO: may have to be nullable at least as we transition from oauth
-    public String sharedSecret;
+    private String sharedSecret;
 
     @Required
     @MaxLength (512)
     @Column (unique = true, nullable = false, length = 512)
-    public String baseUrl;
+    private String baseUrl;
 
-    public String name;
-    public String description;
+    private String name;
+    private String description;
 
     public Long getId()
     {
@@ -102,9 +100,27 @@ public final class AcHostModel implements AcHost
     }
 
     @Override
-    public String getConsumerInfoUrl()
-    {
-        return baseUrl + CONSUMER_INFO_URL;
+    public void setKey(String key) {
+        this.key = key;
     }
 
+    @Override
+    public void setPublicKey(String publicKey) {
+        this.publicKey = publicKey;
+    }
+
+    @Override
+    public void setSharedSecret(String sharedSecret) {
+        this.sharedSecret = sharedSecret;
+    }
+
+    @Override
+    public void setBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
+    }
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
+    }
 }

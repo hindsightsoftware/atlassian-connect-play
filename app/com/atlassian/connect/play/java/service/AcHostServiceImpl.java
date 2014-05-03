@@ -103,11 +103,11 @@ public class AcHostServiceImpl implements AcHostService {
 //        // TODO check the key is the same as this app's
 //        getAttributeAsText(json, "key");
 
-        acHost.key = getAttributeAsText(json, CLIENT_KEY);
-        acHost.baseUrl = getAttributeAsText(json, BASE_URL);
-        acHost.publicKey = getAttributeAsText(json, PUBLIC_KEY_ELEMENT_NAME);
-        acHost.sharedSecret = getAttributeAsText(json, SHARED_SECRET);
-        acHost.name = getAttributeAsText(json, PRODUCT_TYPE);
+        acHost.setKey(getAttributeAsText(json, CLIENT_KEY));
+        acHost.setBaseUrl(getAttributeAsText(json, BASE_URL));
+        acHost.setPublicKey(getAttributeAsText(json, PUBLIC_KEY_ELEMENT_NAME));
+        acHost.setSharedSecret(getAttributeAsText(json, SHARED_SECRET));
+        acHost.setName(getAttributeAsText(json, PRODUCT_TYPE));
 //        acHost.description = getAttributeAsText(json, "description");
         return acHost;
     }
