@@ -1,5 +1,13 @@
 # Changelog - Play Java Module for Atlassian Connect
 
+
+## 0.8.0:
+
+* **BREAKING**
+
+    * During JWT authentication, the full base URL (including any path) is excluded from the qsh calculation
+    * URL encoding of canonical path separator (&)
+
 ## 0.7.1
 
 * changed to use new AUI CDN

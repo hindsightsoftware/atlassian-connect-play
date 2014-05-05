@@ -18,7 +18,9 @@ More details can be found in the [AC Play Java Benefits](#markdown-header-ac-pla
 ## Release Notes
 0.8.0: **BREAKING** 
 
-* During JWT authentication, the full base URL (including any path) is exclueded from the qsh calculation
+* During JWT authentication, the full base URL (including any path) is excluded from the qsh calculation
+
+* URL encoding of canonical path separator (&)
 
 0.7.0: **BREAKING** 
 
