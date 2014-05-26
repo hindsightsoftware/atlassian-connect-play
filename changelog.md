@@ -4,6 +4,7 @@
 ## 0.8.1
 
 * Fixed header lookup to be case insensitive. Caused issues with Authorization header in some cases
+* Fixed NPE in PlayRequestWrapper
 
 ## 0.8.0
 
