@@ -1,7 +1,11 @@
 # Changelog - Play Java Module for Atlassian Connect
 
 
-## 0.8.0:
+## 0.8.1
+
+* Fixed header lookup to be case insensitive. Caused issues with Authorization header in some cases
+
+## 0.8.0
 
 * **BREAKING**
 
