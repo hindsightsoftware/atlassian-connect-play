@@ -15,6 +15,7 @@ import com.atlassian.jwt.exception.JwtUnknownIssuerException;
 import com.atlassian.jwt.httpclient.CanonicalHttpUriRequest;
 import com.atlassian.jwt.reader.JwtReaderFactory;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -109,8 +110,10 @@ public class PlayJwtAuthenticatorTest {
     }
 
     @Test
-    public void looksInHeaderForJwtWhenNotInParams() throws JwtIssuerLacksSharedSecretException, JwtUnknownIssuerException {
-        authenticate(null, null, "/");
+    public void looksInHeaderForJwtWhenNotInParams() throws JwtIssuerLacksSharedSecretException, JwtUnknownIssuerException, UnsupportedEncodingException, NoSuchAlgorithmException {
+        when(request.headers().keySet()).thenReturn(ImmutableSet.of(AUTHORIZATION_HEADER));
+
+        authenticate(null, createJwt(), "/");
         verify(request.headers()).get(AUTHORIZATION_HEADER);
     }
 
