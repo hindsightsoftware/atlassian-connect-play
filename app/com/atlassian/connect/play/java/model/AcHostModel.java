@@ -51,14 +51,12 @@ public final class AcHostModel implements AcHost
     @Column (unique = true, nullable = false)
     public String key;
 
-    @Required
     @MaxLength (512)
-    @Column (nullable = false, length = 512)
+    @Column (length = 512)
     public String publicKey;
 
-    @Required
     @MaxLength (512)
-    @Column (nullable = false, length = 512) // TODO: may have to be nullable at least as we transition from oauth
+    @Column (length = 512) // TODO: may have to be nullable at least as we transition from oauth
     public String sharedSecret;
 
     @Required
