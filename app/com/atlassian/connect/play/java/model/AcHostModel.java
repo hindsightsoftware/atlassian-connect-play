@@ -44,15 +44,13 @@ public final class AcHostModel extends AcHost
     @Column (unique = true, nullable = false)
     private String key;
 
-    @Required
     @MaxLength (512)
-    @Column (nullable = false, length = 512)
-    private String publicKey;
+    @Column (length = 512)
+    public String publicKey;
 
-    @Required
     @MaxLength (512)
-    @Column (nullable = false, length = 512) // TODO: may have to be nullable at least as we transition from oauth
-    private String sharedSecret;
+    @Column (length = 512) // TODO: may have to be nullable at least as we transition from oauth
+    public String sharedSecret;
 
     @Required
     @MaxLength (512)

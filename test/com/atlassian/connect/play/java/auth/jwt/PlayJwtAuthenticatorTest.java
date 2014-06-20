@@ -15,27 +15,28 @@ import com.atlassian.jwt.exception.JwtUnknownIssuerException;
 import com.atlassian.jwt.httpclient.CanonicalHttpUriRequest;
 import com.atlassian.jwt.reader.JwtReaderFactory;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
-import play.libs.F;
-import play.mvc.Results;
 
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.TimeUnit;
 
 import static com.atlassian.connect.play.java.auth.jwt.PlayJwtRequestExtractor.AddonContextProvider;
-import static com.atlassian.jwt.JwtConstants.JWT_PARAM_NAME;
 import static com.atlassian.jwt.JwtConstants.HttpRequests.AUTHORIZATION_HEADER;
+import static com.atlassian.jwt.JwtConstants.JWT_PARAM_NAME;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static play.libs.F.Either;
 import static play.mvc.Http.Request;
 import static play.mvc.Http.Response;
@@ -109,8 +110,10 @@ public class PlayJwtAuthenticatorTest {
     }
 
     @Test
-    public void looksInHeaderForJwtWhenNotInParams() throws JwtIssuerLacksSharedSecretException, JwtUnknownIssuerException {
-        authenticate(null, null, "/");
+    public void looksInHeaderForJwtWhenNotInParams() throws JwtIssuerLacksSharedSecretException, JwtUnknownIssuerException, UnsupportedEncodingException, NoSuchAlgorithmException {
+        when(request.headers().keySet()).thenReturn(ImmutableSet.of(AUTHORIZATION_HEADER));
+
+        authenticate(null, createJwt(), "/");
         verify(request.headers()).get(AUTHORIZATION_HEADER);
     }
 
@@ -148,5 +151,27 @@ public class PlayJwtAuthenticatorTest {
     @Test
     public void excludesAddonContextFromCanonicalUri() throws UnsupportedEncodingException, NoSuchAlgorithmException, JwtIssuerLacksSharedSecretException, JwtUnknownIssuerException {
         assertThat(authenticate(createJwt(), null, ADDON_CONTEXT_PATH).right.isDefined(), equalTo(true));
+    }
+
+    // If the separator is not URL encoded then the following URLs have the same query-string-hash:
+    //   https://djtest9.jira-dev.com/rest/api/2/project&a=b?x=y
+    //   https://djtest9.jira-dev.com/rest/api/2/project?a=b&x=y
+    @Test
+    public void ampersandsInPathAreNotAmbiguous() throws UnsupportedEncodingException {
+        CanonicalHttpRequest request1 = new CanonicalHttpUriRequest(METHOD, "/path&a=b", "/", ImmutableMap.<String, String[]>of("x", new String[]{"y"}));
+        CanonicalHttpRequest request2 = new CanonicalHttpUriRequest(METHOD, "/path", "/", ImmutableMap.<String, String[]>of("a", new String[]{"b"}, "x", new String[]{"y"}));
+        assertThat(HttpRequestCanonicalizer.canonicalize(request1), is(not(HttpRequestCanonicalizer.canonicalize(request2))));
+    }
+
+    @Test
+    public void anAmpersandInThePathIsUrlEncoded() throws UnsupportedEncodingException {
+        CanonicalHttpRequest request = new CanonicalHttpUriRequest("POST", "/path&a=b", "/", ImmutableMap.<String, String[]>of("x", new String[]{"y"}));
+        assertThat(HttpRequestCanonicalizer.canonicalize(request), is("POST&/path%26a=b&x=y"));
+    }
+
+    @Test
+    public void multipleAmpersandsInThePathAreAllUrlEncoded() throws UnsupportedEncodingException {
+        CanonicalHttpRequest request = new CanonicalHttpUriRequest("POST", "/path&a=b&c=d", "/", ImmutableMap.<String, String[]>of("x", new String[]{"y"}));
+        assertThat(HttpRequestCanonicalizer.canonicalize(request), is("POST&/path%26a=b%26c=d&x=y"));
     }
 }
