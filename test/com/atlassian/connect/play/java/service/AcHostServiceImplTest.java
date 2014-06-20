@@ -85,7 +85,7 @@ public class AcHostServiceImplTest {
     @Test
     public void sendsCorrectHttpRequest() {
         acHostService.fetchPublicKeyFromRemoteHost(acHostModel);
-        verify(httpClient).url(BASE_URL + AcHost.CONSUMER_INFO_URL, acHostModel, false);
+        verify(httpClient).url(BASE_URL + "/plugins/servlet/oauth/consumer-info", acHostModel, false);
         verify(requestHolder).get();
     }
 

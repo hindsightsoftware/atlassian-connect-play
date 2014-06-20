@@ -32,7 +32,7 @@ import static play.data.validation.Constraints.Required;
         @NamedQuery (name = "AcHostModel.findByKey", query = "SELECT a FROM AcHostModel a where a.key = :key"),
         @NamedQuery (name = "AcHostModel.findByUrl", query = "SELECT a FROM AcHostModel a where a.baseUrl = :baseUrl")
 })
-public final class AcHostModel extends AcHost
+public final class AcHostModel implements AcHost
 {
 
     @Id

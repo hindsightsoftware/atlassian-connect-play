@@ -2,11 +2,8 @@ package com.atlassian.connect.play.java;
 
 import com.google.common.annotations.VisibleForTesting;
 
-public abstract class AcHost
+public interface AcHost
 {
-    @VisibleForTesting
-    public static final String CONSUMER_INFO_URL = "/plugins/servlet/oauth/consumer-info";
-
     public abstract Long getId();
 
     public abstract String getKey();
@@ -20,11 +17,6 @@ public abstract class AcHost
     public abstract String getPublicKey();
 
     public abstract String getSharedSecret();
-
-    public String getConsumerInfoUrl()
-    {
-        return getBaseUrl() + CONSUMER_INFO_URL;
-    }
 
     public abstract void setKey(String key);
 
