@@ -119,7 +119,8 @@ public class JwtAuthorizationGenerator {
         JwtJsonBuilder jsonBuilder = new JsonSmartJwtJsonBuilder()
                 .issuedAt(TimeUtil.currentTimeSeconds())
                 .expirationTime(TimeUtil.currentTimePlusNSeconds(jwtExpiryWindowSeconds))
-                .issuer(AC.PLUGIN_KEY);
+                .issuer(AC.PLUGIN_KEY)
+                .audience(acHost.getKey());
 
         if (null != userKeyValue) {
             jsonBuilder = jsonBuilder.subject(userKeyValue);
