@@ -16,23 +16,17 @@ add-on developers:
 More details can be found in the [AC Play Java Benefits](#markdown-header-ac-play-java-benefits) section.
 
 ## Release Notes
+
+0.9.0
+
+* Upgraded AUI to version 5.6.12
+
 0.8.0: **BREAKING** 
 
 * During JWT authentication, the full base URL (including any path) is excluded from the qsh calculation
 
 * URL encoding of canonical path separator (&)
 
-0.7.0: **BREAKING** 
-
-* Switch from OAuth to JWT for authentication
-
-    * See [Authentication Documentation for details](https://developer.atlassian.com/static/connect/docs/pages/concepts/authentication.html)
-
-    * Note: we recommend you set the ac logging to trace while debugging jwt code
-
-* Switch from XML Descriptors to JSON. 
-
-    * See [atlassian-connect.json](#markdown-header-add-on-descriptor-template) for details. 
 
 See changelog.md for more details
 

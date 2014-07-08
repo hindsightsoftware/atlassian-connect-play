@@ -1,8 +1,7 @@
-@(version: String = "5.4.3", jqueryVersion: String = "1.8.3", experimental: Boolean = false, soy: Boolean = false)
+@(version: String = "5.6.12", jqueryVersion: String = "1.8.3", experimental: Boolean = false, soy: Boolean = false)
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/@jqueryVersion/jquery.min.js"></script>
 <script src="//aui-cdn.atlassian.com/aui-adg/@version/js/aui.js"></script>
-<!--[if lt IE 9]><script src="//aui-cdn.atlassian.com/aui-adg/@version/js/aui-ie.js"></script><![endif]-->
 <script src="//aui-cdn.atlassian.com/aui-adg/@version/js/aui-datepicker.js"></script>
 @if(experimental) {<script src="//aui-cdn.atlassian.com/aui-adg/@version/js/aui-experimental.js"></script>}
 @if(soy) {<script src="//aui-cdn.atlassian.com/aui-adg/@version/js/aui-soy.js"></script>}
