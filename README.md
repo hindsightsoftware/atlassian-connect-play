@@ -19,7 +19,7 @@ More details can be found in the [AC Play Java Benefits](#markdown-header-ac-pla
 
 0.9.0
 
-* Upgraded AUI to version 5.6.12
+* Upgraded AUI to version 5.6.12 (see [AUI release notes](https://developer.atlassian.com/display/AUI/AUI+5.x) for details)
 
 0.8.0: **BREAKING** 
 
