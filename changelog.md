@@ -1,5 +1,9 @@
 # Changelog - Play Java Module for Atlassian Connect
 
+## 0.9.0
+
+* Upgraded AUI to version 5.6.12
+
 ## 0.8.2
 
 * Bug Fix: Removed `@Required` from _sharedSecret_ and _publicKey_ as they are not required for auth type *none*
