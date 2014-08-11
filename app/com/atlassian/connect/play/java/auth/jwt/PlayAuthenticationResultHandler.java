@@ -48,13 +48,13 @@ public class PlayAuthenticationResultHandler implements AuthenticationResultHand
 
     private static JwtAuthenticationResult createError(Exception e, int httpResponseCode, String externallyVisibleMessage)
     {
-        LOGGER.debug("Error during JWT authentication: ", e);
+        LOGGER.info("Error during JWT authentication: ", e);
         return createErrorResult(httpResponseCode, externallyVisibleMessage);
     }
 
     private static JwtAuthenticationResult createFailure(Exception e, int httpResponseCode, String externallyVisibleMessage)
     {
-        LOGGER.debug("Failure during JWT authentication: ", e);
+        LOGGER.info("Failure during JWT authentication: ", e);
         return createErrorResult(httpResponseCode, externallyVisibleMessage);
     }
 
