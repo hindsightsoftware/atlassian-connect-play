@@ -19,7 +19,7 @@ public interface AcHostRepository {
      * @return
      * @throws Throwable
      */
-    List<? extends AcHost> all() throws Throwable;
+    List<AcHost> all() throws Throwable;
 
     /**
      * Retrieves a AC Host entry from the repository
@@ -44,9 +44,4 @@ public interface AcHostRepository {
      */
     void delete(Long id) throws Throwable;
 
-    /**
-     * Factory method to create a new empty instance of ACHost. This instance will not be stored in the Repository.
-     * @return
-     */
-    AcHost create();
 }

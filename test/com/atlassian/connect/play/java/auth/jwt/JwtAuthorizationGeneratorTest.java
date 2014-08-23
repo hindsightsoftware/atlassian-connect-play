@@ -1,7 +1,7 @@
 package com.atlassian.connect.play.java.auth.jwt;
 
 import com.atlassian.connect.play.java.AC;
-import com.atlassian.connect.play.java.model.AcHostModel;
+import com.atlassian.connect.play.java.AcHost;
 import com.atlassian.fugue.Option;
 import com.atlassian.jwt.SigningAlgorithm;
 import com.atlassian.jwt.core.TimeUtil;
@@ -53,7 +53,7 @@ public class JwtAuthorizationGeneratorTest {
 
     private JwtAuthorizationGenerator jwtAuthorizationGenerator;
 
-    private AcHostModel acHost;
+    private AcHost acHost;
     private String aUrl;
 
     @Before
@@ -66,7 +66,7 @@ public class JwtAuthorizationGeneratorTest {
         aUrl = baseUrl + "/foo";
         FakeApplication fakeApplication = Helpers.fakeApplication();
         Helpers.start(fakeApplication);
-        acHost = new AcHostModel();
+        acHost = new AcHost();
         acHost.setSharedSecret(NOT_SO_SECRET_SECRET);
         acHost.setBaseUrl(baseUrl);
 

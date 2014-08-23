@@ -1,7 +1,6 @@
 package com.atlassian.connect.play.java.service;
 
 import com.atlassian.connect.play.java.AcHost;
-import com.atlassian.connect.play.java.model.AcHostModel;
 import com.atlassian.fugue.Option;
 import play.db.jpa.JPA;
 import play.libs.F;
@@ -34,11 +33,11 @@ public class DefaultAcHostRepository implements AcHostRepository {
     }
 
     @Override
-    public List<? extends AcHost> all() throws Throwable {
-        return JPA.withTransaction("findAll", true, new F.Function0<List<? extends AcHost>>() {
+    public List<AcHost> all() throws Throwable {
+        return JPA.withTransaction("findAll", true, new F.Function0<List<AcHost>>() {
             @Override
-            public List<? extends AcHost> apply() throws Throwable {
-                return JPA.em().createNamedQuery("AcHostModel.findAll", AcHostModel.class).getResultList();
+            public List<AcHost> apply() throws Throwable {
+                return JPA.em().createNamedQuery("AcHost.findAll", AcHost.class).getResultList();
             }
         });
     }
@@ -50,10 +49,10 @@ public class DefaultAcHostRepository implements AcHostRepository {
             @Override
             public Option<AcHost> apply() throws Throwable
             {
-                final List<AcHostModel> resultList = JPA.em().createNamedQuery("AcHostModel.findByKey", AcHostModel.class).
+                final List<AcHost> resultList = JPA.em().createNamedQuery("AcHost.findByKey", AcHost.class).
                         setParameter("key", key).
                         getResultList();
-                return resultList.isEmpty() ? none(AcHost.class) : option((AcHost)resultList.get(0));
+                return resultList.isEmpty() ? none(AcHost.class) : option(resultList.get(0));
             }
         });
     }
@@ -65,10 +64,10 @@ public class DefaultAcHostRepository implements AcHostRepository {
             @Override
             public Option<AcHost> apply() throws Throwable
             {
-                final List<AcHostModel> resultList = JPA.em().createNamedQuery("AcHostModel.findByUrl", AcHostModel.class).
+                final List<AcHost> resultList = JPA.em().createNamedQuery("AcHost.findByUrl", AcHost.class).
                         setParameter(BASE_URL, baseUrl).
                         getResultList();
-                return resultList.isEmpty() ? none(AcHost.class) : option((AcHost)resultList.get(0));
+                return resultList.isEmpty() ? none(AcHost.class) : option(resultList.get(0));
             }
         });
 
@@ -79,20 +78,15 @@ public class DefaultAcHostRepository implements AcHostRepository {
         JPA.withTransaction(new F.Function0<Void>() {
             @Override
             public Void apply() throws Throwable {
-                final AcHostModel acHostModel = JPA.em().find(AcHostModel.class, id);
+                final AcHost acHost = JPA.em().find(AcHost.class, id);
 
-                if (acHostModel != null)
+                if (acHost != null)
                 {
-                    JPA.em().remove(acHostModel);
+                    JPA.em().remove(acHost);
                 }
                 return null;
             }
         });
-    }
-
-    @Override
-    public AcHost create() {
-        return new AcHostModel();
     }
 
 }

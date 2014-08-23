@@ -3,10 +3,7 @@ package com.atlassian.connect.play.java;
 import com.atlassian.connect.play.java.auth.jwt.JwtAuthConfig;
 import com.atlassian.connect.play.java.auth.jwt.JwtAuthorizationGenerator;
 import com.atlassian.connect.play.java.auth.jwt.JwtSignatureCalculator;
-import com.atlassian.connect.play.java.model.AcHostModel;
-import com.atlassian.connect.play.java.service.AcHostHttpClient;
 import com.atlassian.connect.play.java.service.AcHostService;
-import com.atlassian.connect.play.java.service.AcHostServiceImpl;
 import com.atlassian.connect.play.java.service.InjectorFactory;
 import com.atlassian.connect.play.java.token.Token;
 import com.atlassian.fugue.Option;
@@ -14,8 +11,6 @@ import com.google.common.base.Suppliers;
 import org.apache.commons.codec.binary.Base64;
 import play.Play;
 import play.api.libs.Crypto;
-import play.db.jpa.JPA;
-import play.libs.F;
 import play.libs.Json;
 import play.libs.WS;
 import play.mvc.Http;
@@ -29,7 +24,6 @@ import static com.atlassian.fugue.Option.some;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
-import static play.libs.F.Promise;
 import static play.libs.WS.WSRequestHolder;
 
 public final class AC
@@ -135,7 +129,7 @@ public final class AC
         return setAcHost(getAcHost(consumerKey).getOrError(Suppliers.ofInstance("An error occurred getting the host application")));
     }
 
-    public static Option<? extends AcHost> getAcHost(final String consumerKey)
+    public static Option<AcHost> getAcHost(final String consumerKey)
     {
         try
         {
