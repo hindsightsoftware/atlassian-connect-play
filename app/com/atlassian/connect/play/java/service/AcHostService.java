@@ -21,6 +21,8 @@ public interface AcHostService {
      */
     Promise<String> fetchPublicKeyFromRemoteHost(AcHost acHost);
 
+    Promise<Void> registerHost(AcHost acHost);
+
     /**
      * Registers a new host, or updates the details from an existing host
      *

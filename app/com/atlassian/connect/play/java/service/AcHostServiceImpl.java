@@ -55,6 +55,12 @@ public class AcHostServiceImpl implements AcHostService {
     }
 
     @Override
+    public Promise<Void> registerHost(final AcHost acHost) {
+        return registerHost(acHost.getKey(), acHost.getBaseUrl(), acHost.getPublicKey(), acHost.getSharedSecret(),
+                acHost.getName());
+    }
+
+    @Override
     public Promise<Void> registerHost(final String clientKey, final String baseUrl, String publicKey, String sharedSecret, String name) {
         // TODO: The consequence of this is that we will overwrite registrations each time. Is that what we want?
         Option<AcHost> acHostOption;
