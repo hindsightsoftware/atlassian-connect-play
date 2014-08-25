@@ -17,15 +17,14 @@ More details can be found in the [AC Play Java Benefits](#markdown-header-ac-pla
 
 ## Release Notes
 
+## 0.10.0
+
+* Added support for pluggable persistence for AcHost data. Thanks to Alan Parkinson for the contribution
+* Use core Ac logger for JWT. Thanks to Alan Parkinson for the contribution
+
 0.9.0
 
 * Upgraded AUI to version 5.6.12 (see [AUI release notes](https://developer.atlassian.com/display/AUI/AUI+5.x) for details). Previous version was 5.4.3.
-
-0.8.0: **BREAKING** 
-
-* During JWT authentication, the full base URL (including any path) is excluded from the qsh calculation
-
-* URL encoding of canonical path separator (&)
 
 
 See changelog.md for more details
