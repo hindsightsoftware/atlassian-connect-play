@@ -3,18 +3,14 @@ package com.atlassian.connect.play.java;
 import com.atlassian.connect.play.java.auth.jwt.JwtAuthConfig;
 import com.atlassian.connect.play.java.auth.jwt.JwtAuthorizationGenerator;
 import com.atlassian.connect.play.java.auth.jwt.JwtSignatureCalculator;
-import com.atlassian.connect.play.java.model.AcHostModel;
-import com.atlassian.connect.play.java.service.AcHostHttpClient;
 import com.atlassian.connect.play.java.service.AcHostService;
-import com.atlassian.connect.play.java.service.AcHostServiceImpl;
+import com.atlassian.connect.play.java.service.InjectorFactory;
 import com.atlassian.connect.play.java.token.Token;
 import com.atlassian.fugue.Option;
 import com.google.common.base.Suppliers;
 import org.apache.commons.codec.binary.Base64;
 import play.Play;
 import play.api.libs.Crypto;
-import play.db.jpa.JPA;
-import play.libs.F;
 import play.libs.Json;
 import play.libs.WS;
 import play.mvc.Http;
@@ -28,7 +24,6 @@ import static com.atlassian.fugue.Option.some;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
-import static play.libs.F.Promise;
 import static play.libs.WS.WSRequestHolder;
 
 public final class AC
@@ -44,22 +39,7 @@ public final class AC
 
     // TODO: DI of some sort would be nice
     private static final JwtAuthorizationGenerator jwtAuthorisationGenerator = JwtAuthConfig.getJwtAuthorizationGenerator();
-    private static final AcHostService acHostService = new AcHostServiceImpl(new AcHostHttpClient() {
-        @Override
-        public WSRequestHolder url(String url) {
-            return AC.url(url);
-        }
-
-        @Override
-        public WSRequestHolder url(String url, AcHost acHost, boolean signRequest) {
-            return AC.url(url, acHost, signRequest);
-        }
-
-        @Override
-        public WSRequestHolder url(String url, AcHost acHost, Option<String> userId) {
-            return AC.url(url, acHost, userId);
-        }
-    });
+    private static final AcHostService acHostService = InjectorFactory.getAcHostService();
 
     public static boolean isDev()
     {
@@ -149,28 +129,16 @@ public final class AC
         return setAcHost(getAcHost(consumerKey).getOrError(Suppliers.ofInstance("An error occurred getting the host application")));
     }
 
-    public static Option<? extends AcHost> getAcHost(final String consumerKey)
+    public static Option<AcHost> getAcHost(final String consumerKey)
     {
         try
         {
-            return JPA.withTransaction(new F.Function0<Option<? extends AcHost>>()
-            {
-                @Override
-                public Option<? extends AcHost> apply() throws Throwable
-                {
-                    return AcHostModel.findByKey(consumerKey);
-                }
-            });
+            return acHostService.findByKey(consumerKey);
         }
         catch (Throwable throwable)
         {
             throw new RuntimeException(throwable);
         }
-    }
-
-    public static Promise<Void> registerHost(AcHost acHost)
-    {
-        return acHostService.registerHost(acHost);
     }
 
     public static void refreshToken(boolean allowInsecurePolling)

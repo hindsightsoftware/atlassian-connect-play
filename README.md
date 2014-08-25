@@ -119,7 +119,7 @@ The play library uses JPA for persistence so you'll have to create a persistence
         <persistence-unit name="defaultPersistenceUnit" transaction-type="RESOURCE_LOCAL">
             <provider>org.hibernate.ejb.HibernatePersistence</provider>
             <non-jta-data-source>DefaultDS</non-jta-data-source>
-            <class>com.atlassian.connect.play.java.model.AcHostModel</class>
+            <class>com.atlassian.connect.play.java.AcHost</class>
             <properties>
                 <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQL82Dialect"/>
 
