@@ -1,7 +1,6 @@
 package com.atlassian.connect.play.java.service;
 
 import com.atlassian.connect.play.java.AcHost;
-import com.atlassian.connect.play.java.model.AcHostModel;
 import com.atlassian.fugue.Option;
 
 import java.util.List;
@@ -40,6 +39,6 @@ public interface AcHostService {
 
     Option<AcHost> findByKey(String consumerKey) throws Throwable;
 
-    List<? extends AcHost> all() throws Throwable;
+    List<AcHost> all() throws Throwable;
 
 }

@@ -21,7 +21,6 @@ import static play.mvc.Http.Status.OK;
 
 public class AcHostServiceImpl implements AcHostService {
     private static final String PUBLIC_KEY_ELEMENT_NAME = "publicKey";
-    public static final String CONSUMER_INFO_URL = "/plugins/servlet/oauth/consumer-info";
     private final AcHostHttpClient httpClient;
     private final AcHostRepository acHostRepository;
 
@@ -36,7 +35,7 @@ public class AcHostServiceImpl implements AcHostService {
 
     @Override
     public Promise<String> fetchPublicKeyFromRemoteHost(AcHost acHost) {
-        Promise<Response> responsePromise = httpClient.url(acHost.getBaseUrl() + CONSUMER_INFO_URL, acHost, false).get();
+        Promise<Response> responsePromise = httpClient.url(acHost.getConsumerInfoUrl(), acHost, false).get();
 
         Promise<String> publicKeyPromise = responsePromise.map(new Function<Response, String>() {
             @Override
@@ -73,7 +72,7 @@ public class AcHostServiceImpl implements AcHostService {
                     return none(AcHost.class);
                 }
             }
-        }).getOrElse(acHostRepository.create());
+        }).getOrElse(new AcHost());
 
         acHost.setKey(clientKey);
         acHost.setBaseUrl(baseUrl);
@@ -107,7 +106,7 @@ public class AcHostServiceImpl implements AcHostService {
     }
 
     @Override
-    public List<? extends AcHost> all() throws Throwable{
+    public List<AcHost> all() throws Throwable {
         return acHostRepository.all();
     }
 
