@@ -25,9 +25,6 @@ public interface AcHostService {
      * Registers a new host, or updates the details from an existing host
      *
      *
-     *
-     *
-     *
      * @param clientKey
      * @param  baseUrl
      * @param publicKey
