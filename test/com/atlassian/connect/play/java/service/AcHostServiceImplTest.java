@@ -4,7 +4,6 @@ import com.atlassian.connect.play.java.AcHost;
 import com.atlassian.connect.play.java.auth.InvalidAuthenticationRequestException;
 import com.atlassian.connect.play.java.auth.MismatchPublicKeyException;
 import com.atlassian.connect.play.java.auth.PublicKeyVerificationFailureException;
-import com.atlassian.connect.play.java.model.AcHostModel;
 import com.google.common.base.Charsets;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -19,14 +18,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.concurrent.TimeUnit;
 
+import static com.atlassian.fugue.Option.none;
+import static com.atlassian.fugue.Option.option;
 import static org.apache.commons.lang.StringUtils.stripToEmpty;
-import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static play.libs.F.Promise;
@@ -55,7 +52,7 @@ public class AcHostServiceImplTest {
     private AcHostRepository acHostRepository;
 
     private AcHostServiceImpl acHostService;
-    private AcHostModel acHostModel;
+    private AcHost acHost;
 
     @BeforeClass
     public static void loadTestData() throws FileNotFoundException {
@@ -70,28 +67,30 @@ public class AcHostServiceImplTest {
 
 
     @Before
-    public void init() {
+    public void init() throws Throwable {
         acHostService = new AcHostServiceImpl(httpClient, acHostRepository);
-        acHostModel = new AcHostModel();
-        acHostModel.publicKey = TEST_PUBLIC_KEY;
-        acHostModel.baseUrl = BASE_URL;
+        acHost = new AcHost();
+        acHost.setPublicKey(TEST_PUBLIC_KEY);
+        acHost.setBaseUrl(BASE_URL);
 
         when(httpClient.url(anyString(), any(AcHost.class), anyBoolean())).thenReturn(requestHolder);
         when(requestHolder.get()).thenReturn(Promise.pure(response));
         when(response.getStatus()).thenReturn(200);
         when(response.asXml()).thenReturn(testClientInfoDocument);
+        when(acHostRepository.findByKey(any(String.class))).thenReturn(none(AcHost.class));
+        when(acHostRepository.findByUrl(eq(acHost.getBaseUrl()))).thenReturn(option((AcHost) acHost));
     }
 
     @Test
     public void sendsCorrectHttpRequest() {
-        acHostService.fetchPublicKeyFromRemoteHost(acHostModel);
-        verify(httpClient).url(BASE_URL + AcHostModel.CONSUMER_INFO_URL, acHostModel, false);
+        acHostService.fetchPublicKeyFromRemoteHost(acHost);
+        verify(httpClient).url(BASE_URL + AcHost.CONSUMER_INFO_URL, acHost, false);
         verify(requestHolder).get();
     }
 
     @Test
     public void extractsCorrectPublicKey() {
-        Promise<String> publicKeyPromise = acHostService.fetchPublicKeyFromRemoteHost(acHostModel);
+        Promise<String> publicKeyPromise = acHostService.fetchPublicKeyFromRemoteHost(acHost);
         String publicKey = stripToEmpty(publicKeyPromise.get(1, TimeUnit.SECONDS));
 
         assertThat(publicKey, is(TEST_PUBLIC_KEY));
@@ -100,46 +99,46 @@ public class AcHostServiceImplTest {
     @Test(expected = PublicKeyVerificationFailureException.class)
     public void returnsFailurePromiseWhenFailToFetchPublicKey() {
         when(response.getStatus()).thenReturn(401);
-        Promise<String> publicKeyPromise = acHostService.fetchPublicKeyFromRemoteHost(acHostModel);
+        Promise<String> publicKeyPromise = acHostService.fetchPublicKeyFromRemoteHost(acHost);
         publicKeyPromise.get(1, TimeUnit.SECONDS);
     }
 
     @Test(expected = RuntimeException.class)
     public void returnsFailurePromiseWhenFailToParseXml() {
         when(response.asXml()).thenThrow(new RuntimeException("blah"));
-        Promise<String> publicKeyPromise = acHostService.fetchPublicKeyFromRemoteHost(acHostModel);
+        Promise<String> publicKeyPromise = acHostService.fetchPublicKeyFromRemoteHost(acHost);
         publicKeyPromise.get(1, TimeUnit.SECONDS);
     }
 
     @Test(expected = PublicKeyVerificationFailureException.class)
     public void returnsFailurePromiseWhenPublicKeyNotFoundInXml() {
         when(response.asXml()).thenReturn(testDodgyClientInfoDocument);
-        Promise<String> publicKeyPromise = acHostService.fetchPublicKeyFromRemoteHost(acHostModel);
+        Promise<String> publicKeyPromise = acHostService.fetchPublicKeyFromRemoteHost(acHost);
         publicKeyPromise.get(1, TimeUnit.SECONDS);
     }
 
 
     @Test
     public void savesAcHostWhenPublicKeysMatch() throws Throwable {
-        acHostService.registerHost(acHostModel).get(1, TimeUnit.SECONDS);
-        verify(acHostRepository).save(acHostModel);
+        acHostService.registerHost("empty", acHost.getBaseUrl(), acHost.getPublicKey(), "", "").get(1, TimeUnit.SECONDS);
+        verify(acHostRepository).save(acHost);
     }
 
     @Test(expected = InvalidAuthenticationRequestException.class)
     public void returnsFailurePromiseWhenNoPublicKeyProvided() {
-        acHostModel.publicKey = "  ";
-        acHostService.registerHost(acHostModel).get(1, TimeUnit.SECONDS);
+        acHostService.registerHost("empty", acHost.getBaseUrl(), " ", "", "").get(1, TimeUnit.SECONDS);
     }
 
     @Test(expected = MismatchPublicKeyException.class)
     public void returnsFailurePromiseWhenPublicKeyMismatched() {
         when(response.asXml()).thenReturn(testMismatchedPKClientInfoDocument);
-        acHostService.registerHost(acHostModel).get(1, TimeUnit.SECONDS);
+        acHostService.registerHost("empty", acHost.getBaseUrl(), acHost.getPublicKey(), "", "").get(1, TimeUnit.SECONDS);
     }
 
     @Test(expected = PublicKeyVerificationFailureException.class)
     public void returnsFailurePromiseWhenFailToFetchPublicKeyDuringRegistration() {
         when(response.getStatus()).thenReturn(401);
-        acHostService.registerHost(acHostModel).get(1, TimeUnit.SECONDS);
+        acHostService.registerHost("empty", acHost.getBaseUrl(), acHost.getPublicKey(), "", "").get(1, TimeUnit.SECONDS);
     }
+
 }

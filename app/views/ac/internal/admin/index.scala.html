@@ -1,4 +1,4 @@
-@(all: List[com.atlassian.connect.play.java.model.AcHostModel])
+@(all: List[T] forSome { type T <: com.atlassian.connect.play.java.AcHost })
 
 @ac.internal.page("admin-index") {
     <script src='@com.atlassian.connect.play.java.controllers.routes.AcController.asset("js/admin.js")'></script>
@@ -18,13 +18,13 @@
         <tbody>
             @for(h <- all) {
             <tr>
-                <td>@h.key</td>
-                <td>@h.baseUrl</td>
-                <td>@h.name</td>
-                <td>@h.description</td>
-                <!--<td>@h.publicKey</td>-->
+                <td>@h.getKey()</td>
+                <td>@h.getBaseUrl()</td>
+                <td>@h.getName()</td>
+                <td>@h.getDescription()</td>
+                <!--<td>@h.getPublicKey()</td>-->
                 <td>
-                    <a class="clear-cache" href="@com.atlassian.connect.play.java.controllers.routes.AcAdmin.clearMacroCache(h.key)">Clear Cache</a>
+                    <a class="clear-cache" href="@com.atlassian.connect.play.java.controllers.routes.AcAdmin.clearMacroCache(h.getKey())">Clear Cache</a>
                 </td>
             </tr>
             }

@@ -1,16 +1,16 @@
 package com.atlassian.connect.play.java.controllers;
 
-import com.atlassian.connect.play.java.AC;
 import com.atlassian.connect.play.java.auth.PublicKeyVerificationFailureException;
-import com.atlassian.connect.play.java.model.AcHostModel;
+import com.atlassian.connect.play.java.service.AcHostService;
+import com.atlassian.connect.play.java.service.InjectorFactory;
 import com.atlassian.connect.play.java.util.DescriptorUtils;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
 import controllers.AssetsBuilder;
 import play.api.mvc.Action;
 import play.api.mvc.AnyContent;
-import play.db.jpa.Transactional;
 import play.libs.F;
 import play.mvc.BodyParser;
 import play.mvc.Result;
@@ -27,6 +27,16 @@ import static play.mvc.Controller.request;
 import static play.mvc.Results.*;
 
 public class AcController {
+
+    private static final String CLIENT_KEY = "clientKey";
+    private static final String BASE_URL = "baseUrl";
+    private static final String SHARED_SECRET = "sharedSecret";
+    private static final String PRODUCT_TYPE = "productType";
+    private static final String PUBLIC_KEY_ELEMENT_NAME = "publicKey";
+
+    @VisibleForTesting
+    public static AcHostService acHostService = InjectorFactory.getAcHostService();
+
     public static Result index() {
         return index(home(), descriptorSupplier());
     }
@@ -99,7 +109,6 @@ public class AcController {
     }
 
     @BodyParser.Of(BodyParser.Json.class)
-    @Transactional
     public static Promise<Result> registration() {
         LOGGER.info("Registering host application!");
 
@@ -109,9 +118,13 @@ public class AcController {
             return Promise.pure((Result) badRequest("can't extract registration request json"));
         }
 
-        final AcHostModel acHost = AcHostModel.fromJson(remoteApp);
+        final String clientKey = getAttributeAsText(remoteApp, CLIENT_KEY);
+        Promise<Void> hostRegistered = acHostService.registerHost(clientKey,
+                getAttributeAsText(remoteApp, BASE_URL),
+                getAttributeAsText(remoteApp, PUBLIC_KEY_ELEMENT_NAME),
+                getAttributeAsText(remoteApp, SHARED_SECRET),
+                getAttributeAsText(remoteApp, PRODUCT_TYPE));
 
-        Promise<Void> hostRegistered = AC.registerHost(acHost);
         Promise<Result> resultPromise = hostRegistered.map(new F.Function<Void, Result>() {
             @Override
             public Result apply(Void nada) throws Throwable {
@@ -122,7 +135,7 @@ public class AcController {
         return resultPromise.recover(new F.Function<Throwable, Result>() {
             @Override
             public Result apply(Throwable throwable) throws Throwable {
-                LOGGER.warn("Failed to register host (key = " + acHost.getKey() + ")", throwable);
+                LOGGER.warn("Failed to register host (key = " + clientKey + ")", throwable);
 
                 if (throwable instanceof PublicKeyVerificationFailureException) {
                     return internalServerError("failed to fetch public key from host for verification");
@@ -130,6 +143,11 @@ public class AcController {
                 return badRequest("Unable to register host. Request invalid"); // TODO: better analysis of failure and feedback to caller
             }
         });
+    }
+
+    private static String getAttributeAsText(JsonNode json, String name) {
+        JsonNode jsonNode = json.get(name);
+        return jsonNode == null ? null : jsonNode.textValue();
     }
 
     private static AssetsBuilder delegate = new AssetsBuilder();
