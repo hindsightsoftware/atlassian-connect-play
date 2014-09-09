@@ -20,9 +20,9 @@ import static play.data.validation.Constraints.Required;
 @Entity
 @Table (name = "ac_host")
 @NamedQueries ({
-        @NamedQuery (name = "AcHostModel.findAll", query = "SELECT a FROM AcHost a"),
-        @NamedQuery (name = "AcHostModel.findByKey", query = "SELECT a FROM AcHost a where a.key = :key"),
-        @NamedQuery (name = "AcHostModel.findByUrl", query = "SELECT a FROM AcHost a where a.baseUrl = :baseUrl")
+        @NamedQuery (name = "AcHost.findAll", query = "SELECT a FROM AcHost a"),
+        @NamedQuery (name = "AcHost.findByKey", query = "SELECT a FROM AcHost a where a.key = :key"),
+        @NamedQuery (name = "AcHost.findByUrl", query = "SELECT a FROM AcHost a where a.baseUrl = :baseUrl")
 })
 public final class AcHost
 {
