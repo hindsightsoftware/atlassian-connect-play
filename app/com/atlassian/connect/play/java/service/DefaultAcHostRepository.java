@@ -13,6 +13,7 @@ import static com.atlassian.fugue.Option.option;
 public class DefaultAcHostRepository implements AcHostRepository {
 
     private static final String BASE_URL = "baseUrl";
+    public static final String DEFAULT_PERSISTENCE_UNIT = "default";
 
     @Override
     public void save(final AcHost acHostModel) throws Throwable {
@@ -34,7 +35,7 @@ public class DefaultAcHostRepository implements AcHostRepository {
 
     @Override
     public List<AcHost> all() throws Throwable {
-        return JPA.withTransaction("findAll", true, new F.Function0<List<AcHost>>() {
+        return JPA.withTransaction(DEFAULT_PERSISTENCE_UNIT, true, new F.Function0<List<AcHost>>() {
             @Override
             public List<AcHost> apply() throws Throwable {
                 return JPA.em().createNamedQuery("AcHost.findAll", AcHost.class).getResultList();
@@ -44,7 +45,7 @@ public class DefaultAcHostRepository implements AcHostRepository {
 
     @Override
     public Option<AcHost> findByKey(final String key) throws Throwable {
-        return JPA.withTransaction("findByKey", true, new F.Function0<Option<AcHost>>()
+        return JPA.withTransaction(DEFAULT_PERSISTENCE_UNIT, true, new F.Function0<Option<AcHost>>()
         {
             @Override
             public Option<AcHost> apply() throws Throwable
@@ -59,7 +60,7 @@ public class DefaultAcHostRepository implements AcHostRepository {
 
     @Override
     public Option<AcHost> findByUrl(final String baseUrl) throws Throwable {
-        return JPA.withTransaction("findByUrl", true, new F.Function0<Option<AcHost>>()
+        return JPA.withTransaction(DEFAULT_PERSISTENCE_UNIT, true, new F.Function0<Option<AcHost>>()
         {
             @Override
             public Option<AcHost> apply() throws Throwable
