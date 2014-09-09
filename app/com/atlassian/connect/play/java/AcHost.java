@@ -93,6 +93,10 @@ public final class AcHost
         return baseUrl + CONSUMER_INFO_URL;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public void setKey(String key) {
         this.key = key;
     }
