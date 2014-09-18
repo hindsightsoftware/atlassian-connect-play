@@ -125,24 +125,7 @@ public class AcController {
                 getAttributeAsText(remoteApp, SHARED_SECRET),
                 getAttributeAsText(remoteApp, PRODUCT_TYPE));
 
-        Promise<Result> resultPromise = hostRegistered.map(new F.Function<Void, Result>() {
-            @Override
-            public Result apply(Void nada) throws Throwable {
-                return ok();
-            }
-        });
-
-        return resultPromise.recover(new F.Function<Throwable, Result>() {
-            @Override
-            public Result apply(Throwable throwable) throws Throwable {
-                LOGGER.warn("Failed to register host: " + remoteApp.toString(), throwable);
-
-                if (throwable instanceof PublicKeyVerificationFailureException) {
-                    return internalServerError("failed to fetch public key from host for verification");
-                }
-                return badRequest("Unable to register host. Request invalid"); // TODO: better analysis of failure and feedback to caller
-            }
-        });
+        return ok();
     }
 
     private static String getAttributeAsText(JsonNode json, String name) {
