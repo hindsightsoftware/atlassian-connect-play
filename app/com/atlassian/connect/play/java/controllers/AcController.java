@@ -125,7 +125,21 @@ public class AcController {
                 getAttributeAsText(remoteApp, SHARED_SECRET),
                 getAttributeAsText(remoteApp, PRODUCT_TYPE));
 
-        return ok();
+        Promise<Result> resultPromise = hostRegistered.map(new F.Function<Void, Result>() {
+            @Override
+            public Result apply(Void nada) throws Throwable {
+                return ok();
+            }
+        });
+
+        return resultPromise.recover(new F.Function<Throwable, Result>() {
+            @Override
+            public Result apply(Throwable throwable) throws Throwable {
+                LOGGER.warn("Failed to register host: " + remoteApp.toString(), throwable);
+
+                return badRequest("Unable to register host. Request invalid"); // TODO: better analysis of failure and feedback to caller
+            }
+        });
     }
 
     private static String getAttributeAsText(JsonNode json, String name) {

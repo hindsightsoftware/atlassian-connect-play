@@ -60,6 +60,7 @@ public class AcHostServiceImpl implements AcHostService {
                 acHost.getName());
     }
 
+    // TODO: Now that we have removed the public key check this function no longer needs to be async.
     @Override
     public Promise<Void> registerHost(final String clientKey, final String baseUrl, String publicKey, String sharedSecret, String name) {
         // TODO: The consequence of this is that we will overwrite registrations each time. Is that what we want?
@@ -86,24 +87,13 @@ public class AcHostServiceImpl implements AcHostService {
         acHost.setSharedSecret(sharedSecret);
         acHost.setName(name);
 
-        if (stripToNull(acHost.getPublicKey()) == null) {
-            throw new InvalidAuthenticationRequestException("No public key provided in registration request");
+        try {
+            acHostRepository.save(acHost);
+        } catch (Throwable throwable) {
+            return Promise.throwing(throwable);
         }
-        Promise<Void> hostRegistered = fetchPublicKeyFromRemoteHost(acHost).map(new Function<String, Void>() {
-            @Override
-            public Void apply(String fetchedPublicKey) throws Throwable {
-                fetchedPublicKey = stripToNull(fetchedPublicKey);
-                String providedPublicKey = stripToNull(acHost.getPublicKey());
-                boolean keysMatch = Objects.equal(fetchedPublicKey, providedPublicKey);
-                if (!keysMatch) {
-                    throw new MismatchPublicKeyException(providedPublicKey, fetchedPublicKey);
-                }
-                acHostRepository.save(acHost);
-                return null;
-            }
-        });
 
-        return hostRegistered;
+        return Promise.pure(null);
     }
 
     @Override
