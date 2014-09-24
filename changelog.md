@@ -1,5 +1,9 @@
 # Changelog - Play Java Module for Atlassian Connect
 
+## 0.10.1
+
+* Removed checking of public key in install request
+
 ## 0.10.0
 
 * Added support for pluggable persistence for AcHost data. Thanks to Alan Parkinson for the contribution
