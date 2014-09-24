@@ -119,26 +119,9 @@ public class AcHostServiceImplTest {
 
 
     @Test
-    public void savesAcHostWhenPublicKeysMatch() throws Throwable {
+    public void savesAcHost() throws Throwable {
         acHostService.registerHost("empty", acHost.getBaseUrl(), acHost.getPublicKey(), "", "").get(1, TimeUnit.SECONDS);
         verify(acHostRepository).save(acHost);
-    }
-
-    @Test(expected = InvalidAuthenticationRequestException.class)
-    public void returnsFailurePromiseWhenNoPublicKeyProvided() {
-        acHostService.registerHost("empty", acHost.getBaseUrl(), " ", "", "").get(1, TimeUnit.SECONDS);
-    }
-
-    @Test(expected = MismatchPublicKeyException.class)
-    public void returnsFailurePromiseWhenPublicKeyMismatched() {
-        when(response.asXml()).thenReturn(testMismatchedPKClientInfoDocument);
-        acHostService.registerHost("empty", acHost.getBaseUrl(), acHost.getPublicKey(), "", "").get(1, TimeUnit.SECONDS);
-    }
-
-    @Test(expected = PublicKeyVerificationFailureException.class)
-    public void returnsFailurePromiseWhenFailToFetchPublicKeyDuringRegistration() {
-        when(response.getStatus()).thenReturn(401);
-        acHostService.registerHost("empty", acHost.getBaseUrl(), acHost.getPublicKey(), "", "").get(1, TimeUnit.SECONDS);
     }
 
 }
