@@ -2,14 +2,14 @@ import sbt._
 import Keys._
 import play.Project._
 
-object ApplicationBuild extends Build {
+name    := "ac-play-java"
 
-  val appName         = "ac-play-java"
-  val appVersion      = "0.10.1"
-  val atlassianJwtVersion = "1.0.1"
+version := "0.10.1-SNAPSHOT"
 
-  val appDependencies = Seq(
-    "postgresql" % "postgresql" % "8.4-701.jdbc3",
+val atlassianJwtVersion = "1.0.1"
+
+libraryDependencies ++= Seq(
+  "postgresql" % "postgresql" % "8.4-701.jdbc3",
     "com.atlassian.fugue" % "fugue" % "1.1",
     "commons-codec" % "commons-codec" % "1.8",
     "net.oauth.core" % "oauth" % "20090617",
@@ -27,26 +27,24 @@ object ApplicationBuild extends Build {
     javaJpa,
     cache,
     filters
-  )
+)  
 
+play.Project.playJavaSettings
 
-  val customSettings = net.virtualvoid.sbt.graph.Plugin.graphSettings ++ Seq[Setting[_]](
-    //we're using JPA so ebean can safely be disabled
-    ebeanEnabled := false,
-    resolvers += "Typesafe's Repository" at "http://repo.typesafe.com/typesafe/maven-releases",
-    resolvers += "Atlassian's Maven Public Repository" at "https://maven.atlassian.com/content/groups/public",
-    //    resolvers += "Local Maven Repository" at "file://" + Path.userHome + "/.m2/repository",
-    organization := "com.atlassian.connect",
-    publishTo <<= version { (v: String) =>
+ebeanEnabled := false
+
+resolvers += "Typesafe's Repository" at "http://repo.typesafe.com/typesafe/maven-releases"
+
+resolvers += "Atlassian's Maven Public Repository" at "https://maven.atlassian.com/content/groups/public"
+
+organization := "com.atlassian.connect"
+    
+publishTo <<= version { (v: String) =>
       val repo = "https://maven.atlassian.com/"
       if (v.trim.endsWith("SNAPSHOT"))
         Some("Atlassian Repositories" at repo + "private-snapshot")
       else
         Some("Atlassian"  at repo + "public")
-    },
-
-    publishMavenStyle := true
-  )
-
-  val main = play.Project(appName, appVersion, appDependencies).settings(customSettings:_*)
 }
+
+publishMavenStyle := true
