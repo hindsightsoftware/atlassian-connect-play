@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import play.libs.F;
 import play.libs.F.Promise;
 import play.libs.Json;
-import play.libs.WS;
+import play.libs.ws.WSResponse;
 import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.With;
@@ -44,10 +44,10 @@ public class AcAdmin
                     @Override
                     public F.Promise<Result> apply(final AcHost host)
                     {
-                        return AC.url("/rest/atlassian-connect/1/macro/app/" + AC.PLUGIN_KEY, host).delete().map(new F.Function<WS.Response, Result>()
+                        return AC.url("/rest/atlassian-connect/1/macro/app/" + AC.PLUGIN_KEY, host).delete().map(new F.Function<WSResponse, Result>()
                         {
                             @Override
-                            public Result apply(WS.Response response) throws Throwable
+                            public Result apply(WSResponse response) throws Throwable
                             {
                                 if (response.getStatus() == Http.Status.NO_CONTENT)
                                 {

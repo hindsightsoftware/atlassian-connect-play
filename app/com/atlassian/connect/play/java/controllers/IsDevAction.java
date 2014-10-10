@@ -6,13 +6,13 @@ import play.libs.F.Promise;
 import play.mvc.Action;
 import play.mvc.Http;
 import play.mvc.Results;
-import play.mvc.SimpleResult;
+import play.mvc.Result;
 
 public final class IsDevAction extends Action.Simple
 {
     @Override
-    public Promise<SimpleResult> call(Http.Context context) throws Throwable
+    public Promise<Result> call(Http.Context context) throws Throwable
     {
-        return AC.isDev() ? delegate.call(context) : Promise.pure((SimpleResult)Results.notFound());
+        return AC.isDev() ? delegate.call(context) : Promise.pure((Result)Results.notFound());
     }
 }

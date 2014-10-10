@@ -12,7 +12,8 @@ import org.apache.commons.codec.binary.Base64;
 import play.Play;
 import play.api.libs.Crypto;
 import play.libs.Json;
-import play.libs.WS;
+import play.libs.ws.WS;
+import play.libs.ws.WSRequestHolder;
 import play.mvc.Http;
 
 import java.util.concurrent.TimeUnit;
@@ -24,7 +25,7 @@ import static com.atlassian.fugue.Option.some;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
-import static play.libs.WS.WSRequestHolder;
+
 
 public final class AC
 {

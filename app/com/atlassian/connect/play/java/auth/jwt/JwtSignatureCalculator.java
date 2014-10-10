@@ -13,13 +13,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 
+import play.libs.ws.WSRequest;
+import play.libs.ws.WSSignatureCalculator;
+
 import static com.atlassian.connect.play.java.util.Utils.LOGGER;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
-import static play.libs.WS.SignatureCalculator;
-import static play.libs.WS.WSRequest;
 
-public final class JwtSignatureCalculator implements SignatureCalculator
+public final class JwtSignatureCalculator implements WSSignatureCalculator
 {
     private final JwtAuthorizationGenerator jwtAuthorizationGenerator;
     private final AcHost acHost;

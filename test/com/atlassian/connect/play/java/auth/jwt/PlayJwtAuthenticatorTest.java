@@ -124,7 +124,7 @@ public class PlayJwtAuthenticatorTest {
 
     @Test
     public void returnsStatusInternalServerErrorWhenNoJwtInRequest() throws JwtIssuerLacksSharedSecretException, JwtUnknownIssuerException {
-        assertThat(authenticate(null, null, "/").left.get().getWrappedSimpleResult().header().status(), equalTo(500));
+        assertThat(authenticate(null, null, "/").left.get().toScala().header().status(), equalTo(500));
     }
 
     @Test

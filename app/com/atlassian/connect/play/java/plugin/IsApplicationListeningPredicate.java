@@ -4,6 +4,7 @@ import com.google.common.base.Predicate;
 import com.google.common.io.Closeables;
 
 import javax.annotation.Nullable;
+import java.io.Closeable;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.URI;
@@ -43,7 +44,17 @@ final class IsApplicationListeningPredicate implements Predicate<URI>
         }
         finally
         {
-            Closeables.closeQuietly(socket);
+            closeQuietly(socket);
+        }
+    }
+
+    public static void closeQuietly(@Nullable Closeable closeable)
+    {
+        try
+        {
+            Closeables.close(closeable, true);
+        } catch (IOException e) {
+            LOGGER.error("IOException should not have been thrown.", e);
         }
     }
 }

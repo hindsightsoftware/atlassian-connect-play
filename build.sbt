@@ -1,35 +1,38 @@
 import sbt._
 import Keys._
-import play.Project._
+import PlayKeys._
 
 name    := "ac-play-java"
 
-version := "0.10.1-SNAPSHOT"
+version := "0.10.2-SNAPSHOT"
+
+scalaVersion := "2.10.4"
 
 val atlassianJwtVersion = "1.0.1"
 
 libraryDependencies ++= Seq(
   "postgresql" % "postgresql" % "8.4-701.jdbc3",
-    "com.atlassian.fugue" % "fugue" % "1.1",
-    "commons-codec" % "commons-codec" % "1.8",
-    "net.oauth.core" % "oauth" % "20090617",
-    "com.google.guava" % "guava" % "14.0.1",
-    "org.bouncycastle" % "bcprov-jdk16" % "1.46",
-    "org.hibernate" % "hibernate-entitymanager" % "4.2.1.Final",
-    "xml-apis" % "xml-apis" % "1.4.01",
-    "com.atlassian.jwt" % "jwt-api" % atlassianJwtVersion,
-    "com.atlassian.jwt" % "jwt-core" % atlassianJwtVersion,
-    "commons-lang" % "commons-lang" % "2.6",
-    "org.hamcrest" % "hamcrest-all" % "1.3" % "test",
-    "org.mockito" % "mockito-core" % "1.9.5" % "test",
-    javaCore,
-    javaJdbc,
-    javaJpa,
-    cache,
-    filters
+  "com.atlassian.fugue" % "fugue" % "1.1",
+  "commons-codec" % "commons-codec" % "1.8",
+  "net.oauth.core" % "oauth" % "20090617",
+  "com.google.guava" % "guava" % "18.0",
+  "org.bouncycastle" % "bcprov-jdk16" % "1.46",
+  "org.hibernate" % "hibernate-entitymanager" % "4.2.1.Final",
+  "xml-apis" % "xml-apis" % "1.4.01",
+  "com.atlassian.jwt" % "jwt-api" % atlassianJwtVersion,
+  "com.atlassian.jwt" % "jwt-core" % atlassianJwtVersion,
+  "commons-lang" % "commons-lang" % "2.6",
+  "org.hamcrest" % "hamcrest-all" % "1.3" % "test",
+  "org.mockito" % "mockito-core" % "1.9.5" % "test",
+  javaCore,
+  javaJdbc,
+  javaJpa,
+  javaWs,
+  cache,
+  filters
 )  
 
-play.Project.playJavaSettings
+lazy val root = (project in file(".")).enablePlugins(PlayJava)
 
 ebeanEnabled := false
 

@@ -3,22 +3,22 @@ package com.atlassian.connect.play.java.service;
 import com.atlassian.connect.play.java.AC;
 import com.atlassian.connect.play.java.AcHost;
 import com.atlassian.fugue.Option;
-import play.libs.WS;
+import play.libs.ws.WSRequestHolder;
 
 public class AcHostHttpClientImpl implements AcHostHttpClient {
 
     @Override
-    public WS.WSRequestHolder url(String url) {
+    public WSRequestHolder url(String url) {
         return AC.url(url);
     }
 
     @Override
-    public WS.WSRequestHolder url(String url, AcHost acHost, boolean signRequest) {
+    public WSRequestHolder url(String url, AcHost acHost, boolean signRequest) {
         return AC.url(url, acHost, signRequest);
     }
 
     @Override
-    public WS.WSRequestHolder url(String url, AcHost acHost, Option<String> userId) {
+    public WSRequestHolder url(String url, AcHost acHost, Option<String> userId) {
         return AC.url(url, acHost, userId);
     }
 

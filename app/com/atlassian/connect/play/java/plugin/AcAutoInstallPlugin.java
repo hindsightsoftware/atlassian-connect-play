@@ -9,12 +9,12 @@ import com.google.common.collect.Iterables;
 import play.Application;
 import play.libs.F;
 
+import javax.annotation.Nullable;
 import java.net.URI;
 import java.util.List;
 import java.util.Set;
 
 import static com.atlassian.fugue.Pair.pair;
-import static com.google.common.collect.Iterables.transform;
 import static com.atlassian.connect.play.java.util.Utils.LOGGER;
 
 public final class AcAutoInstallPlugin extends AbstractDevPlugin
@@ -40,12 +40,10 @@ public final class AcAutoInstallPlugin extends AbstractDevPlugin
         final Iterable<URI> listeningApplications = Iterables.filter(AUTOREGISTER_HOSTS, new IsApplicationListeningPredicate());
         final String playAppBaseUrl = AC.baseUrl.get();
 
-        return F.Promise.sequence(transform(listeningApplications,
-                new Function<URI, F.Promise<? extends Pair<URI, Boolean>>>()
-                {
+        return F.Promise.sequence(Iterables.transform(listeningApplications,
+                new Function<URI, F.Promise<Pair<URI, Boolean>>>() {
                     @Override
-                    public F.Promise<Pair<URI, Boolean>> apply(URI appUri)
-                    {
+                    public F.Promise<Pair<URI, Boolean>> apply(URI appUri) {
                         return install(appUri, playAppBaseUrl);
                     }
                 }));
