@@ -1,5 +1,9 @@
 # Changelog - Play Java Module for Atlassian Connect
 
+## 0.11.0
+
+* Upgraded to Play version 2.3.4
+
 ## 0.10.1
 
 * Removed checking of public key in install request

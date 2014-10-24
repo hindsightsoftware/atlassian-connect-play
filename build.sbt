@@ -4,7 +4,7 @@ import PlayKeys._
 
 name    := "ac-play-java"
 
-version := "0.10.2-SNAPSHOT"
+version := "0.11.0-SNAPSHOT"
 
 scalaVersion := "2.10.4"
 

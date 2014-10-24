@@ -57,9 +57,6 @@ public final class JwtSignatureCalculator implements WSSignatureCalculator
         }
     }
 
-    // TODO: Figure out if we need this. Think it is hacking around play not exposing query params
-    // Copied from OAuthRequestValidator
-
     private Map<String, List<String>> getQueryParams(WSRequest request)
     {
         QueryStringDecoder decoder = new QueryStringDecoder(request.getUrl());
