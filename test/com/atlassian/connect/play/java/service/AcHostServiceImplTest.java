@@ -18,6 +18,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.concurrent.TimeUnit;
 
+import play.libs.ws.WSResponse;
+import play.libs.ws.WSRequestHolder;
+
 import static com.atlassian.fugue.Option.none;
 import static com.atlassian.fugue.Option.option;
 import static org.apache.commons.lang.StringUtils.stripToEmpty;
@@ -27,8 +30,6 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static play.libs.F.Promise;
-import static play.libs.WS.Response;
-import static play.libs.WS.WSRequestHolder;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AcHostServiceImplTest {
@@ -46,7 +47,7 @@ public class AcHostServiceImplTest {
     private WSRequestHolder requestHolder;
 
     @Mock
-    private Response response;
+    private WSResponse response;
 
     @Mock
     private AcHostRepository acHostRepository;

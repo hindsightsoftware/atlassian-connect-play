@@ -9,6 +9,7 @@ import com.google.common.base.Objects;
 import com.google.common.base.Supplier;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
+import play.libs.ws.WSResponse;
 
 import java.util.List;
 
@@ -16,7 +17,6 @@ import static com.atlassian.fugue.Option.none;
 import static org.apache.commons.lang.StringUtils.stripToNull;
 import static play.libs.F.Function;
 import static play.libs.F.Promise;
-import static play.libs.WS.Response;
 import static play.mvc.Http.Status.OK;
 
 public class AcHostServiceImpl implements AcHostService {
@@ -35,11 +35,11 @@ public class AcHostServiceImpl implements AcHostService {
 
     @Override
     public Promise<String> fetchPublicKeyFromRemoteHost(AcHost acHost) {
-        Promise<Response> responsePromise = httpClient.url(acHost.getConsumerInfoUrl(), acHost, false).get();
+        Promise<WSResponse> responsePromise = httpClient.url(acHost.getConsumerInfoUrl(), acHost, false).get();
 
-        Promise<String> publicKeyPromise = responsePromise.map(new Function<Response, String>() {
+        Promise<String> publicKeyPromise = responsePromise.map(new Function<WSResponse, String>() {
             @Override
-            public String apply(Response response) throws Throwable {
+            public String apply(WSResponse response) throws Throwable {
                 if (response.getStatus() == OK) {
                     Document consumerInfoDoc = response.asXml();
                     NodeList publicKeyElements = consumerInfoDoc.getElementsByTagName(PUBLIC_KEY_ELEMENT_NAME);

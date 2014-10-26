@@ -1,25 +1,23 @@
 package com.atlassian.connect.play.java.auth.jwt;
 
-import com.atlassian.connect.play.java.AC;
 import com.atlassian.connect.play.java.AcHost;
 import com.atlassian.fugue.Option;
 import com.atlassian.jwt.exception.JwtIssuerLacksSharedSecretException;
 import com.atlassian.jwt.exception.JwtUnknownIssuerException;
-import com.ning.http.client.FluentStringsMap;
-import play.mvc.Http;
+import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Map;
+
+import play.libs.ws.WSRequest;
+import play.libs.ws.WSSignatureCalculator;
 
 import static com.atlassian.connect.play.java.util.Utils.LOGGER;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
-import static play.libs.WS.SignatureCalculator;
-import static play.libs.WS.WSRequest;
 
-public final class JwtSignatureCalculator implements SignatureCalculator
+public final class JwtSignatureCalculator implements WSSignatureCalculator
 {
     private final JwtAuthorizationGenerator jwtAuthorizationGenerator;
     private final AcHost acHost;
@@ -59,64 +57,10 @@ public final class JwtSignatureCalculator implements SignatureCalculator
         }
     }
 
-    // TODO: Figure out if we need this. Think it is hacking around play not exposing query params
-    // Copied from OAuthRequestValidator
-
-    private FluentStringsMap getQueryParams(WSRequest request)
+    private Map<String, List<String>> getQueryParams(WSRequest request)
     {
-        final Object underlyingRequest = getRequestObject(getRequestField(request), request);
-        return getQueryParams(getGetQueryParamsMethod(underlyingRequest), underlyingRequest);
+        QueryStringDecoder decoder = new QueryStringDecoder(request.getUrl());
+        return decoder.getParameters();
     }
 
-    private FluentStringsMap getQueryParams(Method m, Object request)
-    {
-        try
-        {
-            return (FluentStringsMap) m.invoke(request);
-        }
-        catch (IllegalAccessException | InvocationTargetException e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private Method getGetQueryParamsMethod(Object o)
-    {
-        try
-        {
-            final Method m = o.getClass().getMethod("getQueryParams");
-            m.setAccessible(true);
-            return m;
-        }
-        catch (NoSuchMethodException e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private Field getRequestField(WSRequest request)
-    {
-        try
-        {
-            final Field f = request.getClass().getSuperclass().getDeclaredField("request");
-            f.setAccessible(true);
-            return f;
-        }
-        catch (NoSuchFieldException e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private Object getRequestObject(Field f, WSRequest request)
-    {
-        try
-        {
-            return f.get(request);
-        }
-        catch (IllegalAccessException e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
 }

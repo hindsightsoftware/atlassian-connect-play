@@ -1,11 +1,13 @@
 package com.atlassian.connect.play.java.upm;
 
 import akka.actor.Cancellable;
-import com.ning.http.client.Realm;
 import com.fasterxml.jackson.databind.JsonNode;
 import play.libs.Akka;
 import play.libs.F;
-import play.libs.WS;
+import play.libs.ws.WS;
+import play.libs.ws.WSAuthScheme;
+import play.libs.ws.WSRequestHolder;
+import play.libs.ws.WSResponse;
 import scala.concurrent.duration.Duration;
 
 import java.util.concurrent.TimeUnit;
@@ -28,10 +30,10 @@ public final class UpmClient
     public F.Promise<String> getToken()
     {
         return url("/").head().map(
-                new F.Function<WS.Response, String>()
+                new F.Function<WSResponse, String>()
                 {
                     @Override
-                    public String apply(WS.Response response) throws Throwable
+                    public String apply(WSResponse response) throws Throwable
                     {
                         final String token = response.getHeader("upm-token");
                         LOGGER.trace("UPM token is " + token);
@@ -51,10 +53,10 @@ public final class UpmClient
                         .setQueryParameter("token", token)
                         .setHeader("Content-Type", "application/vnd.atl.plugins.remote.install+json")
                         .post("{ \"pluginUri\": \"" + uri + "\" }")
-                        .flatMap(new F.Function<WS.Response, F.Promise<Boolean>>()
+                        .flatMap(new F.Function<WSResponse, F.Promise<Boolean>>()
                         {
                             @Override
-                            public F.Promise<Boolean> apply(WS.Response response) throws Throwable
+                            public F.Promise<Boolean> apply(WSResponse response) throws Throwable
                             {
                                 if (is2xxResponse(response))
                                 {
@@ -86,10 +88,10 @@ public final class UpmClient
     {
         return url(format("/pending/%s", id))
                 .get()
-                .map(new F.Function<WS.Response, InstallStatus>()
+                .map(new F.Function<WSResponse, InstallStatus>()
                 {
                     @Override
-                    public InstallStatus apply(WS.Response response) throws Throwable
+                    public InstallStatus apply(WSResponse response) throws Throwable
                     {
                         if (is2xxResponse(response))
                         {
@@ -155,17 +157,18 @@ public final class UpmClient
         );
     }
 
-    private boolean is2xxResponse(WS.Response response)
+    private boolean is2xxResponse(WSResponse response)
     {
         final int status = response.getStatus();
         return 200 <= status && status < 300;
     }
 
-    private WS.WSRequestHolder url(String path)
+    private WSRequestHolder url(String path)
     {
+
         return WS.url(absoluteUrl(path))
                 .setFollowRedirects(false)
-                .setAuth("admin", "admin", Realm.AuthScheme.BASIC);
+                .setAuth("admin", "admin", WSAuthScheme.BASIC);
     }
 
     private String absoluteUrl(String path)
@@ -193,7 +196,7 @@ public final class UpmClient
             return new InstallStatus(null, done, 0, error);
         }
 
-        static InstallStatus fromResponse(WS.Response response)
+        static InstallStatus fromResponse(WSResponse response)
         {
             final JsonNode jsonNode = response.asJson();
             final JsonNode statusNode = jsonNode.get("status");

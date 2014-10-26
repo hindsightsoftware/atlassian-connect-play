@@ -2,10 +2,9 @@ package com.atlassian.connect.play.java.service;
 
 import com.atlassian.connect.play.java.AcHost;
 import com.atlassian.fugue.Option;
-import play.libs.WS;
+import play.libs.ws.WSRequestHolder;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static play.libs.WS.WSRequestHolder;
 
 /**
  * Simple abstraction on the url methods of AC to facilitate testing

@@ -9,7 +9,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import play.libs.F;
 import play.mvc.Action;
 import play.mvc.Http;
-import play.mvc.SimpleResult;
+import play.mvc.Result;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -29,7 +29,7 @@ public class JwtRequestAuthenticatorActionTest {
 
     @Test
     public void foo() throws Throwable {
-        Promise<SimpleResult> result = new JwtRequestAuthenticatorAction.AuthenticationHelper().authenticate(context, delegate);
-        assertThat(result.get(1000).getWrappedSimpleResult().header().status(), equalTo(403));
+        Promise<Result> result = new JwtRequestAuthenticatorAction.AuthenticationHelper().authenticate(context, delegate);
+        assertThat(result.get(1000).toScala().header().status(), equalTo(403));
     }
 }

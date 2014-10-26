@@ -17,7 +17,11 @@ More details can be found in the [AC Play Java Benefits](#markdown-header-ac-pla
 
 ## Release Notes
 
-## 0.10.0
+## 0.11.0
+
+* Upgraded to Play 2.3 see the [Play 2.3 Migration Guide](https://www.playframework.com/documentation/2.3.x/Migration23) for details. Previous version was 2.2.2.
+
+0.10.0
 
 * Added support for pluggable persistence for AcHost data. Thanks to Alan Parkinson for the contribution
 * Use core Ac logger for JWT. Thanks to Alan Parkinson for the contribution
@@ -37,7 +41,7 @@ _Note: The module requires Java 7 in order for your project to compile._
 
 You should find everything you need on the [Play! website][play-doc].
 
-_Note: When you run `play new` make sure you choose the **Create a simple Java application** option when prompted. AC Play Java supports Java only. There is an open source [Scala version of AC Play][ac-play-scala] in Atlassian Labs if you prefer, but note that it is not officially supported by Atlassian._
+_Note: When you run `activator new` make sure you choose the *play-java** option when prompted. AC Play Java supports Java only. There is an open source [Scala version of AC Play][ac-play-scala] in Atlassian Labs if you prefer, but note that it is not officially supported by Atlassian._
 
 Once you have your Play application up and running, go to
 the next step:
@@ -66,8 +70,9 @@ Note that I actually also add my local maven repository for good measure and eas
         // your other dependencies go there
 	)
 
-Where _<version>_ is the latest version of this module. The latest published version of the Atlassian Connect Play module can be found in the [Atlassian Maven repository][atlassian-maven-repo]. The current latest version is 0.7.0-BETA10.
+Where _<version>_ is the latest version of this module. The latest published version of the Atlassian Connect Play module can be found in the [Atlassian Maven repository][atlassian-maven-repo]. The current latest version is 0.10.1
 Note _withSources()_ is optional. It will download the source which can help with debugging.
+If you generated your project with the Typesafe `activator` tool you might need to update the `scalaVersion` property in the `build.sbt` to version `2.10.5`
 
 #### Add the module's routes to your `conf/routes` configuration
 
@@ -324,13 +329,13 @@ If you're running an OnDemand instance of JIRA or Confluence locally, you can in
 
 For further detail, we recommend reading [Heroku Play Framework Support documentation](https://devcenter.heroku.com/articles/play-support).
 
-[play-doc]: http://www.playframework.com/documentation/2.2.x/Home "Play Documentation"
+[play-doc]: http://www.playframework.com/documentation/2.3.x/Home "Play Documentation"
 [sbt]: http://www.scala-sbt.org/ "Simple Build Tool"
-[jdbc]: http://www.playframework.com/documentation/2.2.x/SettingsJDBC
-[ebean]: http://www.playframework.com/documentation/2.2.x/JavaEbean
-[evolutions]: http://www.playframework.com/documentation/2.2.x/Evolutions
-[dev]: http://www.playframework.com/documentation/api/2.2.x/java/play/Play.html#isDev()
-[ws]: http://www.playframework.com/documentation/2.2.x/JavaWS
+[jdbc]: http://www.playframework.com/documentation/2.3.x/SettingsJDBC
+[ebean]: http://www.playframework.com/documentation/2.3.x/JavaEbean
+[evolutions]: http://www.playframework.com/documentation/2.3.x/Evolutions
+[dev]: http://www.playframework.com/documentation/api/2.3.x/java/play/Play.html#isDev()
+[ws]: http://www.playframework.com/documentation/2.3.x/JavaWS
 [aui]: https://docs.atlassian.com/aui/latest/
 [soy]: https://docs.atlassian.com/aui/latest/docs/soy.html
 [jira-permissions]: https://developer.atlassian.com/static/connect/index-plugin.html?lic=none&xdm_e=https%3A%2F%2Fdeveloper.atlassian.com&xdm_c=channel-interactive-guide-0&xdm_p=1#jira/permissions "Jira Permissions"

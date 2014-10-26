@@ -7,7 +7,7 @@ import play.Play;
 import play.libs.F.Promise;
 import play.mvc.Action;
 import play.mvc.Http;
-import play.mvc.SimpleResult;
+import play.mvc.Result;
 import javax.annotation.Nullable;
 
 import static com.atlassian.fugue.Option.option;
@@ -17,14 +17,14 @@ public final class CacheControlAction extends Action<WithCacheControl>
 {
     private static final String DEFAULT_CACHE_CONTROL = Play.application().configuration().getString("ac.cache-control", AC.isDev() ? "no-cache" : null);
 
-    public Promise<SimpleResult> call(Http.Context ctx) throws Throwable
+    public Promise<Result> call(Http.Context ctx) throws Throwable
     {
         if (!ctx.args.containsKey(CACHE_CONTROL))
         {
             ctx.args.put(CACHE_CONTROL, getCacheControl());
         }
 
-        final Promise<SimpleResult> result = delegate.call(ctx);
+        final Promise<Result> result = delegate.call(ctx);
 
         final String cacheControl = (String) ctx.args.get(CACHE_CONTROL);
         final Http.Response response = ctx.response();

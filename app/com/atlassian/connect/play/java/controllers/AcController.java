@@ -150,7 +150,7 @@ public class AcController {
     private static AssetsBuilder delegate = new AssetsBuilder();
 
     public static Action<AnyContent> asset(String path, String file) {
-        return delegate.at(path, file);
+        return delegate.at(path, file, false); // Should we have aggressive caching? Safely gone with no
     }
 
 }

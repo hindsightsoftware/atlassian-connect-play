@@ -1,11 +1,7 @@
 package com.atlassian.connect.play.java.service;
 
-import com.atlassian.connect.play.java.AcHost;
-import com.atlassian.fugue.Option;
 import org.apache.commons.lang.StringUtils;
-import play.Application;
 import play.Play;
-import play.libs.WS;
 
 import static com.atlassian.connect.play.java.util.Utils.LOGGER;
 
