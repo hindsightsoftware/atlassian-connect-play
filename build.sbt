@@ -4,7 +4,7 @@ import PlayKeys._
 
 name    := "ac-play-java"
 
-version := "0.11.0-SNAPSHOT"
+version := "0.12.0"
 
 scalaVersion := "2.10.4"
 
@@ -24,12 +24,12 @@ libraryDependencies ++= Seq(
   "commons-lang" % "commons-lang" % "2.6",
   "org.hamcrest" % "hamcrest-all" % "1.3" % "test",
   "org.mockito" % "mockito-core" % "1.9.5" % "test",
-  javaCore,
-  javaJdbc,
-  javaJpa,
-  javaWs,
-  cache,
-  filters
+  "com.typesafe.play" %% "play" % "2.3.10" % "provided",
+  "com.typesafe.play" %% "play-java-ws" % "2.3.10" % "provided",
+  "com.typesafe.play" %% "play-java-jdbc" % "2.3.10" % "provided",
+  "com.typesafe.play" %% "play-java-jpa" % "2.3.10" % "provided",
+  "com.typesafe.play" %% "play-cache" % "2.3.10" % "provided",
+  "com.typesafe.play" %% "filters-helpers" % "2.3.10" % "provided"
 )  
 
 lazy val root = (project in file(".")).enablePlugins(PlayJava)
