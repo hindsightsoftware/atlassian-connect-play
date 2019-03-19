@@ -16,6 +16,7 @@ import play.libs.ws.WS;
 import play.libs.ws.WSRequestHolder;
 import play.mvc.Http;
 
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static com.atlassian.connect.play.java.Constants.*;
@@ -50,6 +51,7 @@ public final class AC
                 || Boolean.getBoolean(AC_DEV);
     }
 
+    @Deprecated
     public static Option<String> getUser()
     {
         return Option.option((String) getHttpContext().args.get(AC_USER_ID_PARAM));
@@ -59,6 +61,17 @@ public final class AC
     {
         getHttpContext().args.put(AC_USER_ID_PARAM, user);
     }
+
+    public static Optional<String> getUserAccountId()
+    {
+        return Optional.ofNullable((String) getHttpContext().args.get(AC_USER_ACCOUNT_ID_PARAM));
+    }
+
+    public static void setUserAccountId(String accountId)
+    {
+        getHttpContext().args.put(AC_USER_ACCOUNT_ID_PARAM, accountId);
+    }
+
 
     public static WSRequestHolder url(String url)
     {
@@ -144,7 +157,7 @@ public final class AC
 
     public static void refreshToken(boolean allowInsecurePolling)
     {
-        final Token token = new Token(AC.getAcHost().getKey(), AC.getUser(), System.currentTimeMillis(), allowInsecurePolling);
+        final Token token = new Token(AC.getAcHost().getKey(), AC.getUser(), AC.getUserAccountId(), System.currentTimeMillis(), allowInsecurePolling);
 
         final String jsonToken = Base64.encodeBase64String(token.toJson().toString().getBytes());
         final String encryptedToken = Crypto.encryptAES(jsonToken);

@@ -8,6 +8,7 @@ public class Constants
     public static final String AC_PLUGIN_NAME = "ac.name";
 
     public static final String AC_USER_ID_PARAM = "user_id";
+    public static final String AC_USER_ACCOUNT_ID_PARAM = "account_id";
     public static final String AC_HOST_PARAM = "ac_host";
     public static final String AC_TOKEN = "ac_token";
 }

@@ -4,7 +4,9 @@ import com.atlassian.connect.play.java.AC;
 import com.atlassian.connect.play.java.auth.InvalidAuthenticationRequestException;
 import com.atlassian.jwt.Jwt;
 import com.atlassian.jwt.core.http.auth.JwtAuthenticator;
+import com.fasterxml.jackson.databind.JsonNode;
 import play.libs.F.Promise;
+import play.libs.Json;
 import play.mvc.Action;
 import play.mvc.Result;
 
@@ -36,7 +38,18 @@ public final class JwtRequestAuthenticatorAction extends Action.Simple
 
                 Jwt jwt = authResult.right.get();
                 AC.setAcHost(jwt.getIssuer());
-                AC.setUser(jwt.getSubject());
+
+                JsonNode payload = Json.parse(jwt.getJsonPayload());
+                if (payload.hasNonNull("context") && payload.get("context").hasNonNull("user")) {
+                    JsonNode userObject = payload.get("context").get("user");
+                    if (userObject.hasNonNull("userKey")) {
+                        AC.setUser(userObject.get("userKey").asText());
+                    }
+                    if (userObject.hasNonNull("accountId")) {
+                        AC.setUserAccountId(userObject.get("accountId").asText());
+                    }
+                }
+
                 AC.refreshToken(false);
 
                 return delegate.call(context);

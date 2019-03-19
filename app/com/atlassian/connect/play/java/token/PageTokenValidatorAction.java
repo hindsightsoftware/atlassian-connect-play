@@ -9,6 +9,8 @@ import play.libs.F.Promise;
 import play.mvc.Action;
 import play.mvc.Http;
 import play.mvc.Result;
+
+import static com.atlassian.connect.play.java.Constants.AC_USER_ACCOUNT_ID_PARAM;
 import static com.atlassian.connect.play.java.Constants.AC_USER_ID_PARAM;
 import static com.atlassian.fugue.Option.option;
 
@@ -39,6 +41,8 @@ public final class PageTokenValidatorAction extends Action<CheckValidToken>
         {
             context.args.put(AC_USER_ID_PARAM, user.get());
         }
+
+        decryptedToken.get().getUserAccountId().ifPresent(accountId -> context.args.put(AC_USER_ACCOUNT_ID_PARAM, accountId));
 
         //valid request so lets refresh the token with a new timestamp and add it to the response headers
         //so clients can update their tokens on ajax responses!
