@@ -2,16 +2,13 @@ package com.atlassian.connect.play.java.token;
 
 import com.atlassian.connect.play.java.AC;
 import com.atlassian.fugue.Option;
-
 import org.apache.commons.lang3.StringUtils;
-
 import play.libs.F.Promise;
 import play.mvc.Action;
 import play.mvc.Http;
 import play.mvc.Result;
 
 import static com.atlassian.connect.play.java.Constants.AC_USER_ACCOUNT_ID_PARAM;
-import static com.atlassian.connect.play.java.Constants.AC_USER_ID_PARAM;
 import static com.atlassian.fugue.Option.option;
 
 public final class PageTokenValidatorAction extends Action<CheckValidToken>
@@ -36,11 +33,6 @@ public final class PageTokenValidatorAction extends Action<CheckValidToken>
         }
 
         AC.setAcHost(decryptedToken.get().getAcHost());
-        final Option<String> user = decryptedToken.get().getUser();
-        if (user.isDefined())
-        {
-            context.args.put(AC_USER_ID_PARAM, user.get());
-        }
 
         decryptedToken.get().getUserAccountId().ifPresent(accountId -> context.args.put(AC_USER_ACCOUNT_ID_PARAM, accountId));
 

@@ -13,13 +13,13 @@ public class InjectorFactory {
         if (!StringUtils.isEmpty(acHostServiceClass)) {
             try {
                 AcHostRepository repository = (AcHostRepository) Class.forName(acHostServiceClass, false, Play.application().classloader()).newInstance();
-                return new AcHostServiceImpl(new AcHostHttpClientImpl(), repository);
+                return new AcHostServiceImpl(repository);
             } catch (Exception e) {
                 LOGGER.error("Could not load " + acHostServiceClass + " as the AC Host Repository", e);
                 throw new IllegalStateException("No AC Host Repository available", e);
             }
         } else {
-            return new AcHostServiceImpl(new AcHostHttpClientImpl(),  new DefaultAcHostRepository());
+            return new AcHostServiceImpl(new DefaultAcHostRepository());
         }
     }
 }

@@ -12,15 +12,6 @@ import static play.libs.F.Promise;
  */
 public interface AcHostService {
 
-    /**
-     * Retrieves the public key from the remote host (via a REST url)
-     *
-     *
-     * @param acHost
-     * @return
-     */
-    Promise<String> fetchPublicKeyFromRemoteHost(AcHost acHost);
-
     Promise<Void> registerHost(AcHost acHost);
 
     /**

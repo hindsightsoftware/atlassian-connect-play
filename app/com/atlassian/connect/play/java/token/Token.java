@@ -1,26 +1,21 @@
 package com.atlassian.connect.play.java.token;
 
-import com.atlassian.fugue.Option;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import play.libs.Json;
 
 import java.util.Optional;
 
-import static com.atlassian.fugue.Option.option;
-
 public final class Token
 {
     private final String acHost;
-    private final Option<String> user;
     private final Optional<String> userAccountId;
     private final long timestamp;
     private boolean allowInsecurePolling;
 
-    public Token(final String acHost, final Option<String> user, final Optional<String> userAccountId, final long timestamp, boolean allowInsecurePolling)
+    public Token(final String acHost, final Optional<String> userAccountId, final long timestamp, boolean allowInsecurePolling)
     {
         this.acHost = acHost;
-        this.user = user;
         this.userAccountId = userAccountId;
         this.timestamp = timestamp;
         this.allowInsecurePolling = allowInsecurePolling;
@@ -29,11 +24,6 @@ public final class Token
     public String getAcHost()
     {
         return acHost;
-    }
-
-    public Option<String> getUser()
-    {
-        return user;
     }
 
     public Optional<String> getUserAccountId()
@@ -55,10 +45,6 @@ public final class Token
     {
         final ObjectNode jsonToken = Json.newObject();
         jsonToken.put("h", acHost);
-        if (user.isDefined())
-        {
-            jsonToken.put("u", user.get());
-        }
         if (userAccountId.isPresent())
         {
             jsonToken.put("a", userAccountId.get());
@@ -74,7 +60,6 @@ public final class Token
     public static Token fromJson(final JsonNode jsonToken)
     {
         return new Token(jsonToken.get("h").asText(),
-                option(jsonToken.get("u").asText()),
                 Optional.ofNullable(jsonToken.get("a").asText()),
                 jsonToken.get("t").asLong(),
                 jsonToken.has("p"));

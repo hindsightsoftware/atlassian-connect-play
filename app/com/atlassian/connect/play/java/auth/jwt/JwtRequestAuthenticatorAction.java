@@ -42,12 +42,11 @@ public final class JwtRequestAuthenticatorAction extends Action.Simple
                 JsonNode payload = Json.parse(jwt.getJsonPayload());
                 if (payload.hasNonNull("context") && payload.get("context").hasNonNull("user")) {
                     JsonNode userObject = payload.get("context").get("user");
-                    if (userObject.hasNonNull("userKey")) {
-                        AC.setUser(userObject.get("userKey").asText());
-                    }
                     if (userObject.hasNonNull("accountId")) {
                         AC.setUserAccountId(userObject.get("accountId").asText());
                     }
+                } else {
+                    AC.setUserAccountId(jwt.getSubject());
                 }
 
                 AC.refreshToken(false);

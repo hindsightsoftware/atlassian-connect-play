@@ -20,38 +20,14 @@ import static play.libs.F.Promise;
 import static play.mvc.Http.Status.OK;
 
 public class AcHostServiceImpl implements AcHostService {
-    private static final String PUBLIC_KEY_ELEMENT_NAME = "publicKey";
-    private final AcHostHttpClient httpClient;
     private final AcHostRepository acHostRepository;
 
-    public AcHostServiceImpl(AcHostHttpClient httpClient, AcHostRepository acHostRepository) {
-        this.httpClient = httpClient;
+    public AcHostServiceImpl(AcHostRepository acHostRepository) {
         this.acHostRepository = acHostRepository;
     }
 
-    public AcHostServiceImpl(AcHostHttpClient httpClient) {
-        this(httpClient, new DefaultAcHostRepository());
-    }
-
-    @Override
-    public Promise<String> fetchPublicKeyFromRemoteHost(AcHost acHost) {
-        Promise<WSResponse> responsePromise = httpClient.url(acHost.getConsumerInfoUrl(), acHost, false).get();
-
-        Promise<String> publicKeyPromise = responsePromise.map(new Function<WSResponse, String>() {
-            @Override
-            public String apply(WSResponse response) throws Throwable {
-                if (response.getStatus() == OK) {
-                    Document consumerInfoDoc = response.asXml();
-                    NodeList publicKeyElements = consumerInfoDoc.getElementsByTagName(PUBLIC_KEY_ELEMENT_NAME);
-                    if (publicKeyElements.getLength() == 1) {
-                        return publicKeyElements.item(0).getTextContent();
-                    }
-                }
-                throw new PublicKeyVerificationFailureException("Failed to fetch public key for verification. Response status: " + response.getStatus());
-            }
-        });
-
-        return publicKeyPromise;
+    public AcHostServiceImpl() {
+        this(new DefaultAcHostRepository());
     }
 
     @Override

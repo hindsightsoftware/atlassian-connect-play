@@ -2,7 +2,6 @@ package com.atlassian.connect.play.java;
 
 import com.atlassian.connect.play.java.auth.jwt.JwtAuthConfig;
 import com.atlassian.connect.play.java.auth.jwt.JwtAuthorizationGenerator;
-import com.atlassian.connect.play.java.auth.jwt.JwtSignatureCalculator;
 import com.atlassian.connect.play.java.service.AcHostService;
 import com.atlassian.connect.play.java.service.InjectorFactory;
 import com.atlassian.connect.play.java.token.Token;
@@ -12,20 +11,16 @@ import org.apache.commons.codec.binary.Base64;
 import play.Play;
 import play.api.libs.Crypto;
 import play.libs.Json;
-import play.libs.ws.WS;
-import play.libs.ws.WSRequestHolder;
 import play.mvc.Http;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static com.atlassian.connect.play.java.Constants.*;
-import static com.atlassian.connect.play.java.util.Utils.LOGGER;
 import static com.atlassian.fugue.Option.none;
 import static com.atlassian.fugue.Option.some;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static java.lang.String.format;
 
 
 public final class AC
@@ -51,17 +46,6 @@ public final class AC
                 || Boolean.getBoolean(AC_DEV);
     }
 
-    @Deprecated
-    public static Option<String> getUser()
-    {
-        return Option.option((String) getHttpContext().args.get(AC_USER_ID_PARAM));
-    }
-
-    public static void setUser(String user)
-    {
-        getHttpContext().args.put(AC_USER_ID_PARAM, user);
-    }
-
     public static Optional<String> getUserAccountId()
     {
         return Optional.ofNullable((String) getHttpContext().args.get(AC_USER_ACCOUNT_ID_PARAM));
@@ -70,47 +54,6 @@ public final class AC
     public static void setUserAccountId(String accountId)
     {
         getHttpContext().args.put(AC_USER_ACCOUNT_ID_PARAM, accountId);
-    }
-
-
-    public static WSRequestHolder url(String url)
-    {
-        return url(url, checkNotNull(getAcHost(), "No AcHost found in HttpContext"));
-    }
-
-    public static WSRequestHolder url(String url, AcHost acHost)
-    {
-        return url(url, acHost, true);
-    }
-
-    public static WSRequestHolder url(String url, AcHost acHost, boolean signRequest)
-    {
-        return url(url, acHost, getUser(), signRequest);
-    }
-
-    public static WSRequestHolder url(String url, AcHost acHost, Option<String> userId)
-    {
-        return url(url, acHost, userId, true);
-    }
-
-    public static WSRequestHolder url(String url, AcHost acHost, Option<String> userId, boolean signRequest)
-    {
-        checkNotNull(url, "Url must be non-null");
-        checkNotNull(acHost, "acHost must be non-null");
-
-        final String absoluteUrl = getAbsoluteUrl(url, acHost);
-
-        LOGGER.debug(format("Creating request to '%s'", absoluteUrl));
-
-        final WSRequestHolder request = WS.url(absoluteUrl)
-                .setTimeout(DEFAULT_TIMEOUT.intValue());
-
-        if (signRequest) {
-            request.setFollowRedirects(false) // because we need to sign again in those cases.
-            .sign(new JwtSignatureCalculator(jwtAuthorisationGenerator, acHost, userId));
-        }
-
-        return request;
     }
 
     private static String getAbsoluteUrl(String url, AcHost acHost) {
@@ -157,7 +100,7 @@ public final class AC
 
     public static void refreshToken(boolean allowInsecurePolling)
     {
-        final Token token = new Token(AC.getAcHost().getKey(), AC.getUser(), AC.getUserAccountId(), System.currentTimeMillis(), allowInsecurePolling);
+        final Token token = new Token(AC.getAcHost().getKey(), AC.getUserAccountId(), System.currentTimeMillis(), allowInsecurePolling);
 
         final String jsonToken = Base64.encodeBase64String(token.toJson().toString().getBytes());
         final String encryptedToken = Crypto.encryptAES(jsonToken);
